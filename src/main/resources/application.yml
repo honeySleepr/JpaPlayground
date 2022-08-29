@@ -1,11 +1,27 @@
 spring:
   datasource:
-    #MODE=MySQL;IGNORECASE=TRUE
+    # MODE=MySQL;IGNORECASE=TRUE 설정 필요한가?
     url: jdbc:h2:mem:mydb
     username: sa
     password:
     driverClassName: org.h2.Driver
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+
   h2:
     console.enabled: true
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+
+    hibernate:
+      ddl-auto: create
+
+    properties:
+      hibernate:
+        format_sql: true
+
+    defer-datasource-initialization: true
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql: trace
