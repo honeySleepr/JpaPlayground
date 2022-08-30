@@ -1,10 +1,9 @@
 package com.jpaplayground.product.dto;
 
 import com.jpaplayground.product.Product;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class ProductAddRequest {
 
 	private String name;
