@@ -2,59 +2,53 @@ package com.jpaplayground.product;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import com.jpaplayground.product.dto.ProductAddRequest;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-// TODO : 서비스 레이어에서 `단위 테스트`와 `통합 테스트`를 각각 진행하는건 이상한건가?
-@SpringBootTest
-@Transactional
-@ActiveProfiles("bc")
-class ProductServiceIntegrationTest {
+@ExtendWith(MockitoExtension.class)
+class ProductServiceUnitTest {
 
-	final ProductService service;
+	@InjectMocks
+	ProductService service;
 
-	final ProductRepository repository;
+	@Mock
+	ProductRepository repository;
 
 	final List<Product> products;
 
-	@Autowired
-	public ProductServiceIntegrationTest(ProductService service, ProductRepository repository) {
-		this.service = service;
-		this.repository = repository;
+	public ProductServiceUnitTest() {
 		this.products = List.of(
 			Product.of("한무무", 149_000),
 			Product.of("4K 모니터", 500_000),
 			Product.of("연어회 500g", 15_000)
 		);
-
 	}
 
 	@Test
-	@DisplayName("제품 등록 요청을 받으면 db에 제품이 저장된다")
+	@DisplayName("제품을 등록하면 db에 제품이 저장된다")
 	void add() {
-
+		/* Todo : 이게 테스트 제대로 된거 맞는지..?*/
 		// given
 		ProductAddRequest request = new ProductAddRequest("한무무", 149_000);
-		int initialSize = repository.findAll().size();
+		when(repository.save(any(Product.class))).thenReturn(request.toEntity());
 
 		// when
 		Product savedProduct = service.add(request);
 
 		// then
-		Product foundProduct = repository.findById(savedProduct.getId()).orElseThrow();
 		assertAll(
-			() -> assertThat(foundProduct).usingRecursiveComparison()
-				.ignoringFields("id").isEqualTo(request),
-			() -> assertThat(repository.findAll()).hasSize(initialSize + 1)
+			() -> assertThat(savedProduct).usingRecursiveComparison()
+				.ignoringFields("id").isEqualTo(request)
 		);
-
 	}
 
 	@Test
@@ -64,9 +58,7 @@ class ProductServiceIntegrationTest {
 		 * 테스트 시에 직접 데이터를 넣은 뒤 확인하는게 더 제대로 된 테스트 같아서 그렇게 하였다.
 		 * 그래서 sql.init.mode=never 로 해놨는데, testdata.sql는 그럼 필요가 없는건가..? */
 		// given
-		repository.save(products.get(0));
-		repository.save(products.get(1));
-		repository.save(products.get(2));
+		when(repository.findAll()).thenReturn(products);
 
 		// when
 		List<Product> foundProducts = service.findAll();
