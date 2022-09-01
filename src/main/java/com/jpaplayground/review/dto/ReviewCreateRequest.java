@@ -2,9 +2,11 @@ package com.jpaplayground.review.dto;
 
 import com.jpaplayground.product.Product;
 import com.jpaplayground.review.Review;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class ReviewCreateRequest {
 
 	private Long productId;

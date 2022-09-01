@@ -23,6 +23,6 @@ public class ReviewController {
 
 	@PostMapping("/reviews")
 	public ResponseEntity<Review> add(@RequestBody ReviewCreateRequest request) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(service.add(request));
+		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(request));
 	}
 }
