@@ -1,6 +1,6 @@
 package com.jpaplayground.product;
 
-import com.jpaplayground.product.dto.ProductAddRequest;
+import com.jpaplayground.product.dto.ProductCreateRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,7 @@ public class ProductController {
 	}
 
 	@PostMapping("/products")
-	public ResponseEntity<Product> add(@RequestBody ProductAddRequest request) { // Todo : validation
+	public ResponseEntity<Product> add(@RequestBody ProductCreateRequest request) { // Todo : validation
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.add(request));
 	}
 

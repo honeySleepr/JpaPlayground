@@ -4,7 +4,7 @@ import com.jpaplayground.product.Product;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class ProductAddRequest {
+public class ProductCreateRequest {
 
 	private String name;
 	private Integer price;

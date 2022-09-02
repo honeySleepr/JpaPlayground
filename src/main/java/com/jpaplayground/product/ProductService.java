@@ -1,6 +1,6 @@
 package com.jpaplayground.product;
 
-import com.jpaplayground.product.dto.ProductAddRequest;
+import com.jpaplayground.product.dto.ProductCreateRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,8 +15,8 @@ public class ProductService {
 		return repository.findAll();
 	}
 
-	public Product add(ProductAddRequest request) {
-		// TODO : dto에 대해서 서비스단에서도 다시 validation(컨트롤러에 대한 의존성을 가지지 않도록 하고, Unit 테스트 시에도 필요할듯)
+	public Product add(ProductCreateRequest request) {
+		// TODO : 입력 validation을 서비스단에서만 해도 괜찮지 않을까..?
 		return repository.save(request.toEntity());
 	}
 }
