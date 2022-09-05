@@ -35,7 +35,7 @@ class ProductServiceUnitTest {
 
 	@Test
 	@DisplayName("제품을 등록하면 db에 제품이 저장된다")
-	void add() {
+	void save() {
 		/* Todo : 이게 테스트 제대로 된거 맞는지..?*/
 		// given
 		ProductCreateRequest request = new ProductCreateRequest("한무무", 149_000);
@@ -46,8 +46,8 @@ class ProductServiceUnitTest {
 
 		// then
 		assertAll(
-			() -> assertThat(savedProduct).usingRecursiveComparison()
-				.ignoringFields("id").isEqualTo(request)
+			() -> assertThat(savedProduct.getName()).isEqualTo(request.getName()),
+			() -> assertThat(savedProduct.getPrice()).isEqualTo(request.getPrice())
 		);
 	}
 

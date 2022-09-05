@@ -41,8 +41,8 @@ class ReviewServiceUnitTest {
 		Review savedReview = service.save(request);
 
 		// then
-		assertThat(savedReview).usingRecursiveComparison().ignoringFields("id", "product")
-			.isEqualTo(request);
+		assertThat(savedReview.getContent()).isEqualTo(request.getContent());
+
 	}
 
 	/* TODO: 이게 과연 맞는가.. repository와 종속적인 테스트는 단위테스트를 하는게 의미가 없는 것 같아서 일단 통합테스트로 다시 후퇴 */
