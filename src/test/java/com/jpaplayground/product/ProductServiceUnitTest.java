@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.jpaplayground.TestData;
 import com.jpaplayground.product.dto.ProductCreateRequest;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+/**
+ * 로직이 별거 없는 메서드들은 그저 repository의 메서드를 호출하는지 여부 밖에 테스트가 안된다<br> 그러므로 굳이 모든 메서드에 대한 테스트를 만들 필요 없이, 검증이 필요한 로직이 포함된 메서드만
+ * 테스트하면 될 것 같다
+ */
 @ExtendWith(MockitoExtension.class)
 class ProductServiceUnitTest {
 
@@ -23,20 +28,11 @@ class ProductServiceUnitTest {
 	@Mock
 	ProductRepository repository;
 
-	final List<Product> products;
-
-	public ProductServiceUnitTest() {
-		this.products = List.of(
-			Product.of("한무무", 149_000),
-			Product.of("4K 모니터", 500_000),
-			Product.of("연어회 500g", 15_000)
-		);
-	}
-
+	/*  */
 	@Test
 	@DisplayName("제품을 등록하면 db에 제품이 저장된다")
 	void save() {
-		/* Todo : 이게 테스트 제대로 된거 맞는지..?*/
+
 		// given
 		ProductCreateRequest request = new ProductCreateRequest("한무무", 149_000);
 		when(repository.save(any(Product.class))).thenReturn(request.toEntity());
@@ -54,11 +50,8 @@ class ProductServiceUnitTest {
 	@Test
 	@DisplayName("전체 제품 조회 시 제품 목록을 반환한다")
 	void findAll() {
-		/* testdata.sql에 저장된 값을 그대로 findAll 해서 개수가 일치하는지 검사하는 것 보단
-		 * 테스트 시에 직접 데이터를 넣은 뒤 확인하는게 더 제대로 된 테스트 같아서 그렇게 하였다.
-		 * 그래서 sql.init.mode=never 로 해놨는데, testdata.sql는 그럼 필요가 없는건가..? */
 		// given
-		when(repository.findAll()).thenReturn(products);
+		when(repository.findAll()).thenReturn(TestData.products);
 
 		// when
 		List<Product> foundProducts = service.findAll();
@@ -67,7 +60,7 @@ class ProductServiceUnitTest {
 		/* foundProducts.get(i)가  products.get(i)와 일치하는지 검사 */
 		foundProducts.forEach(foundProduct -> assertThat(foundProduct)
 			.usingRecursiveComparison()
-			.isEqualTo(products.get(foundProducts.indexOf(foundProduct))));
+			.isEqualTo(TestData.products.get(foundProducts.indexOf(foundProduct))));
 	}
 
 }

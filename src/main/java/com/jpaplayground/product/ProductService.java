@@ -12,6 +12,7 @@ public class ProductService {
 
 	private final ProductRepository repository;
 
+	/* TODO: findAll() 대신 페이징 처리된 조회 메서드 만들기 */
 	@Transactional(readOnly = true)
 	public List<Product> findAll() {
 		return repository.findAll();
@@ -26,7 +27,7 @@ public class ProductService {
 	@Transactional
 	public Product delete(Long id) {
 		Product product = repository.findById(id).orElseThrow();
-		product.delete();
+		product.delete(true);
 		return product;
 	}
 }

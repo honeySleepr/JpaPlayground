@@ -1,15 +1,17 @@
 package com.jpaplayground.common;
 
 import javax.persistence.MappedSuperclass;
-import lombok.Getter;
 
-@Getter
 @MappedSuperclass
 public abstract class BaseEntity {
 
-	protected boolean deleted = false;
+	protected Boolean deleted = false;
 
-	public void delete() {
-		this.deleted = true;
+	public void delete(Boolean deleted) {
+		this.deleted = deleted;
+	}
+
+	public Boolean isDeleted() {
+		return deleted;
 	}
 }
