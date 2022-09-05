@@ -1,21 +1,15 @@
 package com.jpaplayground.conversation.dto;
 
-import com.jpaplayground.conversation.Conversation;
-import com.jpaplayground.product.Product;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class ConversationCreateRequest {
 
 	private Long productId;
 	private String content;
 
-	public Conversation toEntity(Product product) {
-		return Conversation.builder()
-			.content(content)
-			.product(product)
-			.build();
-	}
 }

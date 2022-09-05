@@ -8,12 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductService {
 
 	private final ProductRepository repository;
 
 	/* TODO: findAll() 대신 페이징 처리된 조회 메서드 만들기 */
-	@Transactional(readOnly = true)
 	public List<Product> findAll() {
 		return repository.findAll();
 	}

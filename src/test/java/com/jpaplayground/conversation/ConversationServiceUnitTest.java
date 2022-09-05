@@ -36,7 +36,8 @@ class ConversationServiceUnitTest {
 		Long productId = 7L;
 		ConversationCreateRequest request = new ConversationCreateRequest(productId, "리뷰를 달자");
 		Product product = Product.of("제품", 10_000);
-		Conversation conversation = request.toEntity(product);
+
+		Conversation conversation = Conversation.of(request.getContent(), product);
 		when(productRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(product));
 		when(conversationRepository.save(any(Conversation.class))).thenReturn(conversation);
 
@@ -55,7 +56,7 @@ class ConversationServiceUnitTest {
 		Long productId = 7L;
 		ConversationCreateRequest request = new ConversationCreateRequest(productId, "리뷰를 달자");
 		Product product = Product.of("제품", 10_000);
-		Conversation conversation = request.toEntity(product);
+		Conversation conversation = Conversation.of(request.getContent(), product);
 		when(productRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(product));
 		when(conversationRepository.save(any(Conversation.class))).thenReturn(conversation);
 
