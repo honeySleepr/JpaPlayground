@@ -32,7 +32,7 @@ public class ProductRepositoryTest {
 		// given
 		Long id = 1L;
 		Product product = productRepository.findById(id).orElseThrow();
-		boolean originalState = product.isDeleted();
+		boolean originalState = product.getDeleted();
 
 		// when
 		product.delete(true);
@@ -43,7 +43,7 @@ public class ProductRepositoryTest {
 		Product foundProduct = productRepository.findById(id).orElseThrow();
 
 		assertThat(originalState).isFalse();
-		assertThat(foundProduct.isDeleted()).isTrue();
+		assertThat(foundProduct.getDeleted()).isTrue();
 	}
 
 	// TODO: 제품 조회(페이징) 시 delete=true 처리된 product는 조회되지 않는다

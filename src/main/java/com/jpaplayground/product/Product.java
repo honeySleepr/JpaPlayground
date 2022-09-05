@@ -1,6 +1,5 @@
 package com.jpaplayground.product;
 
-import com.jpaplayground.common.BaseEntity;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -11,20 +10,22 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Entity
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Product extends BaseEntity {
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+public class Product {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String name;
 	private Integer price;
+	private Boolean deleted;
 
-	@Builder /* 필드의 위치가 바뀌어도 정적 팩토리 메서드의 인자 순서를 바꿔줄 필요가 없다 */
+	@Builder /* 생성자 인자의 순서가 바뀌어도 정적 팩토리 메서드의 인자 순서를 바꿔줄 필요가 없다 */
 	private Product(String name, Integer price) {
 		this.name = name;
 		this.price = price;
+		this.deleted = false;
 	}
 
 	public static Product of(String name, Integer price) {
@@ -32,5 +33,9 @@ public class Product extends BaseEntity {
 			.name(name)
 			.price(price)
 			.build();
+	}
+
+	public void delete(Boolean deleted) {
+		this.deleted = deleted;
 	}
 }
