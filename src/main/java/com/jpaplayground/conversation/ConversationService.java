@@ -1,8 +1,8 @@
-package com.jpaplayground.review;
+package com.jpaplayground.conversation;
 
+import com.jpaplayground.conversation.dto.ConversationCreateRequest;
 import com.jpaplayground.product.Product;
 import com.jpaplayground.product.ProductRepository;
-import com.jpaplayground.review.dto.ReviewCreateRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,19 +11,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ReviewService {
+public class ConversationService {
 
-	private final ReviewRepository reviewRepository;
+	private final ConversationRepository conversationRepository;
 	private final ProductRepository productRepository;
 
 	@Transactional
-	public Review save(ReviewCreateRequest request) {
+	public Conversation save(ConversationCreateRequest request) {
 		Product product = productRepository.findById(request.getProductId())
 			.orElseThrow();// Todo : ProductNotFoundException
-		return reviewRepository.save(request.toEntity(product));
+		return conversationRepository.save(request.toEntity(product));
 	}
 
-	public List<Review> findAll() {
-		return reviewRepository.findAll();
+	/* TODO: paging 적용된 조회 메서드로 바꿀것*/
+	public List<Conversation> findAll() {
+		return conversationRepository.findAll();
 	}
 }

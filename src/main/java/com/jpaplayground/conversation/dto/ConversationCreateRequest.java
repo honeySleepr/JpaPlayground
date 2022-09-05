@@ -1,19 +1,19 @@
-package com.jpaplayground.review.dto;
+package com.jpaplayground.conversation.dto;
 
+import com.jpaplayground.conversation.Conversation;
 import com.jpaplayground.product.Product;
-import com.jpaplayground.review.Review;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ReviewCreateRequest {
+public class ConversationCreateRequest {
 
 	private Long productId;
 	private String content;
 
-	public Review toEntity(Product product) {
-		return Review.builder()
+	public Conversation toEntity(Product product) {
+		return Conversation.builder()
 			.content(content)
 			.product(product)
 			.build();

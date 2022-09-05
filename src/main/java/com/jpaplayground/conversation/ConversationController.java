@@ -1,6 +1,6 @@
-package com.jpaplayground.review;
+package com.jpaplayground.conversation;
 
-import com.jpaplayground.review.dto.ReviewCreateRequest;
+import com.jpaplayground.conversation.dto.ConversationCreateRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,17 +12,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class ReviewController {
+public class ConversationController {
 
-	private final ReviewService service;
+	private final ConversationService service;
 
-	@GetMapping("/reviews")
-	public ResponseEntity<List<Review>> findAll() {
+	@GetMapping("/conversation")
+	public ResponseEntity<List<Conversation>> findAll() {
 		return ResponseEntity.ok(service.findAll());
 	}
 
-	@PostMapping("/reviews")
-	public ResponseEntity<Review> add(@RequestBody ReviewCreateRequest request) {
+	@PostMapping("/conversations")
+	public ResponseEntity<Conversation> add(@RequestBody ConversationCreateRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(request));
 	}
 }

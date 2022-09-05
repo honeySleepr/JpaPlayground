@@ -1,5 +1,6 @@
-package com.jpaplayground.review;
+package com.jpaplayground.conversation;
 
+import com.jpaplayground.common.BaseEntity;
 import com.jpaplayground.product.Product;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -16,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @Entity
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Review {
+public class Conversation extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,13 +30,13 @@ public class Review {
 	private Product product;
 
 	@Builder
-	private Review(String content, Product product) {
+	private Conversation(String content, Product product) {
 		this.content = content;
 		this.product = product;
 	}
 
-	public static Review of(String content, Product product) {
-		return Review.builder()
+	public static Conversation of(String content, Product product) {
+		return Conversation.builder()
 			.content(content)
 			.product(product)
 			.build();

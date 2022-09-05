@@ -1,11 +1,11 @@
-package com.jpaplayground.review;
+package com.jpaplayground.conversation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.jpaplayground.conversation.dto.ConversationCreateRequest;
 import com.jpaplayground.product.Product;
 import com.jpaplayground.product.ProductRepository;
-import com.jpaplayground.review.dto.ReviewCreateRequest;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,12 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-public class ReviewServiceIntegrationTest {
+public class ConversationServiceIntegrationTest {
 
 	@Autowired
-	ReviewService service;
+	ConversationService service;
 	@Autowired
-	ReviewRepository reviewRepository;
+	ConversationRepository conversationRepository;
 	@Autowired
 	ProductRepository productRepository;
 	@Autowired
@@ -27,7 +27,7 @@ public class ReviewServiceIntegrationTest {
 
 	@AfterEach
 	void teardown() {
-		reviewRepository.deleteAll();
+		conversationRepository.deleteAll();
 		productRepository.deleteAll();
 	}
 
@@ -37,18 +37,18 @@ public class ReviewServiceIntegrationTest {
 		// given
 		Product product = Product.of("한무무", 149_000);
 		Product savedProduct = productRepository.save(product);
-		int initialSize = reviewRepository.findAll().size();
-		ReviewCreateRequest request = new ReviewCreateRequest(savedProduct.getId(), "리뷰를 추가한다");
+		int initialSize = conversationRepository.findAll().size();
+		ConversationCreateRequest request = new ConversationCreateRequest(savedProduct.getId(), "리뷰를 추가한다");
 		entityManager.clear(); /* 1차 캐시의 영향을 배제하는게 좋을 것 같아서 */
 
 		// when
-		Review savedReview = service.save(request);
+		Conversation savedConversation = service.save(request);
 		// then
-		Review foundReview = reviewRepository.findById(savedReview.getId()).get();
+		Conversation foundConversation = conversationRepository.findById(savedConversation.getId()).get();
 
 		assertAll(
-			() -> assertThat(foundReview).usingRecursiveComparison().isEqualTo(savedReview),
-			() -> assertThat(reviewRepository.findAll()).hasSize(initialSize + 1)
+			() -> assertThat(foundConversation).usingRecursiveComparison().isEqualTo(savedConversation),
+			() -> assertThat(conversationRepository.findAll()).hasSize(initialSize + 1)
 		);
 	}
 
