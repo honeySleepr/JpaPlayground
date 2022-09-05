@@ -2,7 +2,9 @@ package com.jpaplayground.product.dto;
 
 import com.jpaplayground.product.Product;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
 public class ProductCreateRequest {
 
