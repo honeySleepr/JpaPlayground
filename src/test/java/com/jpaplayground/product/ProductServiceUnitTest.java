@@ -5,9 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.jpaplayground.TestData;
 import com.jpaplayground.product.dto.ProductCreateRequest;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,29 +36,13 @@ class ProductServiceUnitTest {
 		when(repository.save(any(Product.class))).thenReturn(request.toEntity());
 
 		// when
-		Product savedProduct = service.add(request);
+		Product savedProduct = service.save(request);
 
 		// then
 		assertAll(
 			() -> assertThat(savedProduct.getName()).isEqualTo(request.getName()),
 			() -> assertThat(savedProduct.getPrice()).isEqualTo(request.getPrice())
 		);
-	}
-
-	@Test
-	@DisplayName("전체 제품 조회 시 제품 목록을 반환한다")
-	void findAll() {
-		// given
-		when(repository.findAll()).thenReturn(TestData.products);
-
-		// when
-		List<Product> foundProducts = service.findAll();
-
-		// then
-		/* foundProducts.get(i)가  products.get(i)와 일치하는지 검사 */
-		foundProducts.forEach(foundProduct -> assertThat(foundProduct)
-			.usingRecursiveComparison()
-			.isEqualTo(TestData.products.get(foundProducts.indexOf(foundProduct))));
 	}
 
 }
