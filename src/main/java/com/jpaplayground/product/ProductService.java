@@ -1,6 +1,7 @@
 package com.jpaplayground.product;
 
 import com.jpaplayground.product.dto.ProductCreateRequest;
+import com.jpaplayground.product.dto.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -15,8 +16,8 @@ public class ProductService {
 	private final ProductRepository repository;
 
 	/* TODO: findAll() 대신 페이징 처리된 조회 메서드 만들기 */
-	public Slice<Product> findAll(Pageable pageable) {
-		return repository.findProductsBy(pageable);
+	public Slice<ProductResponse> findAll(Pageable pageable) {
+		return repository.findProductsBy(pageable).map(ProductResponse::new);
 	}
 
 	@Transactional

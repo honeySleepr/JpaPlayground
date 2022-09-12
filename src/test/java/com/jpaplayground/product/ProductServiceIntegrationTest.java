@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.jpaplayground.product.dto.ProductCreateRequest;
+import com.jpaplayground.product.dto.ProductResponse;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -67,10 +68,10 @@ class ProductServiceIntegrationTest {
 		PageRequest pageRequest = PageRequest.of(page, size);
 
 		//when
-		Slice<Product> slice = service.findAll(pageRequest);
+		Slice<ProductResponse> slice = service.findAll(pageRequest);
 
 		// then
-		List<Product> content = slice.getContent();
+		List<ProductResponse> content = slice.getContent();
 		int offset = page * size;
 
 		assertThat(content.size()).isEqualTo(size);
