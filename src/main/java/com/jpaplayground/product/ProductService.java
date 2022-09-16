@@ -15,9 +15,9 @@ public class ProductService {
 
 	private final ProductRepository repository;
 
-	/* TODO: findAll() 대신 페이징 처리된 조회 메서드 만들기 */
+
 	public Slice<ProductResponse> findAll(Pageable pageable) {
-		return repository.findProductsBy(pageable).map(ProductResponse::new);
+		return repository.findProductsByDeletedFalse(pageable).map(ProductResponse::new);
 	}
 
 	@Transactional
@@ -29,7 +29,7 @@ public class ProductService {
 	@Transactional
 	public Product delete(Long id) {
 		Product product = repository.findById(id).orElseThrow();
-		product.delete(true);
+		product.delete();
 		return product;
 	}
 }

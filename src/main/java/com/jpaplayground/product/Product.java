@@ -35,7 +35,8 @@ public class Product {
 			.build();
 	}
 
-	public void delete(Boolean deleted) {
-		this.deleted = deleted;
+	public void delete() {
+		this.deleted = true;
 	}
+
 }
