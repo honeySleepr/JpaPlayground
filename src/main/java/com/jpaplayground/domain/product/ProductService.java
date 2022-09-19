@@ -2,6 +2,8 @@ package com.jpaplayground.domain.product;
 
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
+import com.jpaplayground.global.exception.BusinessException;
+import com.jpaplayground.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -28,7 +30,7 @@ public class ProductService {
 
 	@Transactional
 	public Product delete(Long id) {
-		Product product = repository.findById(id).orElseThrow();
+		Product product = repository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
 		product.delete();
 		return product;
 	}

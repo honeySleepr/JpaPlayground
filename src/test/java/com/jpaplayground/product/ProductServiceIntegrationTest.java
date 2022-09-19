@@ -1,6 +1,7 @@
 package com.jpaplayground.product;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.jpaplayground.domain.product.Product;
@@ -8,6 +9,9 @@ import com.jpaplayground.domain.product.ProductRepository;
 import com.jpaplayground.domain.product.ProductService;
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
+import com.jpaplayground.global.exception.BusinessException;
+import com.jpaplayground.global.exception.ErrorCode;
+import java.rmi.NoSuchObjectException;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,6 +28,8 @@ import org.springframework.data.domain.Slice;
  */
 @SpringBootTest
 class ProductServiceIntegrationTest {
+
+	private static final String ERRORCODE = "errorCode";
 
 	@Autowired
 	ProductService productService;
@@ -52,7 +58,7 @@ class ProductServiceIntegrationTest {
 		Product savedProduct = productService.save(request);
 
 		// then
-		Product foundProduct = productRepository.findById(savedProduct.getId()).orElseThrow();
+		Product foundProduct = productRepository.findById(savedProduct.getId()).get();
 		assertAll(
 			() -> assertThat(foundProduct).usingRecursiveComparison()
 				.isEqualTo(savedProduct),
@@ -108,6 +114,21 @@ class ProductServiceIntegrationTest {
 			// then
 			assertThat(slice.getNumberOfElements()).isEqualTo(size - 1);
 		}
+
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 product를 삭제하려고 하면 예외가 발생한다")
+	void delete_error() {
+		// given
+		List<Product> products = productRepository.findAll();
+		Long id = products.size() + 1L;
+
+		// when
+
+		// then
+		assertThatThrownBy(() -> productService.delete(id)).isInstanceOf(BusinessException.class)
+			.hasFieldOrPropertyWithValue(ERRORCODE, ErrorCode.INVALID_INPUT_VALUE);
 
 	}
 
