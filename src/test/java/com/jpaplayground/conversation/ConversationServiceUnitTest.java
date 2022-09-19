@@ -2,8 +2,10 @@ package com.jpaplayground.conversation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.refEq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 import com.jpaplayground.conversation.dto.ConversationCreateRequest;
 import com.jpaplayground.product.Product;
@@ -31,41 +33,24 @@ class ConversationServiceUnitTest {
 
 	@Test
 	@DisplayName("Conversation을 등록한다")
-	void add() {
+	void save() {
 		// given
 		Long productId = 7L;
-		ConversationCreateRequest request = new ConversationCreateRequest(productId, "리뷰를 달자");
+		ConversationCreateRequest request = new ConversationCreateRequest(productId, "대화를 시작하지");
 		Product product = Product.of("제품", 10_000);
 
 		Conversation conversation = Conversation.of(request.getContent(), product);
-		when(productRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(product));
-		when(conversationRepository.save(any(Conversation.class))).thenReturn(conversation);
+		given(productRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(product));
+		given(conversationRepository.save(any(Conversation.class))).willReturn(conversation);
 
 		// when
 		Conversation savedConversation = service.save(request);
 
 		// then
+		then(productRepository).should(times(1)).findById(request.getProductId());
+		then(conversationRepository).should(times(1)).save(refEq(conversation));
+
 		assertThat(savedConversation.getContent()).isEqualTo(request.getContent());
-
-	}
-
-	@Test
-	@DisplayName("Conversation을 등록한다 2")
-	void add_other_version() {
-		// given
-		Long productId = 7L;
-		ConversationCreateRequest request = new ConversationCreateRequest(productId, "리뷰를 달자");
-		Product product = Product.of("제품", 10_000);
-		Conversation conversation = Conversation.of(request.getContent(), product);
-		when(productRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(product));
-		when(conversationRepository.save(any(Conversation.class))).thenReturn(conversation);
-
-		// when
-		service.save(request);
-
-		// then
-		verify(productRepository).findById(any(Long.class));
-		verify(conversationRepository).save(any(Conversation.class));
 	}
 
 }

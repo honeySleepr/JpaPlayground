@@ -22,6 +22,7 @@ public class ProductController {
 
 	@GetMapping("/products")
 	public ResponseEntity<MySlice<ProductResponse>> findAll(Pageable pageable) {
+
 		return ResponseEntity.ok(new MySlice<>(service.findAll(pageable)));
 	}
 

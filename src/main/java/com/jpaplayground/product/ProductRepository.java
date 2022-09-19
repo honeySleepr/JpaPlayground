@@ -10,6 +10,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-	/* 그냥 @Query를 사용하는게 더 가독성 좋은가..? */
 	Slice<Product> findProductsByDeletedFalse(Pageable pageable);
 }

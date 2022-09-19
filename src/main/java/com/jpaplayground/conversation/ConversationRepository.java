@@ -10,5 +10,5 @@ public interface ConversationRepository extends JpaRepository<Conversation, Long
 	@EntityGraph(attributePaths = "product")
 	Optional<Conversation> findById(Long aLong);
 
-	Optional<List<Conversation>> findByProductId(Long productId);
+	List<Conversation> findByProductId(Long productId);
 }

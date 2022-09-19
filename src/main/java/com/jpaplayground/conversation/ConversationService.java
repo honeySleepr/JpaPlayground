@@ -1,7 +1,6 @@
 package com.jpaplayground.conversation;
 
 import com.jpaplayground.conversation.dto.ConversationCreateRequest;
-import com.jpaplayground.conversation.dto.ConversationDeleteRequest;
 import com.jpaplayground.product.Product;
 import com.jpaplayground.product.ProductRepository;
 import java.util.List;
@@ -28,11 +27,10 @@ public class ConversationService {
 	public List<Conversation> findAll() {
 		return conversationRepository.findAll();
 	}
+
 	@Transactional
-	public List<Conversation> delete(ConversationDeleteRequest request) {
-		/* TODO: Login User의 Usertype을 받아와야한다 */
-		//		List<Conversation> conversations = conversationRepository.findByProductId(request.productId).orElseThrow();
-		//		conversations.forEach(conversation-> conversation.changeVisibilityTo(userType.counterPart()));
+	public List<Conversation> delete(Long conversationId) {
+		/* TODO: Login Member의 id를 받아와야한다 */
 		return null;
 	}
 }

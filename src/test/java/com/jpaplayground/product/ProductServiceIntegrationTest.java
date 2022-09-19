@@ -23,9 +23,9 @@ import org.springframework.data.domain.Slice;
 class ProductServiceIntegrationTest {
 
 	@Autowired
-	ProductService service;
+	ProductService productService;
 	@Autowired
-	ProductRepository repository;
+	ProductRepository productRepository;
 
 	/**
 	 * 테스트에서 @Transactional을 쓰지 않기 위함 ->
@@ -34,7 +34,7 @@ class ProductServiceIntegrationTest {
 	 */
 	@AfterEach
 	void tearDown() {
-		repository.deleteAll();
+		productRepository.deleteAll();
 	}
 
 	@Test
@@ -43,22 +43,21 @@ class ProductServiceIntegrationTest {
 
 		// given
 		ProductCreateRequest request = new ProductCreateRequest("한무무", 149_000);
-		int initialSize = repository.findAll().size();
+		int initialSize = productRepository.findAll().size();
 
 		// when
-		Product savedProduct = service.save(request);
+		Product savedProduct = productService.save(request);
 
 		// then
-		Product foundProduct = repository.findById(savedProduct.getId()).orElseThrow();
+		Product foundProduct = productRepository.findById(savedProduct.getId()).orElseThrow();
 		assertAll(
 			() -> assertThat(foundProduct).usingRecursiveComparison()
 				.isEqualTo(savedProduct),
-			() -> assertThat(repository.findAll()).hasSize(initialSize + 1)
+			() -> assertThat(productRepository.findAll()).hasSize(initialSize + 1)
 		);
 
 	}
 
-	/* @DataJpaTest로 하는게 나을 것 같다 */
 	@Nested
 	@DisplayName("Product 조회 시")
 	class FindAll {
@@ -68,18 +67,18 @@ class ProductServiceIntegrationTest {
 		void findAll_paged() {
 			//given
 			for (int i = 1; i <= 20; i++) {
-				repository.save(Product.of(String.valueOf(i), 1000));
+				productRepository.save(Product.of(String.valueOf(i), 1000));
 			}
 			int page = 1;
 			int size = 3;
+			int offset = page * size;
 			PageRequest pageRequest = PageRequest.of(page, size);
 
 			//when
-			Slice<ProductResponse> slice = service.findAll(pageRequest);
+			Slice<ProductResponse> slice = productService.findAll(pageRequest);
 
 			// then
 			List<ProductResponse> content = slice.getContent();
-			int offset = page * size;
 
 			assertThat(content.size()).isEqualTo(size);
 			for (int i = 0; i < size; i++) {
@@ -91,18 +90,17 @@ class ProductServiceIntegrationTest {
 		@DisplayName("삭제된 제품은 조회되지 않는다")
 		void findAll_not_deleted() {
 			// given
-			repository.save(Product.of("1", 1000));
-			repository.save(Product.of("2", 1000));
-			repository.save(Product.of("3", 1000));
-			long id = 2L;
-			int size = repository.findAll().size();
+			Product product1 = Product.of("1", 1000);
+			product1.delete();
+			productRepository.save(product1);
+			productRepository.save(Product.of("2", 1000));
+			productRepository.save(Product.of("3", 1000));
+
+			int size = productRepository.findAll().size();
 			Pageable pageable = Pageable.ofSize(size);
-			Product product = repository.findById(id).get();
-			product.delete();
-			repository.save(product);
 
 			// when
-			Slice<Product> slice = repository.findProductsByDeletedFalse(pageable);
+			Slice<ProductResponse> slice = productService.findAll(pageable);
 
 			// then
 			assertThat(slice.getNumberOfElements()).isEqualTo(size - 1);
