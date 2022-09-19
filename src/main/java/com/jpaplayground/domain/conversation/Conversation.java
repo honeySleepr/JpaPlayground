@@ -1,6 +1,6 @@
-package com.jpaplayground.conversation;
+package com.jpaplayground.domain.conversation;
 
-import com.jpaplayground.product.Product;
+import com.jpaplayground.domain.product.Product;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;

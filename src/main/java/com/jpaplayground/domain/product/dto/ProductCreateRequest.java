@@ -1,6 +1,6 @@
-package com.jpaplayground.product.dto;
+package com.jpaplayground.domain.product.dto;
 
-import com.jpaplayground.product.Product;
+import com.jpaplayground.domain.product.Product;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

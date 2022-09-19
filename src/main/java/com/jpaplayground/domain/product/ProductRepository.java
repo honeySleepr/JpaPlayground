@@ -1,4 +1,4 @@
-package com.jpaplayground.product;
+package com.jpaplayground.domain.product;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;

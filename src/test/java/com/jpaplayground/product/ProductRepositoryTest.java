@@ -1,5 +1,6 @@
 package com.jpaplayground.product;
 
+import com.jpaplayground.domain.product.ProductRepository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;

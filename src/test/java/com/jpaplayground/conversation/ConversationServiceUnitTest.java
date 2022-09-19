@@ -7,9 +7,12 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
-import com.jpaplayground.conversation.dto.ConversationCreateRequest;
-import com.jpaplayground.product.Product;
-import com.jpaplayground.product.ProductRepository;
+import com.jpaplayground.domain.conversation.Conversation;
+import com.jpaplayground.domain.conversation.ConversationRepository;
+import com.jpaplayground.domain.conversation.ConversationService;
+import com.jpaplayground.domain.conversation.dto.ConversationCreateRequest;
+import com.jpaplayground.domain.product.Product;
+import com.jpaplayground.domain.product.ProductRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

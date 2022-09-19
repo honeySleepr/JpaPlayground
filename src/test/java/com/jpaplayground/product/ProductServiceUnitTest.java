@@ -5,7 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-import com.jpaplayground.product.dto.ProductCreateRequest;
+import com.jpaplayground.domain.product.Product;
+import com.jpaplayground.domain.product.ProductRepository;
+import com.jpaplayground.domain.product.ProductService;
+import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

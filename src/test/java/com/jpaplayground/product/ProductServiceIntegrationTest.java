@@ -3,8 +3,11 @@ package com.jpaplayground.product;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.jpaplayground.product.dto.ProductCreateRequest;
-import com.jpaplayground.product.dto.ProductResponse;
+import com.jpaplayground.domain.product.Product;
+import com.jpaplayground.domain.product.ProductRepository;
+import com.jpaplayground.domain.product.ProductService;
+import com.jpaplayground.domain.product.dto.ProductCreateRequest;
+import com.jpaplayground.domain.product.dto.ProductResponse;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -60,7 +63,7 @@ class ProductServiceIntegrationTest {
 
 	@Nested
 	@DisplayName("Product 조회 시")
-	class FindAll {
+	class FindAllTest {
 
 		@Test
 		@DisplayName("Paging이 적용된 제품 목록을 반환한다")

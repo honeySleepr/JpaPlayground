@@ -1,4 +1,4 @@
-package com.jpaplayground.conversation.dto;
+package com.jpaplayground.domain.conversation.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConversationCreateRequest {
+public class ConversationDeleteRequest {
 
-	private Long productId;
-	private String content;
+	public Long productId;
 
 }

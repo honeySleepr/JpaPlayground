@@ -1,4 +1,4 @@
-package com.jpaplayground.common;
+package com.jpaplayground.global;
 
 import java.util.List;
 import java.util.stream.Collectors;

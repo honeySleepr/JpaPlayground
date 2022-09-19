@@ -1,8 +1,8 @@
-package com.jpaplayground.conversation;
+package com.jpaplayground.domain.conversation;
 
-import com.jpaplayground.conversation.dto.ConversationCreateRequest;
-import com.jpaplayground.product.Product;
-import com.jpaplayground.product.ProductRepository;
+import com.jpaplayground.domain.conversation.dto.ConversationCreateRequest;
+import com.jpaplayground.domain.product.Product;
+import com.jpaplayground.domain.product.ProductRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

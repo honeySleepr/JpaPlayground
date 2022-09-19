@@ -1,4 +1,4 @@
-package com.jpaplayground.product;
+package com.jpaplayground.domain.product;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

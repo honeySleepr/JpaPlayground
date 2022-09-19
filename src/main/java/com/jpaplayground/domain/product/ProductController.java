@@ -1,8 +1,8 @@
-package com.jpaplayground.product;
+package com.jpaplayground.domain.product;
 
-import com.jpaplayground.common.MySlice;
-import com.jpaplayground.product.dto.ProductCreateRequest;
-import com.jpaplayground.product.dto.ProductResponse;
+import com.jpaplayground.domain.product.dto.ProductCreateRequest;
+import com.jpaplayground.domain.product.dto.ProductResponse;
+import com.jpaplayground.global.MySlice;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;

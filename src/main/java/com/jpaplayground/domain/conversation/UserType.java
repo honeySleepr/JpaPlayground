@@ -1,4 +1,4 @@
-package com.jpaplayground.conversation;
+package com.jpaplayground.domain.conversation;
 
 public enum UserType {
 	SELLER,

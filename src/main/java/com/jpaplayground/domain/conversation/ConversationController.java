@@ -1,6 +1,6 @@
-package com.jpaplayground.conversation;
+package com.jpaplayground.domain.conversation;
 
-import com.jpaplayground.conversation.dto.ConversationCreateRequest;
+import com.jpaplayground.domain.conversation.dto.ConversationCreateRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
