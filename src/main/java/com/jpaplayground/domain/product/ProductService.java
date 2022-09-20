@@ -24,13 +24,14 @@ public class ProductService {
 
 	@Transactional
 	public Product save(ProductCreateRequest request) {
-		// TODO : 입력 validation을 서비스단에서만 하는건 어떨까?
+		// TODO : 서비스단 validation
 		return repository.save(request.toEntity());
 	}
 
 	@Transactional
-	public Product delete(Long id) {
-		Product product = repository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
+	public Product delete(Long productId) {
+		Product product = repository.findById(productId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
 		product.delete();
 		return product;
 	}

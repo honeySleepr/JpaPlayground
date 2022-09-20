@@ -3,6 +3,7 @@ package com.jpaplayground.domain.product;
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
 import com.jpaplayground.global.MySlice;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,17 +23,16 @@ public class ProductController {
 
 	@GetMapping("/products")
 	public ResponseEntity<MySlice<ProductResponse>> findAll(Pageable pageable) {
-
 		return ResponseEntity.ok(new MySlice<>(service.findAll(pageable)));
 	}
 
 	@PostMapping("/products")
-	public ResponseEntity<Product> add(@RequestBody ProductCreateRequest request) { // Todo : validation
+	public ResponseEntity<Product> add(@Valid @RequestBody ProductCreateRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(request));
 	}
 
-	@DeleteMapping("/products/{id}")
-	public ResponseEntity<Product> delete(@PathVariable Long id) {
-		return ResponseEntity.ok(service.delete(id));
+	@DeleteMapping("/products/{productId}")
+	public ResponseEntity<Product> delete(@PathVariable Long productId) {
+		return ResponseEntity.ok(service.delete(productId));
 	}
 }

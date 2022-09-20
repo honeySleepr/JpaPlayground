@@ -2,6 +2,7 @@ package com.jpaplayground.domain.conversation;
 
 import com.jpaplayground.domain.conversation.dto.ConversationCreateRequest;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class ConversationController {
 	}
 
 	@PostMapping("/conversations")
-	public ResponseEntity<Conversation> add(@RequestBody ConversationCreateRequest request) {
+	public ResponseEntity<Conversation> add(@Valid @RequestBody ConversationCreateRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(request));
 	}
 
@@ -33,8 +34,8 @@ public class ConversationController {
 	 * @param conversationId
 	 * @return ProductId와 삭제된 전체 채팅 목록
 	 */
-	@DeleteMapping("/conversations/{id}")
-	public ResponseEntity<List<Conversation>> delete(@PathVariable(name = "id") Long conversationId) {
+	@DeleteMapping("/conversations/{conversationId}")
+	public ResponseEntity<List<Conversation>> delete(@PathVariable Long conversationId) {
 		return ResponseEntity.ok(service.delete(conversationId));
 	}
 
