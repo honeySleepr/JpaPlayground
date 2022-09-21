@@ -1,6 +1,6 @@
-package com.jpaplayground.conversation;
+package com.jpaplayground.domain.conversation;
 
-import com.jpaplayground.product.Product;
+import com.jpaplayground.domain.product.Product;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -35,7 +35,7 @@ public class Conversation {
 	private Conversation(String content, Product product) {
 		this.content = content;
 		this.product = product;
-		this.visibleTo = UserType.All;
+		this.visibleTo = UserType.ALL;
 	}
 
 	public static Conversation of(String content, Product product) {

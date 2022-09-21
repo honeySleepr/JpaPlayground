@@ -3,9 +3,12 @@ package com.jpaplayground.product;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
-import com.jpaplayground.product.dto.ProductCreateRequest;
+import com.jpaplayground.domain.product.Product;
+import com.jpaplayground.domain.product.ProductRepository;
+import com.jpaplayground.domain.product.ProductService;
+import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,14 +29,13 @@ class ProductServiceUnitTest {
 	@Mock
 	ProductRepository repository;
 
-	/*  */
 	@Test
 	@DisplayName("제품을 등록하면 db에 제품이 저장된다")
 	void save() {
 
 		// given
 		ProductCreateRequest request = new ProductCreateRequest("한무무", 149_000);
-		when(repository.save(any(Product.class))).thenReturn(request.toEntity());
+		given(repository.save(any(Product.class))).willReturn(request.toEntity());
 
 		// when
 		Product savedProduct = service.save(request);

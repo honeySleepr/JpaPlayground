@@ -3,9 +3,12 @@ package com.jpaplayground.conversation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import com.jpaplayground.conversation.dto.ConversationCreateRequest;
-import com.jpaplayground.product.Product;
-import com.jpaplayground.product.ProductRepository;
+import com.jpaplayground.domain.conversation.Conversation;
+import com.jpaplayground.domain.conversation.ConversationRepository;
+import com.jpaplayground.domain.conversation.ConversationService;
+import com.jpaplayground.domain.conversation.dto.ConversationCreateRequest;
+import com.jpaplayground.domain.product.Product;
+import com.jpaplayground.domain.product.ProductRepository;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,4 +1,4 @@
-package com.jpaplayground.common;
+package com.jpaplayground.global;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -8,12 +8,12 @@ import org.springframework.data.domain.Slice;
 @Getter
 public class MySlice<T> {
 
-	int size;
-	int page;
-	boolean last;
-	int numberOfElements;
-	List<String> sort;
-	List<T> data;
+	private int size;
+	private int page;
+	private boolean last;
+	private int numberOfElements;
+	private List<String> sort;
+	private List<T> data;
 
 	public MySlice(Slice<T> slice) {
 		this.size = slice.getSize();

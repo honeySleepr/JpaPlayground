@@ -1,4 +1,4 @@
-package com.jpaplayground.conversation.dto;
+package com.jpaplayground.domain.conversation.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

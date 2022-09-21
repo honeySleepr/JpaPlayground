@@ -1,9 +1,9 @@
-package com.jpaplayground.conversation;
+package com.jpaplayground.domain.conversation;
 
-import com.jpaplayground.conversation.dto.ConversationCreateRequest;
-import com.jpaplayground.conversation.dto.ConversationDeleteRequest;
-import com.jpaplayground.product.Product;
-import com.jpaplayground.product.ProductRepository;
+import com.jpaplayground.domain.conversation.dto.ConversationCreateRequest;
+import com.jpaplayground.domain.product.Product;
+import com.jpaplayground.domain.product.ProductRepository;
+import com.jpaplayground.domain.product.exception.ProductNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class ConversationService {
 	@Transactional
 	public Conversation save(ConversationCreateRequest request) {
 		Product product = productRepository.findById(request.getProductId())
-			.orElseThrow();// Todo : ProductNotFoundException
+			.orElseThrow(ProductNotFoundException::new);
 		return conversationRepository.save(Conversation.of(request.getContent(), product));
 	}
 
@@ -28,11 +28,10 @@ public class ConversationService {
 	public List<Conversation> findAll() {
 		return conversationRepository.findAll();
 	}
+
 	@Transactional
-	public List<Conversation> delete(ConversationDeleteRequest request) {
-		/* TODO: Login User의 Usertype을 받아와야한다 */
-		//		List<Conversation> conversations = conversationRepository.findByProductId(request.productId).orElseThrow();
-		//		conversations.forEach(conversation-> conversation.changeVisibilityTo(userType.counterPart()));
+	public List<Conversation> delete(Long conversationId) {
+		/* TODO: Login Member의 id를 받아와야한다 */
 		return null;
 	}
 }
