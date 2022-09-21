@@ -9,9 +9,7 @@ import com.jpaplayground.domain.product.ProductRepository;
 import com.jpaplayground.domain.product.ProductService;
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
-import com.jpaplayground.global.exception.BusinessException;
-import com.jpaplayground.global.exception.ErrorCode;
-import java.rmi.NoSuchObjectException;
+import com.jpaplayground.domain.product.exception.ProductNotFoundException;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -127,9 +125,7 @@ class ProductServiceIntegrationTest {
 		// when
 
 		// then
-		assertThatThrownBy(() -> productService.delete(id)).isInstanceOf(BusinessException.class)
-			.hasFieldOrPropertyWithValue(ERRORCODE, ErrorCode.INVALID_INPUT_VALUE);
-
+		assertThatThrownBy(() -> productService.delete(id)).isInstanceOf(ProductNotFoundException.class);
 	}
 
 }

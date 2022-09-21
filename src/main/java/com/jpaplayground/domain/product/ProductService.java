@@ -2,8 +2,7 @@ package com.jpaplayground.domain.product;
 
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
-import com.jpaplayground.global.exception.BusinessException;
-import com.jpaplayground.global.exception.ErrorCode;
+import com.jpaplayground.domain.product.exception.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -12,11 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional()
+@Transactional(readOnly = true)
 public class ProductService {
 
 	private final ProductRepository repository;
-
 
 	public Slice<ProductResponse> findAll(Pageable pageable) {
 		return repository.findProductsByDeletedFalse(pageable).map(ProductResponse::new);
@@ -31,7 +29,7 @@ public class ProductService {
 	@Transactional
 	public Product delete(Long productId) {
 		Product product = repository.findById(productId)
-			.orElseThrow(() -> new BusinessException(ErrorCode.PRODUCT_NOT_FOUND));
+			.orElseThrow(ProductNotFoundException::new);
 		product.delete();
 		return product;
 	}
