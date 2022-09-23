@@ -37,3 +37,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Other ###
+**/TestAnything.java
+**/oauth.yml
