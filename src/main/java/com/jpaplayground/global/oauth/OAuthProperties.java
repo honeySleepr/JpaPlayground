@@ -10,6 +10,7 @@ public class OAuthProperties {
 	private final String clientId;
 	private final String clientSecret;
 	private final String accessCodeRequestUrl;
+	private final String accessTokenRequestUrl;
 	private final String redirectUri;
 
 }

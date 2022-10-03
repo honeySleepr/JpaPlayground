@@ -29,9 +29,7 @@ public class LoginFilter implements Filter {
 
 		OAuthServer oAuthServer = OAuthServer.getOAuthServer(parseProvider(request));
 		log.debug("Login request to OAuth server : {}", oAuthServer.toString());
-		OAuthProperties properties = oAuthPropertyHandler.getProperties(oAuthServer)
-			.orElseThrow(
-				OAuthServerNotFoundException::new); /* TODO: Filter에서 발생한 에러는 ControllerAdvice에서 잡지 못한다. 그럼 어떡하지? */
+		OAuthProperties properties = oAuthPropertyHandler.getProperties(oAuthServer);
 
 		response.sendRedirect(properties.getAccessCodeRequestUrl());
 	}
