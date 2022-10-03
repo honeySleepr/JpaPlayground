@@ -1,8 +1,5 @@
 package com.jpaplayground.product;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.jpaplayground.TestData;
 import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.domain.product.ProductRepository;
@@ -11,6 +8,8 @@ import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
 import com.jpaplayground.domain.product.exception.ProductNotFoundException;
 import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -32,6 +31,7 @@ class ProductServiceIntegrationTest {
 	static List<Product> allProducts;
 	static List<Product> deletedProducts;
 	static List<Product> notDeletedProducts;
+
 	@Autowired
 	ProductService productService;
 	@Autowired
@@ -49,6 +49,14 @@ class ProductServiceIntegrationTest {
 	 * <a href="https://tecoble.techcourse.co.kr/post/2020-08-31-jpa-transaction-test/">테스트 코드에서 @Transactional
 	 * 주의하기</a>
 	 */
+
+	@Test /* TestData 가 repository의 데이터와 일치하는지도 검사를 해야할 것 같다. 그런데 이러면 배꼽이 더 커지는 것 같다.. */
+	@DisplayName("testdata.sql로 삽입된 데이터와 TestData를 이용해 만든 데이터가 일치하는지 테스트한다")
+	void testdata_integrity_test() {
+		List<Product> savedProducts = productRepository.findAll();
+		savedProducts.forEach(product -> assertThat(product).usingRecursiveComparison().ignoringFields("id")
+			.isEqualTo(allProducts.get(savedProducts.indexOf(product))));
+	}
 
 	@Test
 	@DisplayName("제품을 등록하면 제품이 저장된다")

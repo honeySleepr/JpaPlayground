@@ -1,23 +1,24 @@
 package com.jpaplayground.product;
 
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jpaplayground.domain.product.ProductController;
 import com.jpaplayground.domain.product.ProductService;
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
+import com.jpaplayground.global.oauth.OAuthPropertyHandler;
+import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * <a href="https://reflectoring.io/spring-boot-web-controller-test/">
@@ -29,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
  * <br><a href="https://github.com/honeySleepr/JpaPlayground/pull/5#issuecomment-1250048799">관련 PR 피드백</a>
  */
 @WebMvcTest(ProductController.class)
+@EnableConfigurationProperties(OAuthPropertyHandler.class)
 class ProductControllerTest {
 
 	@Autowired
