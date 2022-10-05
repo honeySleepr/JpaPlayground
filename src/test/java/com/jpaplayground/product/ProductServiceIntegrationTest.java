@@ -19,12 +19,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 /**
  * Service 단에서 통합테스트와 단위테스트를 둘다 하는건 의미가 없는 것 같아서 단위테스트만 해볼 예정이었으나, 단위 테스트로 뭘 어떻게 테스트해야하는지 모르겠어서 다시 통합테스트로 후퇴
  */
 @SpringBootTest
+@ActiveProfiles("test")
 @Sql(value = "classpath:testdata.sql") /* 통합테스트에서는 테스트용 DB data 사용*/
 class ProductServiceIntegrationTest {
 

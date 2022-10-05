@@ -23,22 +23,19 @@ import org.springframework.web.client.RestTemplate;
 public class GitHubService {
 
 	private static final Pattern serviceNamePattern = Pattern.compile("(.*)Service$");
-	private final OAuthPropertyHandler oAuthPropertyHandler;
 	private final RestTemplate restTemplate;
 	private final MemberRepository memberRepository;
-	private OAuthProperties oAuthProperties; /* TODO : 생성자에서 초기화 할 시, SpringBootTest를 돌리면 초기화가 안되는 문제 무엇? */
+	private final OAuthProperties oAuthProperties;
 
 	@Autowired
 	public GitHubService(OAuthPropertyHandler oAuthPropertyHandler, RestTemplate restTemplate,
 		MemberRepository memberRepository) {
-		this.oAuthPropertyHandler = oAuthPropertyHandler;
 		this.restTemplate = restTemplate;
 		this.memberRepository = memberRepository;
+		this.oAuthProperties = oAuthPropertyHandler.getProperties(getOAuthServer());
 	}
 
 	public Member login(String code) {
-		oAuthProperties = oAuthPropertyHandler.getProperties(getOAuthServer());
-
 		GitHubAccessToken accessToken = getAccessToken(code);
 		log.debug("github access token : {}", accessToken.getAccessToken());
 		OAuthUserInfo userInfo = getUserInfo(accessToken);

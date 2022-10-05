@@ -1,26 +1,27 @@
 package com.jpaplayground.product;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-
 import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.domain.product.ProductRepository;
 import com.jpaplayground.domain.product.ProductService;
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
 
 /**
  * 로직이 별거 없는 메서드들은 그저 repository의 메서드를 호출하는지 여부 밖에 테스트가 안된다<br> 그러므로 굳이 모든 메서드에 대한 테스트를 만들 필요 없이, 검증이 필요한 로직이 포함된 메서드만
  * 테스트하면 될 것 같다
  */
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
 class ProductServiceUnitTest {
 
 	@InjectMocks

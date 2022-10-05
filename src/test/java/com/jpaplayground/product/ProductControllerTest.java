@@ -15,6 +15,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <br><a href="https://github.com/honeySleepr/JpaPlayground/pull/5#issuecomment-1250048799">관련 PR 피드백</a>
  */
 @WebMvcTest(ProductController.class)
+@ActiveProfiles("test")
 @EnableConfigurationProperties(OAuthPropertyHandler.class)
 class ProductControllerTest {
 
