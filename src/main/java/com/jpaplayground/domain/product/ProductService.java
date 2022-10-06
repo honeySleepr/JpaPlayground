@@ -21,16 +21,16 @@ public class ProductService {
 	}
 
 	@Transactional
-	public Product save(ProductCreateRequest request) {
+	public ProductResponse save(ProductCreateRequest request) {
 		// TODO : 서비스단 validation
-		return repository.save(request.toEntity());
+		return new ProductResponse(repository.save(request.toEntity()));
 	}
 
 	@Transactional
-	public Product delete(Long productId) {
+	public ProductResponse delete(Long productId) {
 		Product product = repository.findById(productId)
 			.orElseThrow(ProductNotFoundException::new);
 		product.delete();
-		return product;
+		return new ProductResponse(product);
 	}
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jpaplayground.domain.product.ProductController;
 import com.jpaplayground.domain.product.ProductService;
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
+import com.jpaplayground.domain.product.dto.ProductResponse;
 import com.jpaplayground.global.oauth.OAuthPropertyHandler;
 import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.DisplayName;
@@ -50,7 +51,7 @@ class ProductControllerTest {
 		int price = 1000;
 		ProductCreateRequest request = new ProductCreateRequest(name, price);
 
-		given(service.save(any())).willReturn(request.toEntity());
+		given(service.save(any())).willReturn(new ProductResponse(request.toEntity()));
 
 		mockMvc.perform(post("/products")
 				.content(objectMapper.writeValueAsString(request))

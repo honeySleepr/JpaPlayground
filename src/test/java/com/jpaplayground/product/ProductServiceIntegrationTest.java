@@ -43,12 +43,11 @@ class ProductServiceIntegrationTest {
 		ProductCreateRequest request = new ProductCreateRequest("한무무", 149_000);
 
 		// when
-		Product savedProduct = productService.save(request);
+		ProductResponse savedProduct = productService.save(request);
 
 		// then
 		assertThat(savedProduct.getName()).isEqualTo(request.getName());
 		assertThat(savedProduct.getPrice()).isEqualTo(request.getPrice());
-		assertThat(savedProduct.getDeleted()).isFalse();
 	}
 
 	@Test
