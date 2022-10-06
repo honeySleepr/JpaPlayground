@@ -1,4 +1,4 @@
-package com.jpaplayground.global.oauth.dto;
+package com.jpaplayground.global.login.dto;
 
 import com.jpaplayground.global.member.Member;
 

@@ -1,7 +1,7 @@
-package com.jpaplayground.global.oauth;
+package com.jpaplayground.global.login;
 
-import com.jpaplayground.global.oauth.dto.OAuthAccessToken;
-import com.jpaplayground.global.oauth.dto.OAuthUserInfo;
+import com.jpaplayground.global.login.dto.OAuthAccessToken;
+import com.jpaplayground.global.login.dto.OAuthUserInfo;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

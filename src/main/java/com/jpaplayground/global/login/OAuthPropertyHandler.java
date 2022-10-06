@@ -1,4 +1,4 @@
-package com.jpaplayground.global.oauth;
+package com.jpaplayground.global.login;
 
 import java.util.Map;
 import lombok.Getter;

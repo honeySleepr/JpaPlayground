@@ -1,4 +1,4 @@
-package com.jpaplayground.global.oauth;
+package com.jpaplayground.global.login;
 
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.exception.NotFoundException;

@@ -1,7 +1,7 @@
-package com.jpaplayground.global.oauth.dto;
+package com.jpaplayground.global.login.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.jpaplayground.global.oauth.OAuthProperties;
+import com.jpaplayground.global.login.OAuthProperties;
 import lombok.Getter;
 
 @Getter

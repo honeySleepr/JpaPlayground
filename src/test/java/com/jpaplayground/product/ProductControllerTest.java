@@ -5,7 +5,7 @@ import com.jpaplayground.domain.product.ProductController;
 import com.jpaplayground.domain.product.ProductService;
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
-import com.jpaplayground.global.oauth.OAuthPropertyHandler;
+import com.jpaplayground.global.login.OAuthPropertyHandler;
 import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
