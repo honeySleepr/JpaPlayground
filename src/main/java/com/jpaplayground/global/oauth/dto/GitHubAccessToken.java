@@ -9,7 +9,7 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
-public class GitHubAccessToken {
+public class GitHubAccessToken implements OAuthAccessToken {
 
 	@JsonProperty(value = "access_token")
 	private String accessToken;
