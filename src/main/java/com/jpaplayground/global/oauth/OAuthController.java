@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class OAuthController {
 
 	/* TODO: OAuthService 인터페이스로 확장하기 */
-	private final GitHubService gitHubService;
+	private final GitHubOAuthService gitHubOAuthService;
 
 	@GetMapping("login/github/callback")
 	public void login(String code) {
 
 		log.debug("OAuth code received: {}", code);
 
-		Member member = gitHubService.login(code);
+		Member member = gitHubOAuthService.login(code);
 		/* Todo: JWT 토큰 생성, 로그인 사용자 검증(Interceptor), 캐싱(redis? encache?) */
 	}
 }

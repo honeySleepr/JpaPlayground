@@ -20,15 +20,15 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 @Slf4j
-public class GitHubService {
+public class GitHubOAuthService {
 
-	private static final Pattern serviceNamePattern = Pattern.compile("(.*)Service$");
+	private static final Pattern serviceNamePattern = Pattern.compile("(.*)OAuthService$");
 	private final RestTemplate restTemplate;
 	private final MemberRepository memberRepository;
 	private final OAuthProperties oAuthProperties;
 
 	@Autowired
-	public GitHubService(OAuthPropertyHandler oAuthPropertyHandler, RestTemplate restTemplate,
+	public GitHubOAuthService(OAuthPropertyHandler oAuthPropertyHandler, RestTemplate restTemplate,
 		MemberRepository memberRepository) {
 		this.restTemplate = restTemplate;
 		this.memberRepository = memberRepository;

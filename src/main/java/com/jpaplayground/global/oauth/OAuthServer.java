@@ -3,18 +3,12 @@ package com.jpaplayground.global.oauth;
 import java.util.Arrays;
 
 public enum OAuthServer {
-	GITHUB("github"),
-	KAKAO("kakao"),
-	NAVER("naver");
-
-	private final String name;
-
-	OAuthServer(String name) {
-		this.name = name;
-	}
+	GITHUB,
+	KAKAO,
+	NAVER;
 
 	private boolean hasName(String name) {
-		return this.name.equals(name);
+		return this.toString().toLowerCase().equals(name);
 	}
 
 	public static OAuthServer getOAuthServer(String server) {
