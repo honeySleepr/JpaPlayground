@@ -6,13 +6,13 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class GitHubUserInfo implements OAuthUserInfo {
+public class NaverUserInfo implements OAuthUserInfo {
 
-	@JsonProperty(value = "login")
+	@JsonProperty(value = "nickname")
 	private String account;
 	private String name;
 	private String email;
-	@JsonProperty(value = "avatar_url")
+	@JsonProperty(value = "profile_image")
 	private String profileImageUrl;
 
 }

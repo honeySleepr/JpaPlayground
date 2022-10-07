@@ -31,6 +31,7 @@ public class LoginController {
 		}
 		OAuthAccessToken accessToken = oAuthProvider.getAccessToken(code);
 		OAuthUserInfo userInfo = oAuthProvider.getUserInfo(accessToken);
+		log.debug("Login user info : {}", userInfo);
 
 		Member member = loginService.login(userInfo);
 		/* Todo: JWT 토큰 생성, 로그인 사용자 검증(Interceptor), 캐싱(redis? encache?) */

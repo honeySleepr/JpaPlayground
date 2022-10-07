@@ -10,7 +10,11 @@ public interface OAuthUserInfo {
 
 	String getEmail();
 
+	String getProfileImageUrl();
+
 	String toString();
 
-	Member toEntity();
+	default Member toEntity() {
+		return Member.of(getAccount(), getName(), getEmail(), getProfileImageUrl());
+	}
 }
