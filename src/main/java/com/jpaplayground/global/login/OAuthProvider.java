@@ -9,9 +9,16 @@ public interface OAuthProvider {
 
 	Pattern serviceNamePattern = Pattern.compile("(.*)OAuthProvider$");
 
+	OAuthAccessToken getAccessToken(String code);
+
 	OAuthUserInfo getUserInfo(OAuthAccessToken accessToken);
 
-	OAuthAccessToken getAccessToken(String code);
+	default boolean verifyState(String receivedState, String sentState) {
+		if (receivedState.equals(sentState)) {
+			return true;
+		}
+		return false;
+	}
 
 	default OAuthServer getOAuthServer() {
 		Matcher matcher = serviceNamePattern.matcher(this.getClass().getSimpleName());

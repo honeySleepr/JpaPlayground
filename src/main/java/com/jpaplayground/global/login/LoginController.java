@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,9 +21,14 @@ public class LoginController {
 	private final LoginService loginService;
 
 	@GetMapping("login/{server}/callback")
-	public void login(String code, @PathVariable String server) {
+	public void login(String code, @RequestParam("state") String receivedState, @PathVariable String server,
+		@SessionAttribute("state") String sentState) {
+
 		OAuthProvider oAuthProvider = oAuthProviderMap.get(server);
 
+		if (!oAuthProvider.verifyState(receivedState, sentState)) {
+			throw new OAuthFailedException();
+		}
 		OAuthAccessToken accessToken = oAuthProvider.getAccessToken(code);
 		OAuthUserInfo userInfo = oAuthProvider.getUserInfo(accessToken);
 
