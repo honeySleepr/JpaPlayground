@@ -15,7 +15,6 @@ public class LoginService {
 	private final MemberRepository memberRepository;
 
 	public Member login(OAuthUserInfo userInfo) {
-		log.debug("Login user info : {}", userInfo);
 		return memberRepository.save(userInfo.toEntity());
 	}
 }

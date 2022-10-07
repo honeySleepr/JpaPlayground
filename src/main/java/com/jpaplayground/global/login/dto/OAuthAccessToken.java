@@ -1,11 +1,18 @@
 package com.jpaplayground.global.login.dto;
 
-public interface OAuthAccessToken {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 
-	String getAccessToken();
+@Getter
+public class OAuthAccessToken {
 
-	String getScope();
+	@JsonProperty(value = "access_token")
+	private String accessToken;
+	@JsonProperty(value = "token_type")
+	private String tokenType;
 
-	String getTokenType();
+	public String getTokenHeader() {
+		return tokenType + " " + accessToken;
+	}
 
 }
