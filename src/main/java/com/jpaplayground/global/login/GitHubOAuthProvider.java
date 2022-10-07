@@ -1,6 +1,5 @@
 package com.jpaplayground.global.login;
 
-import com.jpaplayground.global.login.dto.GitHubAccessToken;
 import com.jpaplayground.global.login.dto.GitHubUserInfo;
 import com.jpaplayground.global.login.dto.GithubAccessTokenRequest;
 import com.jpaplayground.global.login.dto.OAuthAccessToken;
@@ -27,17 +26,6 @@ public class GitHubOAuthProvider implements OAuthProvider {
 	}
 
 	@Override
-	public OAuthUserInfo getUserInfo(OAuthAccessToken accessToken) {
-		HttpHeaders headers = new HttpHeaders();
-		headers.setBearerAuth(accessToken.getAccessToken());
-
-		HttpEntity<Object> requestHttpEntity = new HttpEntity<>(headers);
-
-		return restTemplate.exchange(oAuthProperties.getUserInfoRequestUrl(),
-			HttpMethod.GET, requestHttpEntity, GitHubUserInfo.class).getBody();
-	}
-
-	@Override
 	public OAuthAccessToken getAccessToken(String code) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(List.of(MediaType.APPLICATION_JSON));
@@ -45,7 +33,18 @@ public class GitHubOAuthProvider implements OAuthProvider {
 		HttpEntity<GithubAccessTokenRequest> requestHttpEntity = new HttpEntity<>(
 			new GithubAccessTokenRequest(code, oAuthProperties), headers);
 
-		return restTemplate.postForObject(oAuthProperties.getAccessTokenRequestUrl()
-			, requestHttpEntity, GitHubAccessToken.class);
+		String url = oAuthProperties.getAccessTokenRequestUrl();
+		return restTemplate.postForObject(url, requestHttpEntity, OAuthAccessToken.class);
+	}
+
+	@Override
+	public OAuthUserInfo getUserInfo(OAuthAccessToken accessToken) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.set(HttpHeaders.AUTHORIZATION, accessToken.getTokenHeader());
+
+		HttpEntity<Object> requestHttpEntity = new HttpEntity<>(headers);
+
+		String url = oAuthProperties.getUserInfoRequestUrl();
+		return restTemplate.exchange(url, HttpMethod.GET, requestHttpEntity, GitHubUserInfo.class).getBody();
 	}
 }

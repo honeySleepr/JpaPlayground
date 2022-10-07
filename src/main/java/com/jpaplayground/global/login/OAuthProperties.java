@@ -13,5 +13,6 @@ public class OAuthProperties {
 	private final String accessCodeRequestUrl;
 	private final String accessTokenRequestUrl;
 	private final String userInfoRequestUrl;
+	private final String grantType;
 
 }
