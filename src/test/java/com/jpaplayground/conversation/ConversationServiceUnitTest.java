@@ -1,12 +1,5 @@
 package com.jpaplayground.conversation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.refEq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
-
 import com.jpaplayground.domain.conversation.Conversation;
 import com.jpaplayground.domain.conversation.ConversationRepository;
 import com.jpaplayground.domain.conversation.ConversationService;
@@ -17,8 +10,13 @@ import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.refEq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.times;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
@@ -43,17 +41,16 @@ class ConversationServiceUnitTest {
 		Product product = Product.of("제품", 10_000);
 
 		Conversation conversation = Conversation.of(request.getContent(), product);
-		given(productRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(product));
+		given(productRepository.findById(any(Long.class))).willReturn(
+			Optional.ofNullable(product)); // Stubbing. 테스트 진행을 위해 사용
 		given(conversationRepository.save(any(Conversation.class))).willReturn(conversation);
 
 		// when
 		Conversation savedConversation = service.save(request);
 
 		// then
-		then(productRepository).should(times(1)).findById(request.getProductId());
+		then(productRepository).should(times(1)).findById(request.getProductId()); // 행동 검증. verify. Mock
 		then(conversationRepository).should(times(1)).save(refEq(conversation));
-
-		assertThat(savedConversation.getContent()).isEqualTo(request.getContent());
 	}
 
 }
