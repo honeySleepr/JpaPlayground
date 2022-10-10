@@ -1,4 +1,4 @@
-package com.jpaplayground.global.login;
+package com.jpaplayground.global.login.oauth;
 
 import com.jpaplayground.global.login.dto.NaverUserInfo;
 import com.jpaplayground.global.login.dto.OAuthAccessToken;

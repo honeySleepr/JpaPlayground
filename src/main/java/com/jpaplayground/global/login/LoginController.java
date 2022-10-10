@@ -2,10 +2,15 @@ package com.jpaplayground.global.login;
 
 import com.jpaplayground.global.login.dto.OAuthAccessToken;
 import com.jpaplayground.global.login.dto.OAuthUserInfo;
-import com.jpaplayground.global.member.Member;
+import com.jpaplayground.global.login.oauth.OAuthFailedException;
+import com.jpaplayground.global.login.oauth.OAuthProperties;
+import com.jpaplayground.global.login.oauth.OAuthPropertyHandler;
+import com.jpaplayground.global.login.oauth.OAuthProvider;
+import com.jpaplayground.global.member.MemberResponse;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +27,8 @@ public class LoginController {
 	private final LoginService loginService;
 
 	@GetMapping("login/{server}/callback")
-	public void login(String code, @RequestParam("state") String receivedState, @PathVariable String server,
+	public ResponseEntity<MemberResponse> login(String code, @RequestParam("state") String receivedState,
+		@PathVariable String server,
 		@SessionAttribute("state") String sentState) {
 
 		OAuthProvider oAuthProvider = oAuthProviderMap.get(server);
@@ -35,7 +41,7 @@ public class LoginController {
 		OAuthUserInfo userInfo = oAuthProvider.getUserInfo(accessToken, properties);
 		log.debug("Login user info : {}", userInfo);
 
-		Member member = loginService.login(userInfo);
+		return ResponseEntity.ok(loginService.login(userInfo));
 		/* Todo: JWT 토큰 생성, 로그인 사용자 검증(Interceptor), 캐싱(redis? encache?) */
 	}
 }

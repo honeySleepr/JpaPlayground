@@ -1,4 +1,4 @@
-package com.jpaplayground.global.login;
+package com.jpaplayground.global.login.oauth;
 
 import com.jpaplayground.global.exception.BusinessException;
 import com.jpaplayground.global.exception.ErrorCode;

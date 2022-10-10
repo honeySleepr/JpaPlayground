@@ -1,5 +1,7 @@
 package com.jpaplayground.global.login;
 
+import com.jpaplayground.global.login.oauth.OAuthProperties;
+import com.jpaplayground.global.login.oauth.OAuthPropertyHandler;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.regex.Matcher;
