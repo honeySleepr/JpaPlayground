@@ -33,9 +33,9 @@ public class LoginFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest) servletRequest;
 		HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-		OAuthServer oAuthServer = OAuthServer.getOAuthServer(parseProvider(request));
-		log.debug("Login request to OAuth server : {}", oAuthServer.toString());
-		OAuthProperties properties = oAuthPropertyHandler.getProperties(oAuthServer);
+		String server = parseProvider(request);
+		OAuthProperties properties = oAuthPropertyHandler.getProperties(server);
+		log.debug("Login request to OAuth server : {}", server);
 
 		String state = UUID.randomUUID().toString();
 		request.getSession().setAttribute(STATE, state);

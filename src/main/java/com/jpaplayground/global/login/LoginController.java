@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 public class LoginController {
 
 	private final Map<String, OAuthProvider> oAuthProviderMap;
+	private final OAuthPropertyHandler oAuthPropertyHandler;
 	private final LoginService loginService;
 
 	@GetMapping("login/{server}/callback")
@@ -25,12 +26,13 @@ public class LoginController {
 		@SessionAttribute("state") String sentState) {
 
 		OAuthProvider oAuthProvider = oAuthProviderMap.get(server);
-
+		OAuthProperties properties = oAuthPropertyHandler.getProperties(server);
 		if (!oAuthProvider.verifyState(receivedState, sentState)) {
 			throw new OAuthFailedException();
 		}
-		OAuthAccessToken accessToken = oAuthProvider.getAccessToken(code);
-		OAuthUserInfo userInfo = oAuthProvider.getUserInfo(accessToken);
+		OAuthAccessToken accessToken = oAuthProvider.getAccessToken(code, properties);
+		log.debug("OAuth accessToken : {}", accessToken.getTokenHeader());
+		OAuthUserInfo userInfo = oAuthProvider.getUserInfo(accessToken, properties);
 		log.debug("Login user info : {}", userInfo);
 
 		Member member = loginService.login(userInfo);

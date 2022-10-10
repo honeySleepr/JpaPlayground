@@ -14,7 +14,7 @@ public class OAuthPropertyHandler {
 
 	private final Map<OAuthServer, OAuthProperties> server;
 
-	public OAuthProperties getProperties(OAuthServer oAuthServer) {
-		return server.get(oAuthServer);
+	public OAuthProperties getProperties(String server) {
+		return this.server.get(OAuthServer.getOAuthServer(server));
 	}
 }
