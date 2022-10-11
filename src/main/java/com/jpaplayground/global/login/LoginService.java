@@ -14,8 +14,9 @@ public class LoginService {
 
 	private final MemberRepository memberRepository;
 
-	public MemberResponse login(OAuthUserInfo userInfo, String server) {
-		Member member = userInfo.toEntity(OAuthServer.getOAuthServer(server));
+	public MemberResponse save(OAuthUserInfo userInfo, String server) {
+		OAuthServer oAuthServer = OAuthServer.getOAuthServer(server);
+		Member member = userInfo.toEntity(oAuthServer);
 		return new MemberResponse(memberRepository.save(member));
 	}
 }
