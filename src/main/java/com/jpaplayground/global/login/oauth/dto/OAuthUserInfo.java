@@ -1,5 +1,6 @@
 package com.jpaplayground.global.login.oauth.dto;
 
+import com.jpaplayground.global.login.oauth.OAuthServer;
 import com.jpaplayground.global.member.Member;
 
 public interface OAuthUserInfo {
@@ -12,9 +13,11 @@ public interface OAuthUserInfo {
 
 	String getProfileImageUrl();
 
+	OAuthServer getOAuthServer();
+
 	String toString();
 
-	default Member toEntity() {
-		return Member.of(getAccount(), getName(), getEmail(), getProfileImageUrl());
+	default Member toEntity(OAuthServer oAuthServer) {
+		return Member.of(getAccount(), getName(), getEmail(), getProfileImageUrl(), oAuthServer);
 	}
 }

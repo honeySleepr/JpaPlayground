@@ -1,6 +1,7 @@
 package com.jpaplayground.global.login.oauth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.jpaplayground.global.login.oauth.OAuthServer;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -14,5 +15,5 @@ public class NaverUserInfo implements OAuthUserInfo {
 	private String email;
 	@JsonProperty(value = "profile_image")
 	private String profileImageUrl;
-
+	private OAuthServer oAuthServer;
 }

@@ -1,5 +1,6 @@
 package com.jpaplayground.global.login;
 
+import com.jpaplayground.global.login.oauth.OAuthServer;
 import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
 import com.jpaplayground.global.member.Member;
 import com.jpaplayground.global.member.MemberRepository;
@@ -13,9 +14,8 @@ public class LoginService {
 
 	private final MemberRepository memberRepository;
 
-	public MemberResponse login(OAuthUserInfo userInfo) {
-		Member member = memberRepository.save(userInfo.toEntity());
-
-		return new MemberResponse(member);
+	public MemberResponse login(OAuthUserInfo userInfo, String server) {
+		Member member = userInfo.toEntity(OAuthServer.getOAuthServer(server));
+		return new MemberResponse(memberRepository.save(member));
 	}
 }

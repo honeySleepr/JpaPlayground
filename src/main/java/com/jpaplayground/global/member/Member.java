@@ -2,6 +2,8 @@ package com.jpaplayground.global.member;
 
 import com.jpaplayground.global.login.oauth.OAuthServer;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -22,6 +24,7 @@ public class Member {
 	private String name;
 	private String email;
 	private String profileImageUrl;
+	@Enumerated(EnumType.STRING)
 	private OAuthServer oAuthServer;
 
 	@Builder
