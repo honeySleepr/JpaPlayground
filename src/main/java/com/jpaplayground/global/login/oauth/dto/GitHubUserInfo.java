@@ -1,7 +1,6 @@
 package com.jpaplayground.global.login.oauth.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.jpaplayground.global.login.oauth.OAuthServer;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -15,6 +14,5 @@ public class GitHubUserInfo implements OAuthUserInfo {
 	private String email;
 	@JsonProperty(value = "avatar_url")
 	private String profileImageUrl;
-	private OAuthServer oAuthServer;
 
 }

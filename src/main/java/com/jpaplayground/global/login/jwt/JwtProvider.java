@@ -1,5 +1,6 @@
 package com.jpaplayground.global.login.jwt;
 
+import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -13,20 +14,20 @@ public class JwtProvider {
 
 	public static final String ISSUER = "JpaPlayground";
 
-	public String createAccessToken(Long memberId, SecretKey secretKey) {
+	public String createAccessToken(OAuthUserInfo userInfo, String server, SecretKey secretKey) {
 		return Jwts.builder()
 			.setIssuer(ISSUER)
-			.setSubject(memberId.toString())
+			.setSubject(server.toUpperCase() + " " + userInfo.getAccount())
 			.setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))
 			.setExpiration(Timestamp.valueOf(LocalDateTime.now().plusMinutes(10L)))
 			.signWith(secretKey)
 			.compact();
 	}
 
-	public String createRefreshToken(Long memberId, SecretKey secretKey) {
+	public String createRefreshToken(OAuthUserInfo userInfo, String server, SecretKey secretKey) {
 		return Jwts.builder()
 			.setIssuer(ISSUER)
-			.setSubject(memberId.toString())
+			.setSubject(server.toUpperCase() + " " + userInfo.getAccount())
 			.setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))
 			.setExpiration(Timestamp.valueOf(LocalDateTime.now().plusWeeks(2L)))
 			.signWith(secretKey)
@@ -34,10 +35,6 @@ public class JwtProvider {
 	}
 
 	public SecretKey createSecretKey() {
-		return Keys.secretKeyFor(SignatureAlgorithm.HS512); //or HS384 or HS512
+		return Keys.secretKeyFor(SignatureAlgorithm.HS512);
 	}
 }
-/*
-1. 의존성 설정
-2.
-*/

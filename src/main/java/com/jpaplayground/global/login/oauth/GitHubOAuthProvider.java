@@ -32,8 +32,7 @@ public class GitHubOAuthProvider implements OAuthProvider {
 	}
 
 	@Override
-	public OAuthUserInfo getUserInfo(OAuthAccessToken accessToken,
-		OAuthProperties properties) {
+	public OAuthUserInfo getUserInfo(OAuthAccessToken accessToken, OAuthProperties properties) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(HttpHeaders.AUTHORIZATION, accessToken.getTokenHeader());
 

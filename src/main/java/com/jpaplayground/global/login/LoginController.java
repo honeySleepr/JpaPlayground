@@ -46,12 +46,12 @@ public class LoginController {
 		OAuthAccessToken accessToken = oAuthProvider.getAccessToken(code, properties);
 		OAuthUserInfo userInfo = oAuthProvider.getUserInfo(accessToken, properties);
 		log.debug("Login user info : {}", userInfo);
-		MemberResponse memberResponse = loginService.save(userInfo, server);
 
 		SecretKey secretKey = jwtProvider.createSecretKey();
-		String jwtAccessToken = jwtProvider.createAccessToken(memberResponse.getId(), secretKey);
-		String jwtRefreshToken = jwtProvider.createRefreshToken(memberResponse.getId(), secretKey);
+		String jwtAccessToken = jwtProvider.createAccessToken(userInfo, server, secretKey);
+		String jwtRefreshToken = jwtProvider.createRefreshToken(userInfo, server, secretKey);
 
+		MemberResponse memberResponse = loginService.save(userInfo, server, secretKey, jwtRefreshToken);
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(ACCESS_TOKEN, jwtAccessToken);
 		headers.set(REFRESH_TOKEN, jwtRefreshToken);
