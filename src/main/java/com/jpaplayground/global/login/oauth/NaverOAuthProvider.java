@@ -1,5 +1,8 @@
 package com.jpaplayground.global.login.oauth;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jpaplayground.global.login.dto.NaverAccessTokenRequest;
 import com.jpaplayground.global.login.dto.NaverUserInfo;
 import com.jpaplayground.global.login.dto.OAuthAccessToken;
 import com.jpaplayground.global.login.dto.OAuthUserInfo;
@@ -20,27 +23,20 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class NaverOAuthProvider implements OAuthProvider {
 
-	public static final String GRANT_TYPE = "grant_type";
-	public static final String CLIENT_ID = "client_id";
-	public static final String CLIENT_SECRET = "client_secret";
-	public static final String CODE = "code";
 	private final RestTemplate restTemplate;
+	private final ObjectMapper objectMapper;
 
 	@Override
 	public OAuthAccessToken getAccessToken(String code, OAuthProperties properties) {
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(List.of(MediaType.APPLICATION_JSON));
-		MultiValueMap<String, String> urlParamters = new LinkedMultiValueMap<>();
-		urlParamters.add(CODE, code);
-		urlParamters.add(CLIENT_ID, properties.getClientId());
-		urlParamters.add(CLIENT_SECRET, properties.getClientSecret());
-		urlParamters.add(GRANT_TYPE, properties.getGrantType());
 
-		/* TODO: 네이버는 DTO에 담아 보내면 401 에러가 난다. 왜지? */
-		//		HttpEntity<NaverAccessTokenRequest> requestHttpEntity = new HttpEntity<>(
-		//			new NaverAccessTokenRequest(code, properties), headers);
+		// Naver는 MultiValueMap 형태로 보내지 않으면 401 에러가 발생한다
+		MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+		body.setAll(objectMapper.convertValue(new NaverAccessTokenRequest(code, properties), new TypeReference<>() {
+		}));
 
-		HttpEntity<MultiValueMap<String, String>> requestHttpEntity = new HttpEntity<>(urlParamters, headers);
+		HttpEntity<MultiValueMap<String, String>> requestHttpEntity = new HttpEntity<>(body, headers);
 
 		String url = properties.getAccessTokenRequestUrl();
 		return restTemplate.postForObject(url, requestHttpEntity, OAuthAccessToken.class);

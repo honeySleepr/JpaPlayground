@@ -29,9 +29,9 @@ public class TestData {
 		Product deleted1 = Product.of("노트북파우치", 10000);
 		Product deleted2 = Product.of("와플기계", 30000);
 		Product deleted3 = Product.of("한무무", 100000);
-		deleted1.delete();
-		deleted2.delete();
-		deleted3.delete();
+		deleted1.changeDeletedState(true);
+		deleted2.changeDeletedState(true);
+		deleted3.changeDeletedState(true);
 
 		return List.of(
 			deleted1

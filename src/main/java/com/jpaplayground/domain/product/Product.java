@@ -44,8 +44,8 @@ public class Product {
 			.build();
 	}
 
-	public void delete() {
-		this.deleted = true;
+	public void changeDeletedState(boolean tf) {
+		this.deleted = tf;
 	}
 
 }

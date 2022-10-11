@@ -2,7 +2,8 @@ package com.jpaplayground.domain.product;
 
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
-import com.jpaplayground.domain.product.exception.ProductNotFoundException;
+import com.jpaplayground.domain.product.exception.NotFoundException;
+import com.jpaplayground.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -23,14 +24,15 @@ public class ProductService {
 	@Transactional
 	public ProductResponse save(ProductCreateRequest request) {
 		// TODO : 서비스단 validation
-		return new ProductResponse(repository.save(request.toEntity()));
+		Product product = repository.save(request.toEntity());
+		return new ProductResponse(product);
 	}
 
 	@Transactional
 	public ProductResponse delete(Long productId) {
 		Product product = repository.findById(productId)
-			.orElseThrow(ProductNotFoundException::new);
-		product.delete();
+			.orElseThrow(() -> new NotFoundException(ErrorCode.ENTITY_NOT_FOUND));
+		product.changeDeletedState(true);
 		return new ProductResponse(product);
 	}
 }
