@@ -1,7 +1,7 @@
 package com.jpaplayground.global.login.oauth;
 
-import com.jpaplayground.global.login.dto.OAuthAccessToken;
-import com.jpaplayground.global.login.dto.OAuthUserInfo;
+import com.jpaplayground.global.login.oauth.dto.OAuthAccessToken;
+import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
 
 public interface OAuthProvider {
 

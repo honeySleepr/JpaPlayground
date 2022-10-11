@@ -2,10 +2,10 @@ package com.jpaplayground.global.login.oauth;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jpaplayground.global.login.dto.NaverAccessTokenRequest;
-import com.jpaplayground.global.login.dto.NaverUserInfo;
-import com.jpaplayground.global.login.dto.OAuthAccessToken;
-import com.jpaplayground.global.login.dto.OAuthUserInfo;
+import com.jpaplayground.global.login.oauth.dto.NaverAccessTokenRequest;
+import com.jpaplayground.global.login.oauth.dto.NaverUserInfo;
+import com.jpaplayground.global.login.oauth.dto.OAuthAccessToken;
+import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
 import java.util.List;
 import java.util.Optional;
 import lombok.Getter;

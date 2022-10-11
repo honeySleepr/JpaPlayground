@@ -1,6 +1,6 @@
 package com.jpaplayground.global.login;
 
-import com.jpaplayground.global.login.dto.OAuthUserInfo;
+import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
 import com.jpaplayground.global.member.Member;
 import com.jpaplayground.global.member.MemberRepository;
 import com.jpaplayground.global.member.MemberResponse;

@@ -1,9 +1,9 @@
 package com.jpaplayground.global.login.oauth;
 
-import com.jpaplayground.global.login.dto.GitHubUserInfo;
-import com.jpaplayground.global.login.dto.GithubAccessTokenRequest;
-import com.jpaplayground.global.login.dto.OAuthAccessToken;
-import com.jpaplayground.global.login.dto.OAuthUserInfo;
+import com.jpaplayground.global.login.oauth.dto.GitHubUserInfo;
+import com.jpaplayground.global.login.oauth.dto.GithubAccessTokenRequest;
+import com.jpaplayground.global.login.oauth.dto.OAuthAccessToken;
+import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;

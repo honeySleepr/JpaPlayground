@@ -1,11 +1,12 @@
 package com.jpaplayground.global.login;
 
-import com.jpaplayground.global.login.dto.OAuthAccessToken;
-import com.jpaplayground.global.login.dto.OAuthUserInfo;
+import com.jpaplayground.global.login.jwt.JwtProvider;
 import com.jpaplayground.global.login.oauth.OAuthFailedException;
 import com.jpaplayground.global.login.oauth.OAuthProperties;
 import com.jpaplayground.global.login.oauth.OAuthPropertyHandler;
 import com.jpaplayground.global.login.oauth.OAuthProvider;
+import com.jpaplayground.global.login.oauth.dto.OAuthAccessToken;
+import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
 import com.jpaplayground.global.member.MemberResponse;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

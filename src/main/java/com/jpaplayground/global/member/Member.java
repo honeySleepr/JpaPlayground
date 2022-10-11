@@ -1,5 +1,6 @@
 package com.jpaplayground.global.member;
 
+import com.jpaplayground.global.login.oauth.OAuthServer;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,21 +22,26 @@ public class Member {
 	private String name;
 	private String email;
 	private String profileImageUrl;
+	private OAuthServer oAuthServer;
 
 	@Builder
-	private Member(String account, String name, String email, String profileImageUrl) {
+	private Member(String account, String name, String email, String profileImageUrl,
+		OAuthServer oAuthServer) {
 		this.account = account;
 		this.name = name;
 		this.email = email;
 		this.profileImageUrl = profileImageUrl;
+		this.oAuthServer = oAuthServer;
 	}
 
-	public static Member of(String account, String name, String email, String profileImageUrl) {
+	public static Member of(String account, String name, String email, String profileImageUrl,
+		OAuthServer oAuthServer) {
 		return Member.builder()
 			.account(account)
 			.name(name)
 			.email(email)
 			.profileImageUrl(profileImageUrl)
+			.oAuthServer(oAuthServer)
 			.build();
 	}
 
