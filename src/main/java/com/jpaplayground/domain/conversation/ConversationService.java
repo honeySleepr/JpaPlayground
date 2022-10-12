@@ -3,8 +3,8 @@ package com.jpaplayground.domain.conversation;
 import com.jpaplayground.domain.conversation.dto.ConversationCreateRequest;
 import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.domain.product.ProductRepository;
-import com.jpaplayground.domain.product.exception.NotFoundException;
 import com.jpaplayground.global.exception.ErrorCode;
+import com.jpaplayground.global.exception.NotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class ConversationService {
 	@Transactional
 	public Conversation save(ConversationCreateRequest request) {
 		Product product = productRepository.findById(request.getProductId())
-			.orElseThrow(() -> new NotFoundException(ErrorCode.ENTITY_NOT_FOUND));
+			.orElseThrow(() -> new NotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
 		return conversationRepository.save(Conversation.of(request.getContent(), product));
 	}
 

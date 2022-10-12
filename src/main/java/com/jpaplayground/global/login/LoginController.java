@@ -1,7 +1,8 @@
 package com.jpaplayground.global.login;
 
+import com.jpaplayground.global.exception.ErrorCode;
+import com.jpaplayground.global.login.exception.LoginException;
 import com.jpaplayground.global.login.jwt.JwtProvider;
-import com.jpaplayground.global.login.oauth.OAuthFailedException;
 import com.jpaplayground.global.login.oauth.OAuthProperties;
 import com.jpaplayground.global.login.oauth.OAuthPropertyHandler;
 import com.jpaplayground.global.login.oauth.OAuthProvider;
@@ -25,8 +26,8 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 @Slf4j
 public class LoginController {
 
-	public static final String ACCESS_TOKEN = "access_token";
-	public static final String REFRESH_TOKEN = "refresh_token";
+	public static final String ACCESS_TOKEN = "accessToken";
+	public static final String REFRESH_TOKEN = "refreshToken";
 	private final Map<String, OAuthProvider> oAuthProviderMap;
 	private final OAuthPropertyHandler oAuthPropertyHandler;
 	private final JwtProvider jwtProvider;
@@ -40,7 +41,7 @@ public class LoginController {
 		OAuthProvider oAuthProvider = oAuthProviderMap.get(server);
 		OAuthProperties properties = oAuthPropertyHandler.getProperties(server);
 		if (!oAuthProvider.verifyState(receivedState, sentState)) {
-			throw new OAuthFailedException();
+			throw new LoginException(ErrorCode.OAUTH_STATE_MISMATCH);
 		}
 
 		OAuthAccessToken accessToken = oAuthProvider.getAccessToken(code, properties);
@@ -52,6 +53,7 @@ public class LoginController {
 		String jwtRefreshToken = jwtProvider.createRefreshToken(userInfo, server, secretKey);
 
 		MemberResponse memberResponse = loginService.save(userInfo, server, secretKey, jwtRefreshToken);
+
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(ACCESS_TOKEN, jwtAccessToken);
 		headers.set(REFRESH_TOKEN, jwtRefreshToken);

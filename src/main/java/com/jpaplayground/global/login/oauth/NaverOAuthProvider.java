@@ -2,6 +2,8 @@ package com.jpaplayground.global.login.oauth;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jpaplayground.global.exception.ErrorCode;
+import com.jpaplayground.global.login.exception.LoginException;
 import com.jpaplayground.global.login.oauth.dto.NaverAccessTokenRequest;
 import com.jpaplayground.global.login.oauth.dto.NaverUserInfo;
 import com.jpaplayground.global.login.oauth.dto.OAuthAccessToken;
@@ -53,7 +55,9 @@ public class NaverOAuthProvider implements OAuthProvider {
 		ResponseJsonWrapper body = restTemplate.exchange(url, HttpMethod.GET, requestHttpEntity,
 			ResponseJsonWrapper.class).getBody();
 
-		return Optional.ofNullable(body).orElseThrow(OAuthFailedException::new).getResponse();
+		return Optional.ofNullable(body)
+			.orElseThrow(() -> new LoginException(ErrorCode.OAUTH_FAILED))
+			.getResponse();
 	}
 
 	@Getter
