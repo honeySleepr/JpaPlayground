@@ -1,8 +1,10 @@
 package com.jpaplayground.global.login.jwt;
 
 import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -36,5 +38,14 @@ public class JwtProvider {
 
 	public SecretKey createSecretKey() {
 		return Keys.secretKeyFor(SignatureAlgorithm.HS512);
+	}
+
+	public Claims verifyToken(String encodedSecretKey, String token) {
+		byte[] decodedSecretKey = Decoders.BASE64.decode(encodedSecretKey);
+		return Jwts.parserBuilder()
+			.setSigningKey(Keys.hmacShaKeyFor(decodedSecretKey))
+			.build()
+			.parseClaimsJws(token)
+			.getBody();
 	}
 }

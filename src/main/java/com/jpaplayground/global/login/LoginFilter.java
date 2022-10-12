@@ -1,5 +1,8 @@
 package com.jpaplayground.global.login;
 
+import static com.jpaplayground.global.login.LoginUtils.OAUTH_CLIENT_ID;
+import static com.jpaplayground.global.login.LoginUtils.OAUTH_REDIRECT_URI;
+import static com.jpaplayground.global.login.LoginUtils.OAUTH_STATE;
 import com.jpaplayground.global.login.oauth.OAuthProperties;
 import com.jpaplayground.global.login.oauth.OAuthPropertyHandler;
 import java.io.IOException;
@@ -23,10 +26,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Slf4j
 public class LoginFilter implements Filter {
 
-	private static final Pattern pattern = Pattern.compile("/login/(.*)$");
-	public static final String CLIENT_ID = "client_id";
-	public static final String STATE = "state";
-	public static final String REDIRECT_URI = "redirect_uri";
+	public static final Pattern pattern = Pattern.compile("/login/(.*)$");
 	private final OAuthPropertyHandler oAuthPropertyHandler;
 
 	@Override
@@ -40,12 +40,12 @@ public class LoginFilter implements Filter {
 		log.debug("Login request to OAuth server : {}", server);
 
 		String state = UUID.randomUUID().toString();
-		request.getSession().setAttribute(STATE, state);
+		request.getSession().setAttribute(OAUTH_STATE, state);
 
 		UriComponents uri = UriComponentsBuilder.fromHttpUrl(properties.getAccessCodeRequestUrl())
-			.queryParam(CLIENT_ID, properties.getClientId())
-			.queryParam(STATE, state)
-			.queryParam(REDIRECT_URI, properties.getRedirectUri())
+			.queryParam(OAUTH_CLIENT_ID, properties.getClientId())
+			.queryParam(OAUTH_STATE, state)
+			.queryParam(OAUTH_REDIRECT_URI, properties.getRedirectUri())
 			.build();
 
 		response.sendRedirect(uri.toString());
