@@ -3,7 +3,6 @@ package com.jpaplayground.global.exception;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
@@ -18,7 +17,7 @@ public enum ErrorCode {
 	OAUTH_STATE_MISMATCH(UNAUTHORIZED, "state 값이 일치하지 않습니다"),
 	OAUTH_FAILED(UNAUTHORIZED, "OAuth 인증이 실패했습니다"),
 	JWT_HEADER_MISSING(BAD_REQUEST, "Header에 JWT가 포함되지 않았습니다"),
-	DUPLICATE_MEMBER(FORBIDDEN, "이미 가입된 회원입니다");
+	INVALID_JWT(UNAUTHORIZED, "JWT가 유효하지 않습니다");
 
 	private final HttpStatus status;
 	private final String message;

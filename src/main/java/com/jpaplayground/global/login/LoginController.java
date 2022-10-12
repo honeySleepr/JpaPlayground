@@ -34,7 +34,7 @@ public class LoginController {
 	private final LoginService loginService;
 
 	@GetMapping("login/{server}/callback")
-	public ResponseEntity<MemberResponse> login(String code, @RequestParam("state") String receivedState,
+	public ResponseEntity<MemberResponse> oAuthLogin(String code, @RequestParam("state") String receivedState,
 		@PathVariable String server,
 		@SessionAttribute("state") String sentState) {
 

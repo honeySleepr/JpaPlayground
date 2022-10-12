@@ -1,10 +1,6 @@
 package com.jpaplayground.global.member;
 
 import com.jpaplayground.global.login.oauth.OAuthServer;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.io.Encoders;
-import io.jsonwebtoken.security.Keys;
-import javax.crypto.SecretKey;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -29,7 +25,7 @@ public class Member {
 	private String email;
 	private String profileImageUrl;
 	@Enumerated(EnumType.STRING)
-	private OAuthServer oAuthServer;
+	private OAuthServer server;
 	private String jwtSecretKey;
 	private String jwtRefreshToken;
 
@@ -50,17 +46,23 @@ public class Member {
 			.build();
 	}
 
-	public void setOAuthServer(OAuthServer oAuthServer) {
-		this.oAuthServer = oAuthServer;
+	public void setServer(OAuthServer server) {
+		this.server = server;
 	}
 
-	public void setJwtCredentials(SecretKey secretKey, String jwtRefreshToken) {
-		this.jwtSecretKey = Encoders.BASE64.encode(secretKey.getEncoded());
+	public void setJwtCredentials(String secretKey, String jwtRefreshToken) {
+		this.jwtSecretKey = secretKey;
 		this.jwtRefreshToken = jwtRefreshToken;
 	}
 
-	public SecretKey getJwtSecretKey() {
-		byte[] decode = Decoders.BASE64.decode(this.jwtSecretKey);
-		return Keys.hmacShaKeyFor(decode);
+	public String getJwtSecretKey() {
+		return this.jwtSecretKey;
+	}
+
+	public Member updateInfo(Member member) {
+		this.name = member.getName();
+		this.email = member.getEmail();
+		this.profileImageUrl = member.getProfileImageUrl();
+		return this;
 	}
 }

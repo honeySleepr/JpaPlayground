@@ -19,6 +19,6 @@ public class MemberResponse {
 		this.name = member.getName();
 		this.email = member.getEmail();
 		this.profileImageUrl = member.getProfileImageUrl();
-		this.oAuthServer = member.getOAuthServer();
+		this.oAuthServer = member.getServer();
 	}
 }
