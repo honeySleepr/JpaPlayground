@@ -8,7 +8,7 @@ import static com.jpaplayground.global.login.LoginUtils.HEADER_REFRESH_TOKEN;
 import com.jpaplayground.global.login.exception.LoginException;
 import com.jpaplayground.global.login.jwt.JwtProvider;
 import com.jpaplayground.global.login.jwt.JwtVerifier;
-import com.jpaplayground.global.member.Member;
+import com.jpaplayground.global.member.JwtCredentials;
 import io.jsonwebtoken.ExpiredJwtException;
 import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +36,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 		verifyHeader(request);
 		verifyJwt(request, response);
 
+		/* TODO : `@CreatedBy`*/
 		return true;
 	}
 
@@ -44,8 +45,10 @@ public class LoginInterceptor implements HandlerInterceptor {
 	 */
 	private void verifyJwt(HttpServletRequest request, HttpServletResponse response) {
 		String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION).split("\\s")[1];
-		Member member = loginService.findById(Long.valueOf(request.getHeader(HEADER_MEMBER_ID)));
-		SecretKey secretKey = jwtProvider.decodeSecretKey(member.getEncodedSecretKey());
+		JwtCredentials jwtCredentials = loginService.findJwtCredentials(
+			Long.valueOf(request.getHeader(HEADER_MEMBER_ID)));
+
+		SecretKey secretKey = jwtProvider.decodeSecretKey(jwtCredentials.getEncodedSecretKey());
 
 		try {
 			jwtVerifier.verifyAccessToken(secretKey, accessToken);
@@ -56,7 +59,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
 			String refreshToken = request.getHeader(HEADER_REFRESH_TOKEN);
 			jwtVerifier.verifyRefreshToken(secretKey, refreshToken);
-			jwtVerifier.verifyMatchingRefreshToken(refreshToken, member.getJwtRefreshToken());
+			jwtVerifier.verifyMatchingRefreshToken(refreshToken, jwtCredentials.getJwtRefreshToken());
 
 			String newAccessToken = jwtProvider.createAccessToken(Long.valueOf(request.getHeader(HEADER_MEMBER_ID)),
 				secretKey);
@@ -66,6 +69,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 			throw new LoginException(ErrorCode.ACCESS_TOKEN_RENEWED);
 		}
 	}
+
 	/**
 	 * Authorization Header와 MemberId Header를 검사한다
 	 */
