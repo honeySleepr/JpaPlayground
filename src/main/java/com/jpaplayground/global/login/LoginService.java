@@ -7,25 +7,39 @@ import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
 import com.jpaplayground.global.member.Member;
 import com.jpaplayground.global.member.MemberRepository;
 import com.jpaplayground.global.member.MemberResponse;
-import io.jsonwebtoken.io.Encoders;
-import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
+@Slf4j
 public class LoginService {
 
 	private final MemberRepository memberRepository;
 
-	public MemberResponse save(OAuthUserInfo userInfo, String server, SecretKey secretKey, String jwtRefreshToken) {
+	@Transactional
+	public MemberResponse save(OAuthUserInfo userInfo, String server) {
 		OAuthServer oAuthServer = OAuthServer.getOAuthServer(server);
-		Member member = memberRepository.findByAccountAndServer(oAuthServer, userInfo.getAccount())
+		Member member = memberRepository.findByAccountAndServer(userInfo.getAccount(), oAuthServer)
 			.map(foundMember -> foundMember.updateInfo(userInfo.toEntity()))
-			.orElseGet(userInfo::toEntity);
+			.orElseGet(() -> {
+				log.debug("신규 OAuth 회원가입");
+				return userInfo.toEntity();
+			});
 
 		member.setServer(oAuthServer);
-		member.setJwtCredentials(Encoders.BASE64.encode(secretKey.getEncoded()), jwtRefreshToken);
+		return new MemberResponse(memberRepository.save(member));
+	}
+
+	@Transactional
+	public MemberResponse updateJwtCredentials(Long memberId, String encodedSecretKey, String jwtRefreshToken) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+		member.updateJwtCredentials(encodedSecretKey, jwtRefreshToken);
 		return new MemberResponse(memberRepository.save(member));
 	}
 
@@ -33,5 +47,4 @@ public class LoginService {
 		return memberRepository.findById(memberId)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 	}
-
 }

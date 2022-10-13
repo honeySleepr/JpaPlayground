@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface MemberRepository extends CrudRepository<Member, Long> {
 
-	Optional<Member> findByAccountAndServer(OAuthServer server, String account);
+	Optional<Member> findByAccountAndServer(String account, OAuthServer server);
 }

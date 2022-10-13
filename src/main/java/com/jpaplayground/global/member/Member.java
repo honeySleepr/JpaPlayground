@@ -26,7 +26,7 @@ public class Member {
 	private String profileImageUrl;
 	@Enumerated(EnumType.STRING)
 	private OAuthServer server;
-	private String jwtSecretKey;
+	private String encodedSecretKey;
 	private String jwtRefreshToken;
 
 	@Builder
@@ -50,13 +50,13 @@ public class Member {
 		this.server = server;
 	}
 
-	public void setJwtCredentials(String secretKey, String jwtRefreshToken) {
-		this.jwtSecretKey = secretKey;
+	public void updateJwtCredentials(String encodedSecretKey, String jwtRefreshToken) {
+		this.encodedSecretKey = encodedSecretKey;
 		this.jwtRefreshToken = jwtRefreshToken;
 	}
 
-	public String getJwtSecretKey() {
-		return this.jwtSecretKey;
+	public String getEncodedSecretKey() {
+		return this.encodedSecretKey;
 	}
 
 	public Member updateInfo(Member member) {

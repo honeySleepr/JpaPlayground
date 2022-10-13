@@ -40,12 +40,7 @@ public class JwtProvider {
 		return Keys.secretKeyFor(SignatureAlgorithm.HS512);
 	}
 
-	public Claims verifyToken(String encodedSecretKey, String token) {
-		byte[] decodedSecretKey = Decoders.BASE64.decode(encodedSecretKey);
-		return Jwts.parserBuilder()
-			.setSigningKey(Keys.hmacShaKeyFor(decodedSecretKey))
-			.build()
-			.parseClaimsJws(token)
-			.getBody();
+	public String encodeSecretKey(SecretKey secretKey) {
+		return Encoders.BASE64.encode(secretKey.getEncoded());
 	}
 }

@@ -1,6 +1,8 @@
 package com.jpaplayground.global.login;
 
 import com.jpaplayground.global.exception.ErrorCode;
+import static com.jpaplayground.global.login.LoginUtils.HEADER_ACCESS_TOKEN;
+import static com.jpaplayground.global.login.LoginUtils.HEADER_REFRESH_TOKEN;
 import com.jpaplayground.global.login.exception.LoginException;
 import com.jpaplayground.global.login.jwt.JwtProvider;
 import com.jpaplayground.global.login.oauth.OAuthProperties;
@@ -26,8 +28,6 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 @Slf4j
 public class LoginController {
 
-	public static final String ACCESS_TOKEN = "accessToken";
-	public static final String REFRESH_TOKEN = "refreshToken";
 	private final Map<String, OAuthProvider> oAuthProviderMap;
 	private final OAuthPropertyHandler oAuthPropertyHandler;
 	private final JwtProvider jwtProvider;
@@ -47,16 +47,18 @@ public class LoginController {
 		OAuthAccessToken accessToken = oAuthProvider.getAccessToken(code, properties);
 		OAuthUserInfo userInfo = oAuthProvider.getUserInfo(accessToken, properties);
 		log.debug("Login user info : {}", userInfo);
+		Long memberId = loginService.save(userInfo, server).getId();
 
 		SecretKey secretKey = jwtProvider.createSecretKey();
 		String jwtAccessToken = jwtProvider.createAccessToken(userInfo, server, secretKey);
 		String jwtRefreshToken = jwtProvider.createRefreshToken(userInfo, server, secretKey);
 
-		MemberResponse memberResponse = loginService.save(userInfo, server, secretKey, jwtRefreshToken);
+		String encodedSecretKey = jwtProvider.encodeSecretKey(secretKey);
+		MemberResponse memberResponse = loginService.updateJwtCredentials(memberId, encodedSecretKey, jwtRefreshToken);
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.set(ACCESS_TOKEN, jwtAccessToken);
-		headers.set(REFRESH_TOKEN, jwtRefreshToken);
+		headers.set(HEADER_ACCESS_TOKEN, jwtAccessToken);
+		headers.set(HEADER_REFRESH_TOKEN, jwtRefreshToken);
 
 		return ResponseEntity.ok().headers(headers).body(memberResponse);
 
