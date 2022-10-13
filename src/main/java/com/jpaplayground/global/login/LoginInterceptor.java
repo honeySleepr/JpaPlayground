@@ -48,11 +48,18 @@ public class LoginInterceptor implements HandlerInterceptor {
 		}
 		return true;
 	}
-/*
-UnsupportedJwtException – if the claimsJws argument does not represent an Claims JWS
-MalformedJwtException – if the claimsJws string is not a valid JWS
-SignatureException – if the claimsJws JWS signature validation fails
-ExpiredJwtException – if the specified JWT is a Claims JWT and the Claims has an expiration time before the time this method is invoked.
-IllegalArgumentException – if the claimsJws string is null or empty or only whitespac
-*/
+
+	/**
+	 * Authorization Header와 MemberId Header를 검사한다
+	 */
+	private void verifyHeader(HttpServletRequest request) {
+		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+		if (authHeader == null || !authHeader.matches(BEARER_REGEX)) {
+			throw new LoginException(ErrorCode.JWT_ACCESS_TOKEN_MISSING);
+		}
+		if (request.getHeader(HEADER_MEMBER_ID) == null) {
+			throw new LoginException(ErrorCode.MEMBER_ID_HEADER_MISSING);
+		}
+	}
 }
