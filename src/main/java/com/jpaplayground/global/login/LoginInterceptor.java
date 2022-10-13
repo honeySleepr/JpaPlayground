@@ -1,12 +1,16 @@
 package com.jpaplayground.global.login;
 
 import com.jpaplayground.global.exception.ErrorCode;
+import static com.jpaplayground.global.login.LoginUtils.BEARER_REGEX;
+import static com.jpaplayground.global.login.LoginUtils.HEADER_ACCESS_TOKEN;
+import static com.jpaplayground.global.login.LoginUtils.HEADER_MEMBER_ID;
+import static com.jpaplayground.global.login.LoginUtils.HEADER_REFRESH_TOKEN;
 import com.jpaplayground.global.login.exception.LoginException;
 import com.jpaplayground.global.login.jwt.JwtProvider;
+import com.jpaplayground.global.login.jwt.JwtVerifier;
 import com.jpaplayground.global.member.Member;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
+import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +24,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Slf4j
 public class LoginInterceptor implements HandlerInterceptor {
 
-	public static final String BEARER_REGEX = "^[bB]earer\\s.*";
+	private final JwtVerifier jwtVerifier;
 	private final JwtProvider jwtProvider;
 	private final LoginService loginService;
 
@@ -28,27 +32,40 @@ public class LoginInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 		throws Exception {
 		log.debug("인터셉터 발동 : {}", request.getRequestURI());
-		String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-		log.debug("Authorization Header : {}", token);
 
-		if (token == null || !token.matches(BEARER_REGEX)) {
-			throw new LoginException(ErrorCode.JWT_HEADER_MISSING);
-		}
+		verifyHeader(request);
+		verifyJwt(request, response);
 
-		Long id = Long.valueOf(request.getHeader("memberId"));
-		Member member = loginService.findById(id);
-
-		try {
-			Claims claims = jwtProvider.verifyToken(member.getJwtSecretKey(), token.split("\\s")[1]);
-		} catch (ExpiredJwtException e) {
-
-			return false;
-		} catch (JwtException e) {
-			throw new LoginException(ErrorCode.INVALID_JWT);
-		}
 		return true;
 	}
 
+	/**
+	 * AccessToken가 유효하면 API 응답을 내려주고, 만료되었으면 RefreshToken을 검사하여 AccessToken을 재발급해준다
+	 */
+	private void verifyJwt(HttpServletRequest request, HttpServletResponse response) {
+		String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION).split("\\s")[1];
+		Member member = loginService.findById(Long.valueOf(request.getHeader(HEADER_MEMBER_ID)));
+		SecretKey secretKey = jwtProvider.decodeSecretKey(member.getEncodedSecretKey());
+
+		try {
+			jwtVerifier.verifyAccessToken(secretKey, accessToken);
+		} catch (ExpiredJwtException e) {
+			if (request.getHeader(HEADER_REFRESH_TOKEN) == null) {
+				throw new LoginException(ErrorCode.JWT_REFRESH_TOKEN_MISSING);
+			}
+
+			String refreshToken = request.getHeader(HEADER_REFRESH_TOKEN);
+			jwtVerifier.verifyRefreshToken(secretKey, refreshToken);
+			jwtVerifier.verifyMatchingRefreshToken(refreshToken, member.getJwtRefreshToken());
+
+			String newAccessToken = jwtProvider.createAccessToken(Long.valueOf(request.getHeader(HEADER_MEMBER_ID)),
+				secretKey);
+			response.setHeader(HEADER_ACCESS_TOKEN, newAccessToken);
+			log.debug("new AccessToken : {}", newAccessToken);
+
+			throw new LoginException(ErrorCode.ACCESS_TOKEN_RENEWED);
+		}
+	}
 	/**
 	 * Authorization Header와 MemberId Header를 검사한다
 	 */

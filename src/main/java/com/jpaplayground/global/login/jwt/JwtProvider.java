@@ -19,7 +19,7 @@ public class JwtProvider {
 			.setIssuer(JWT_ISSUER)
 			.setSubject(String.valueOf(memberId))
 			.setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))
-			.setExpiration(Timestamp.valueOf(LocalDateTime.now().plusMinutes(1L)))
+			.setExpiration(Timestamp.valueOf(LocalDateTime.now().plusMinutes(10L)))
 			.signWith(secretKey)
 			.compact();
 	}
