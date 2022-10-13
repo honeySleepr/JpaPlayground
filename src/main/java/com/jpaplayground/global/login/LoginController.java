@@ -50,8 +50,9 @@ public class LoginController {
 		Long memberId = loginService.save(userInfo, server).getId();
 
 		SecretKey secretKey = jwtProvider.createSecretKey();
-		String jwtAccessToken = jwtProvider.createAccessToken(userInfo, server, secretKey);
-		String jwtRefreshToken = jwtProvider.createRefreshToken(userInfo, server, secretKey);
+		String jwtAccessToken = jwtProvider.createAccessToken(memberId, secretKey);
+		String jwtRefreshToken = jwtProvider.createRefreshToken(memberId, secretKey);
+		log.debug("JWT AccessToken : {}", jwtAccessToken);
 
 		String encodedSecretKey = jwtProvider.encodeSecretKey(secretKey);
 		MemberResponse memberResponse = loginService.updateJwtCredentials(memberId, encodedSecretKey, jwtRefreshToken);

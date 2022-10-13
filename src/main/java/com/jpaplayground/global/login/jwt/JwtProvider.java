@@ -1,10 +1,10 @@
 package com.jpaplayground.global.login.jwt;
 
-import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
-import io.jsonwebtoken.Claims;
+import static com.jpaplayground.global.login.LoginUtils.JWT_ISSUER;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -14,22 +14,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtProvider {
 
-	public static final String ISSUER = "JpaPlayground";
-
-	public String createAccessToken(OAuthUserInfo userInfo, String server, SecretKey secretKey) {
+	public String createAccessToken(Long memberId, SecretKey secretKey) {
 		return Jwts.builder()
-			.setIssuer(ISSUER)
-			.setSubject(server.toUpperCase() + " " + userInfo.getAccount())
+			.setIssuer(JWT_ISSUER)
+			.setSubject(String.valueOf(memberId))
 			.setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))
-			.setExpiration(Timestamp.valueOf(LocalDateTime.now().plusMinutes(10L)))
+			.setExpiration(Timestamp.valueOf(LocalDateTime.now().plusMinutes(1L)))
 			.signWith(secretKey)
 			.compact();
 	}
 
-	public String createRefreshToken(OAuthUserInfo userInfo, String server, SecretKey secretKey) {
+	public String createRefreshToken(Long memberId, SecretKey secretKey) {
 		return Jwts.builder()
-			.setIssuer(ISSUER)
-			.setSubject(server.toUpperCase() + " " + userInfo.getAccount())
+			.setIssuer(JWT_ISSUER)
+			.setSubject(String.valueOf(memberId))
 			.setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))
 			.setExpiration(Timestamp.valueOf(LocalDateTime.now().plusWeeks(2L)))
 			.signWith(secretKey)
@@ -42,5 +40,10 @@ public class JwtProvider {
 
 	public String encodeSecretKey(SecretKey secretKey) {
 		return Encoders.BASE64.encode(secretKey.getEncoded());
+	}
+
+	public SecretKey decodeSecretKey(String encodedSecretKey) {
+		byte[] decode = Decoders.BASE64.decode(encodedSecretKey);
+		return Keys.hmacShaKeyFor(decode);
 	}
 }
