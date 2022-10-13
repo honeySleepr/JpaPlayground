@@ -1,4 +1,4 @@
-package com.jpaplayground.global;
+package com.jpaplayground.config;
 
 import com.jpaplayground.global.login.LoginFilter;
 import com.jpaplayground.global.login.LoginInterceptor;
