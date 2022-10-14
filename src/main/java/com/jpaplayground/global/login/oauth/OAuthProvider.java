@@ -10,9 +10,6 @@ public interface OAuthProvider {
 	OAuthUserInfo getUserInfo(OAuthAccessToken accessToken, OAuthProperties properties);
 
 	default boolean verifyState(String receivedState, String sentState) {
-		if (receivedState.equals(sentState)) {
-			return true;
-		}
-		return false;
+		return receivedState.equals(sentState);
 	}
 }

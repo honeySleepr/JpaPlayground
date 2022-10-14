@@ -44,6 +44,7 @@ public class NaverOAuthProvider implements OAuthProvider {
 		return restTemplate.postForObject(url, requestHttpEntity, OAuthAccessToken.class);
 	}
 
+	/* GitHubOAuthProvider, NaverOAuthProvider를 하나로 합치고 싶은데, 유저 정보를 가져오는 부분이 달라서 결국 OAuthUserInfo를 parsing 해오는 코드는 나누긴 해야할 것 같다*/
 	@Override
 	public OAuthUserInfo getUserInfo(OAuthAccessToken accessToken, OAuthProperties properties) {
 		HttpHeaders headers = new HttpHeaders();
@@ -51,9 +52,8 @@ public class NaverOAuthProvider implements OAuthProvider {
 
 		HttpEntity<Object> requestHttpEntity = new HttpEntity<>(headers);
 
-		String url = properties.getUserInfoRequestUrl();
-		ResponseJsonWrapper body = restTemplate.exchange(url, HttpMethod.GET, requestHttpEntity,
-			ResponseJsonWrapper.class).getBody();
+		ResponseJsonWrapper body = restTemplate.exchange(properties.getUserInfoRequestUrl(), HttpMethod.GET,
+			requestHttpEntity, ResponseJsonWrapper.class).getBody();
 
 		return Optional.ofNullable(body)
 			.orElseThrow(() -> new LoginException(ErrorCode.OAUTH_FAILED))
@@ -62,7 +62,6 @@ public class NaverOAuthProvider implements OAuthProvider {
 
 	@Getter
 	static class ResponseJsonWrapper {
-
 		/* TODO: Q: Key 값이 response인 Nested Json 안에 NaverUserInfo 값들이 담겨있다. NaverUserInfo 안에서 바로 매핑되도록 처리하려면 어떻게 해야할까..?*/
 		private NaverUserInfo response;
 	}

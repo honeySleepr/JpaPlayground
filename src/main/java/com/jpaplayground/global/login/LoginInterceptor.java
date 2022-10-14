@@ -31,6 +31,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 		throws Exception {
+		/* Todo : 특정 요청은 로그인 없이 허용하도록 하려면? (ex:Product 조회) */
 		log.debug("인터셉터 발동 : {}", request.getRequestURI());
 		verifyHeader(request);
 		verifyJwt(request, response);
