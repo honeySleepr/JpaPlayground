@@ -32,16 +32,15 @@ public class LoginInterceptor implements HandlerInterceptor {
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 		throws Exception {
 		log.debug("인터셉터 발동 : {}", request.getRequestURI());
-
 		verifyHeader(request);
 		verifyJwt(request, response);
 
-		/* TODO : `@CreatedBy`*/
+		loginService.createLoginMember(Long.valueOf(request.getHeader(HEADER_MEMBER_ID)));
 		return true;
 	}
 
 	/**
-	 * AccessToken가 유효하면 API 응답을 내려주고, 만료되었으면 RefreshToken을 검사하여 AccessToken을 재발급해준다
+	 * AccessToken이 유효하면 API 응답을 내려주고, 만료되었으면 RefreshToken을 검사하여 AccessToken을 재발급해준다
 	 */
 	private void verifyJwt(HttpServletRequest request, HttpServletResponse response) {
 		String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION).split("\\s")[1];

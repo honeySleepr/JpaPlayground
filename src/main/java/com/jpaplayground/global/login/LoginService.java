@@ -1,5 +1,6 @@
 package com.jpaplayground.global.login;
 
+import com.jpaplayground.global.auditing.LoginMember;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.exception.NotFoundException;
 import com.jpaplayground.global.login.oauth.OAuthServer;
@@ -10,6 +11,7 @@ import com.jpaplayground.global.member.MemberRepository;
 import com.jpaplayground.global.member.MemberResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class LoginService {
 
 	private final MemberRepository memberRepository;
+	private final LoginMember loginMember;
 
 	@Transactional
 	public MemberResponse save(OAuthUserInfo userInfo, String server) {
@@ -45,7 +48,14 @@ public class LoginService {
 		return new MemberResponse(memberRepository.save(member));
 	}
 
-	@Cacheable(key = "#memberId", cacheNames = "member")
+	public void createLoginMember(Long memberId) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+		loginMember.create(member);
+	}
+
+	@Cacheable(key = "#memberId", cacheNames = "jwt")
 	public JwtCredentials findJwtCredentials(Long memberId) {
 		log.debug("@@@ JwtCredentials cache miss");
 		return memberRepository.findJwtCredentialsById(memberId)

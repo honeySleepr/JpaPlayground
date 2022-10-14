@@ -30,11 +30,13 @@ public class Member {
 	private String jwtRefreshToken;
 
 	@Builder
-	private Member(String account, String name, String email, String profileImageUrl) {
+	private Member(Long id, String account, String name, String email, String profileImageUrl, OAuthServer server) {
+		this.id = id;
 		this.account = account;
 		this.name = name;
 		this.email = email;
 		this.profileImageUrl = profileImageUrl;
+		this.server = server;
 	}
 
 	public static Member of(String account, String name, String email, String profileImageUrl) {
@@ -53,10 +55,6 @@ public class Member {
 	public void updateJwtCredentials(String encodedSecretKey, String jwtRefreshToken) {
 		this.encodedSecretKey = encodedSecretKey;
 		this.jwtRefreshToken = jwtRefreshToken;
-	}
-
-	public String getEncodedSecretKey() {
-		return this.encodedSecretKey;
 	}
 
 	public Member updateInfo(Member member) {
