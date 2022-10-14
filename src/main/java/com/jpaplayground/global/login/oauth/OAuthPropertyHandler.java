@@ -1,4 +1,4 @@
-package com.jpaplayground.global.oauth;
+package com.jpaplayground.global.login.oauth;
 
 import java.util.Map;
 import lombok.Getter;
@@ -12,11 +12,9 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 @ConfigurationProperties(prefix = "oauth")
 public class OAuthPropertyHandler {
 
-	/* TODO : yml 파일의 "github"가 자동으로 Enum으로 매핑된다. HOW? */
 	private final Map<OAuthServer, OAuthProperties> server;
 
-	public OAuthProperties getProperties(OAuthServer oAuthServer) {
-		return server.get(oAuthServer);
+	public OAuthProperties getProperties(String server) {
+		return this.server.get(OAuthServer.getOAuthServer(server));
 	}
-
 }

@@ -20,19 +20,23 @@ public class Member {
 	private String account;
 	private String name;
 	private String email;
+	private String profileImageUrl;
 
 	@Builder
-	private Member(String account, String name, String email) {
+	private Member(String account, String name, String email, String profileImageUrl) {
 		this.account = account;
 		this.name = name;
 		this.email = email;
+		this.profileImageUrl = profileImageUrl;
 	}
 
-	public static Member of(String account, String name, String email) {
+	public static Member of(String account, String name, String email, String profileImageUrl) {
 		return Member.builder()
 			.account(account)
 			.name(name)
 			.email(email)
+			.profileImageUrl(profileImageUrl)
 			.build();
 	}
+
 }

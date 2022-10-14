@@ -1,6 +1,6 @@
 package com.jpaplayground.global;
 
-import com.jpaplayground.global.oauth.LoginFilter;
+import com.jpaplayground.global.login.LoginFilter;
 import javax.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;

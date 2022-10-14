@@ -27,12 +27,12 @@ public class ProductController {
 	}
 
 	@PostMapping("/products")
-	public ResponseEntity<Product> add(@Valid @RequestBody ProductCreateRequest request) {
+	public ResponseEntity<ProductResponse> add(@Valid @RequestBody ProductCreateRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(request));
 	}
 
 	@DeleteMapping("/products/{productId}")
-	public ResponseEntity<Product> delete(@PathVariable Long productId) {
+	public ResponseEntity<ProductResponse> delete(@PathVariable Long productId) {
 		return ResponseEntity.ok(service.delete(productId));
 	}
 }

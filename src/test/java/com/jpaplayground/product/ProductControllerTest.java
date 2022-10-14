@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jpaplayground.domain.product.ProductController;
 import com.jpaplayground.domain.product.ProductService;
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
-import com.jpaplayground.global.oauth.OAuthPropertyHandler;
+import com.jpaplayground.domain.product.dto.ProductResponse;
+import com.jpaplayground.global.login.oauth.OAuthPropertyHandler;
 import static org.hamcrest.Matchers.is;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <br><a href="https://github.com/honeySleepr/JpaPlayground/pull/5#issuecomment-1250048799">관련 PR 피드백</a>
  */
 @WebMvcTest(ProductController.class)
+@ActiveProfiles("test")
 @EnableConfigurationProperties(OAuthPropertyHandler.class)
 class ProductControllerTest {
 
@@ -48,7 +51,7 @@ class ProductControllerTest {
 		int price = 1000;
 		ProductCreateRequest request = new ProductCreateRequest(name, price);
 
-		given(service.save(any())).willReturn(request.toEntity());
+		given(service.save(any())).willReturn(new ProductResponse(request.toEntity()));
 
 		mockMvc.perform(post("/products")
 				.content(objectMapper.writeValueAsString(request))

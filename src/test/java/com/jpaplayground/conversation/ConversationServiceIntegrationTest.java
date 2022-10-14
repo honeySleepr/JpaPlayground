@@ -1,8 +1,5 @@
 package com.jpaplayground.conversation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import com.jpaplayground.domain.conversation.Conversation;
 import com.jpaplayground.domain.conversation.ConversationRepository;
 import com.jpaplayground.domain.conversation.ConversationService;
@@ -10,13 +7,17 @@ import com.jpaplayground.domain.conversation.dto.ConversationCreateRequest;
 import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.domain.product.ProductRepository;
 import javax.persistence.EntityManager;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
+@ActiveProfiles("test")
 public class ConversationServiceIntegrationTest {
 
 	@Autowired

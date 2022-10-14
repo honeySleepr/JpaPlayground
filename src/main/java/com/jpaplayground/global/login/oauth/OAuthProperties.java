@@ -1,4 +1,4 @@
-package com.jpaplayground.global.oauth;
+package com.jpaplayground.global.login.oauth;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,5 +13,6 @@ public class OAuthProperties {
 	private final String accessCodeRequestUrl;
 	private final String accessTokenRequestUrl;
 	private final String userInfoRequestUrl;
+	private final String grantType;
 
 }

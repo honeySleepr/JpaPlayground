@@ -1,4 +1,7 @@
 spring:
+  config:
+    import: oauth.yml
+
   datasource:
     # MODE=MySQL;IGNORECASE=TRUE 설정 필요한가?
     url: jdbc:h2:mem:mydb
