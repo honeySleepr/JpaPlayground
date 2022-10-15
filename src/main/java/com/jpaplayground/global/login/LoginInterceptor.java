@@ -1,5 +1,6 @@
 package com.jpaplayground.global.login;
 
+import com.jpaplayground.global.auditing.LoginMember;
 import com.jpaplayground.global.exception.ErrorCode;
 import static com.jpaplayground.global.login.LoginUtils.BEARER_REGEX;
 import static com.jpaplayground.global.login.LoginUtils.HEADER_ACCESS_TOKEN;
@@ -8,7 +9,7 @@ import static com.jpaplayground.global.login.LoginUtils.HEADER_REFRESH_TOKEN;
 import com.jpaplayground.global.login.exception.LoginException;
 import com.jpaplayground.global.login.jwt.JwtProvider;
 import com.jpaplayground.global.login.jwt.JwtVerifier;
-import com.jpaplayground.global.member.JwtCredentials;
+import com.jpaplayground.global.member.MemberCredentials;
 import io.jsonwebtoken.ExpiredJwtException;
 import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
@@ -27,28 +28,30 @@ public class LoginInterceptor implements HandlerInterceptor {
 	private final JwtVerifier jwtVerifier;
 	private final JwtProvider jwtProvider;
 	private final LoginService loginService;
+	private final LoginMember loginMember;
 
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-		throws Exception {
-		/* Todo : 특정 요청은 로그인 없이 허용하도록 하려면? (ex:Product 조회) */
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+		/* Todo : `POST /products`는 막고 `GET /products`는 열어주려면 여기서 if문 처리하는 방법 뿐인가? */
+
 		log.debug("인터셉터 발동 : {}", request.getRequestURI());
 		verifyHeader(request);
-		verifyJwt(request, response);
+		MemberCredentials memberCredentials = loginService.findMemberCredentials(
+			Long.valueOf(request.getHeader(HEADER_MEMBER_ID)));
+		verifyJwt(request, response, memberCredentials);
 
-		loginService.createLoginMember(Long.valueOf(request.getHeader(HEADER_MEMBER_ID)));
+		loginMember.create(memberCredentials);
 		return true;
 	}
 
 	/**
 	 * AccessToken이 유효하면 API 응답을 내려주고, 만료되었으면 RefreshToken을 검사하여 AccessToken을 재발급해준다
 	 */
-	private void verifyJwt(HttpServletRequest request, HttpServletResponse response) {
+	private void verifyJwt(HttpServletRequest request, HttpServletResponse response,
+		MemberCredentials memberCredentials) {
 		String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION).split("\\s")[1];
-		JwtCredentials jwtCredentials = loginService.findJwtCredentials(
-			Long.valueOf(request.getHeader(HEADER_MEMBER_ID)));
 
-		SecretKey secretKey = jwtProvider.decodeSecretKey(jwtCredentials.getEncodedSecretKey());
+		SecretKey secretKey = jwtProvider.decodeSecretKey(memberCredentials.getEncodedSecretKey());
 
 		try {
 			jwtVerifier.verifyAccessToken(secretKey, accessToken);
@@ -59,7 +62,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
 			String refreshToken = request.getHeader(HEADER_REFRESH_TOKEN);
 			jwtVerifier.verifyRefreshToken(secretKey, refreshToken);
-			jwtVerifier.verifyMatchingRefreshToken(refreshToken, jwtCredentials.getJwtRefreshToken());
+			jwtVerifier.verifyMatchingRefreshToken(refreshToken, memberCredentials.getJwtRefreshToken());
 
 			String newAccessToken = jwtProvider.createAccessToken(Long.valueOf(request.getHeader(HEADER_MEMBER_ID)),
 				secretKey);

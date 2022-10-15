@@ -5,8 +5,8 @@ import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.exception.NotFoundException;
 import com.jpaplayground.global.login.oauth.OAuthServer;
 import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
-import com.jpaplayground.global.member.JwtCredentials;
 import com.jpaplayground.global.member.Member;
+import com.jpaplayground.global.member.MemberCredentials;
 import com.jpaplayground.global.member.MemberRepository;
 import com.jpaplayground.global.member.MemberResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class LoginService {
 
 	private final MemberRepository memberRepository;
-	private final LoginMember loginMember;
 
 	@Transactional
 	public MemberResponse save(OAuthUserInfo userInfo, String server) {
@@ -40,6 +39,7 @@ public class LoginService {
 	}
 
 	@Transactional
+	@CacheEvict(key = "#memberId", cacheNames = "jwt")
 	public MemberResponse updateJwtCredentials(Long memberId, String encodedSecretKey, String jwtRefreshToken) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
@@ -48,17 +48,10 @@ public class LoginService {
 		return new MemberResponse(memberRepository.save(member));
 	}
 
-	public void createLoginMember(Long memberId) {
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-		loginMember.create(member);
-	}
-
 	@Cacheable(key = "#memberId", cacheNames = "jwt")
-	public JwtCredentials findJwtCredentials(Long memberId) {
-		log.debug("@@@ JwtCredentials cache miss");
-		return memberRepository.findJwtCredentialsById(memberId)
+	public MemberCredentials findMemberCredentials(Long memberId) {
+		log.debug("====== MemberCredentials Cache Miss");
+		return memberRepository.findMemberCredentialsById(memberId)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 	}
 }

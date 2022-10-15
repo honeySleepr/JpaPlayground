@@ -7,9 +7,10 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE) // JSON에서 DTO로 변환하기 위해 필요하다(private일 필요는 없다)
-@AllArgsConstructor // `@Query`를 이용해 DTO에 바로 매핑하기 위해 필요하다
-public class JwtCredentials {
+@AllArgsConstructor
+public class MemberCredentials {
 
+	private Long id;
 	private String encodedSecretKey;
 	private String jwtRefreshToken;
 }
