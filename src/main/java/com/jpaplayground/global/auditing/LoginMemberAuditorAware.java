@@ -17,8 +17,7 @@ public class LoginMemberAuditorAware implements AuditorAware<Member> {
 
 	@Override
 	public Optional<Member> getCurrentAuditor() {
-		log.debug("@@@@@ LoginMemberAuditorAware 호출");
-		System.out.println(loginMember.toString());
+		log.debug("====== LoginMemberAuditorAware 호출");
 		return Optional.ofNullable(loginMember.toEntity());
 	}
 }

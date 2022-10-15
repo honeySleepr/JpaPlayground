@@ -1,6 +1,5 @@
 package com.jpaplayground.global.login;
 
-import com.jpaplayground.global.auditing.LoginMember;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.exception.NotFoundException;
 import com.jpaplayground.global.login.oauth.OAuthServer;
@@ -27,25 +26,28 @@ public class LoginService {
 	@Transactional
 	public MemberResponse save(OAuthUserInfo userInfo, String server) {
 		OAuthServer oAuthServer = OAuthServer.getOAuthServer(server);
+
 		Member member = memberRepository.findByAccountAndServer(userInfo.getAccount(), oAuthServer)
-			.map(foundMember -> foundMember.updateInfo(userInfo.toEntity()))
+			.map(existingMember -> existingMember.updateInfo(userInfo.toEntity()))
 			.orElseGet(() -> {
 				log.debug("신규 OAuth 회원가입");
-				return userInfo.toEntity();
+				Member newMember = userInfo.toEntity();
+				newMember.setServer(oAuthServer);
+				return memberRepository.save(newMember);
 			});
 
-		member.setServer(oAuthServer);
-		return new MemberResponse(memberRepository.save(member));
+		return new MemberResponse(member);
 	}
 
 	@Transactional
 	@CacheEvict(key = "#memberId", cacheNames = "jwt")
 	public MemberResponse updateJwtCredentials(Long memberId, String encodedSecretKey, String jwtRefreshToken) {
-		Member member = memberRepository.findById(memberId)
+		Member member = memberRepository.findById(
+				memberId) // OSIV가 작동하기 때문에 select query를 날리지 않고 영속성 컨텍스트의 member를 사용한다
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
 		member.updateJwtCredentials(encodedSecretKey, jwtRefreshToken);
-		return new MemberResponse(memberRepository.save(member));
+		return new MemberResponse(member);
 	}
 
 	@Cacheable(key = "#memberId", cacheNames = "jwt")
