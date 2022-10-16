@@ -12,6 +12,7 @@ public class MemberResponse {
 	private String email;
 	private String profileImageUrl;
 	private OAuthServer oAuthServer;
+	private Boolean loggedIn;
 
 	public MemberResponse(Member member) {
 		this.id = member.getId();
@@ -20,5 +21,6 @@ public class MemberResponse {
 		this.email = member.getEmail();
 		this.profileImageUrl = member.getProfileImageUrl();
 		this.oAuthServer = member.getServer();
+		this.loggedIn = member.getLoggedIn();
 	}
 }

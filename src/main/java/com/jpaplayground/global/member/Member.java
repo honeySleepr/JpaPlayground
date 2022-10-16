@@ -1,6 +1,7 @@
 package com.jpaplayground.global.member;
 
 import com.jpaplayground.global.login.oauth.OAuthServer;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -20,14 +21,17 @@ public class Member {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	@Column(updatable = false)
 	private String account;
 	private String name;
 	private String email;
 	private String profileImageUrl;
+	@Column(updatable = false)
 	@Enumerated(EnumType.STRING)
 	private OAuthServer server;
 	private String encodedSecretKey;
 	private String jwtRefreshToken;
+	private Boolean loggedIn;
 
 	@Builder
 	private Member(Long id, String account, String name, String email, String profileImageUrl, OAuthServer server) {
@@ -37,6 +41,7 @@ public class Member {
 		this.email = email;
 		this.profileImageUrl = profileImageUrl;
 		this.server = server;
+		this.loggedIn = true;
 	}
 
 	public static Member of(String account, String name, String email, String profileImageUrl) {
@@ -57,10 +62,17 @@ public class Member {
 		this.jwtRefreshToken = jwtRefreshToken;
 	}
 
-	public Member updateInfo(Member member) {
+	public Member logInAndUpdateInfo(Member member) {
 		this.name = member.getName();
 		this.email = member.getEmail();
 		this.profileImageUrl = member.getProfileImageUrl();
+		this.loggedIn = true;
 		return this;
+	}
+
+	public void logOutAndDeleteJwtCredentials() {
+		this.encodedSecretKey = null;
+		this.jwtRefreshToken = null;
+		this.loggedIn = false;
 	}
 }

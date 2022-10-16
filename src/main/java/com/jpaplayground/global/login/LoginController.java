@@ -1,5 +1,6 @@
 package com.jpaplayground.global.login;
 
+import com.jpaplayground.global.auditing.LoginMember;
 import com.jpaplayground.global.exception.ErrorCode;
 import static com.jpaplayground.global.login.LoginUtils.HEADER_ACCESS_TOKEN;
 import static com.jpaplayground.global.login.LoginUtils.HEADER_REFRESH_TOKEN;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,6 +34,7 @@ public class LoginController {
 	private final OAuthPropertyHandler oAuthPropertyHandler;
 	private final JwtProvider jwtProvider;
 	private final LoginService loginService;
+	private final LoginMember loginMember;
 
 	@GetMapping("login/{server}/callback")
 	public ResponseEntity<MemberResponse> oAuthLogin(String code, @RequestParam("state") String receivedState,
@@ -62,5 +65,11 @@ public class LoginController {
 		headers.set(HEADER_REFRESH_TOKEN, jwtRefreshToken);
 
 		return ResponseEntity.ok().headers(headers).body(memberResponse);
+	}
+
+	@DeleteMapping("/logout")
+	public ResponseEntity<MemberResponse> logout() {
+		log.debug("Logout Member : {}", loginMember);
+		return ResponseEntity.ok(loginService.logout(loginMember.getId()));
 	}
 }

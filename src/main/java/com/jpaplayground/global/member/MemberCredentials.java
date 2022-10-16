@@ -1,5 +1,6 @@
 package com.jpaplayground.global.member;
 
+import com.jpaplayground.global.login.oauth.OAuthServer;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +12,8 @@ import lombok.NoArgsConstructor;
 public class MemberCredentials {
 
 	private Long id;
+	private String account;
+	private OAuthServer server;
 	private String encodedSecretKey;
 	private String jwtRefreshToken;
 }

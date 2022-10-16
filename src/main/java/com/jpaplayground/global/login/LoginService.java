@@ -28,7 +28,7 @@ public class LoginService {
 		OAuthServer oAuthServer = OAuthServer.getOAuthServer(server);
 
 		Member member = memberRepository.findByAccountAndServer(userInfo.getAccount(), oAuthServer)
-			.map(existingMember -> existingMember.updateInfo(userInfo.toEntity()))
+			.map(existingMember -> existingMember.logInAndUpdateInfo(userInfo.toEntity()))
 			.orElseGet(() -> {
 				log.debug("신규 OAuth 회원가입");
 				Member newMember = userInfo.toEntity();
@@ -40,9 +40,9 @@ public class LoginService {
 	}
 
 	@Transactional
-	@CacheEvict(key = "#memberId", cacheNames = "jwt")
+	@CacheEvict(key = "#memberId", cacheNames = "member")
 	public MemberResponse updateJwtCredentials(Long memberId, String encodedSecretKey, String jwtRefreshToken) {
-		Member member = memberRepository.findById(
+		Member member = memberRepository.findByIdAndLoggedInTrue(
 				memberId) // OSIV가 작동하기 때문에 select query를 날리지 않고 영속성 컨텍스트의 member를 사용한다
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -50,10 +50,20 @@ public class LoginService {
 		return new MemberResponse(member);
 	}
 
-	@Cacheable(key = "#memberId", cacheNames = "jwt")
+	@Cacheable(key = "#memberId", cacheNames = "member")
 	public MemberCredentials findMemberCredentials(Long memberId) {
 		log.debug("====== MemberCredentials Cache Miss");
-		return memberRepository.findMemberCredentialsById(memberId)
+		MemberCredentials memberCredentials = memberRepository.findMemberCredentialsById(memberId)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+		return memberCredentials;
+	}
+
+	@Transactional
+	@CacheEvict(key = "#memberId", cacheNames = "member")
+	public MemberResponse logout(Long memberId) {
+		Member member = memberRepository.findByIdAndLoggedInTrue(memberId)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+		member.logOutAndDeleteJwtCredentials();
+		return new MemberResponse(member);
 	}
 }
