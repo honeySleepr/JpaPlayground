@@ -69,7 +69,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 			response.setHeader(HEADER_ACCESS_TOKEN, newAccessToken);
 			log.debug("new AccessToken : {}", newAccessToken);
 
-			throw new LoginException(ErrorCode.ACCESS_TOKEN_RENEWED);
+			throw new LoginException(ErrorCode.JWT_ACCESS_TOKEN_RENEWED);
 		}
 	}
 

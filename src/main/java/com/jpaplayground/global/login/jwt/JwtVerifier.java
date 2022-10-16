@@ -23,7 +23,7 @@ public class JwtVerifier {
 			log.debug("JWT AccessToken 기간 만료");
 			throw e;
 		} catch (JwtException e) {
-			throw new LoginException(ErrorCode.INVALID_JWT_ACCESS_TOKEN);
+			throw new LoginException(ErrorCode.JWT_ACCESS_TOKEN_INVALID);
 		}
 	}
 
@@ -34,15 +34,15 @@ public class JwtVerifier {
 				.build()
 				.parseClaimsJws(refreshToken);
 		} catch (ExpiredJwtException e) {
-			throw new LoginException(ErrorCode.REFRESH_TOKEN_EXPIRED);
+			throw new LoginException(ErrorCode.JWT_REFRESH_TOKEN_EXPIRED);
 		} catch (JwtException e) {
-			throw new LoginException(ErrorCode.INVALID_JWT_REFRESH_TOKEN);
+			throw new LoginException(ErrorCode.JWT_REFRESH_TOKEN_INVALID);
 		}
 	}
 
 	public void verifyMatchingRefreshToken(String receivedRefreshToken, String savedRefreshToken) {
 		if (!receivedRefreshToken.equals(savedRefreshToken)) {
-			throw new LoginException(ErrorCode.REFRESH_TOKEN_MISMATCH);
+			throw new LoginException(ErrorCode.JWT_REFRESH_TOKEN_MISMATCH);
 		}
 	}
 }
