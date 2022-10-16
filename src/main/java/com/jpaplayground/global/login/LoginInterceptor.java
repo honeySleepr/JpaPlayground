@@ -41,6 +41,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 		verifyJwt(request, response, memberCredentials);
 
 		loginMember.create(memberCredentials);
+		log.debug("====== {}", loginMember);
 		return true;
 	}
 

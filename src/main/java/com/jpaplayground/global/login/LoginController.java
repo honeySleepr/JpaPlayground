@@ -38,8 +38,7 @@ public class LoginController {
 
 	@GetMapping("login/{server}/callback")
 	public ResponseEntity<MemberResponse> oAuthLogin(String code, @RequestParam("state") String receivedState,
-		@PathVariable String server,
-		@SessionAttribute("state") String sentState) {
+		@PathVariable String server, @SessionAttribute("state") String sentState) {
 
 		OAuthProvider oAuthProvider = oAuthProviderMap.get(server);
 		OAuthProperties properties = oAuthPropertyHandler.getProperties(server);
