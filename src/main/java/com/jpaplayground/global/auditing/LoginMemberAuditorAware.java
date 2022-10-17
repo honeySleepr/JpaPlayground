@@ -1,6 +1,5 @@
 package com.jpaplayground.global.auditing;
 
-import com.jpaplayground.global.member.Member;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,13 +10,13 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class LoginMemberAuditorAware implements AuditorAware<Member> {
+public class LoginMemberAuditorAware implements AuditorAware<Long> {
 
 	private final LoginMember loginMember;
 
 	@Override
-	public Optional<Member> getCurrentAuditor() {
+	public Optional<Long> getCurrentAuditor() {
 		log.debug("====== LoginMemberAuditorAware 호출");
-		return Optional.ofNullable(loginMember.toEntity());
+		return Optional.ofNullable(loginMember.getId());
 	}
 }
