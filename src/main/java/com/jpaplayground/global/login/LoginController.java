@@ -63,6 +63,7 @@ public class LoginController {
 		headers.set(HEADER_ACCESS_TOKEN, jwtAccessToken);
 		headers.set(HEADER_REFRESH_TOKEN, jwtRefreshToken);
 
+		log.debug("로그인 성공");
 		return ResponseEntity.ok().headers(headers).body(memberResponse);
 	}
 

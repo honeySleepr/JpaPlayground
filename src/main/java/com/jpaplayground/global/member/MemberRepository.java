@@ -16,5 +16,5 @@ public interface MemberRepository extends CrudRepository<Member, Long> {
 		"select new com.jpaplayground.global.member.MemberCredentials(m.id, m.account, m.server, m.encodedSecretKey, m. jwtRefreshToken) " +
 		"from Member m " +
 		"where m.id =:memberId and m.loggedIn=true")
-	Optional<MemberCredentials> findMemberCredentialsById(@Param("memberId") Long memberId);
+	Optional<MemberCredentials> findLoginMemberCredentialsById(@Param("memberId") Long memberId);
 }
