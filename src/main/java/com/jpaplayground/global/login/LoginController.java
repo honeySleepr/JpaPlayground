@@ -13,7 +13,6 @@ import com.jpaplayground.global.login.oauth.dto.OAuthAccessToken;
 import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
 import com.jpaplayground.global.member.MemberResponse;
 import java.util.Map;
-import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -51,13 +50,11 @@ public class LoginController {
 		log.debug("Login user info : {}", userInfo);
 		Long memberId = loginService.save(userInfo, server).getId();
 
-		SecretKey secretKey = jwtProvider.createSecretKey();
-		String jwtAccessToken = jwtProvider.createAccessToken(memberId, secretKey);
-		String jwtRefreshToken = jwtProvider.createRefreshToken(memberId, secretKey);
+		String jwtAccessToken = jwtProvider.createAccessToken(memberId);
+		String jwtRefreshToken = jwtProvider.createRefreshToken(memberId);
 		log.debug("JWT AccessToken : {}", jwtAccessToken);
 
-		String encodedSecretKey = jwtProvider.encodeSecretKey(secretKey);
-		MemberResponse memberResponse = loginService.updateJwtCredentials(memberId, encodedSecretKey, jwtRefreshToken);
+		MemberResponse memberResponse = loginService.updateJwtCredentials(memberId, jwtRefreshToken);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(HEADER_ACCESS_TOKEN, jwtAccessToken);

@@ -41,12 +41,12 @@ public class LoginService {
 
 	@Transactional
 	@CacheEvict(key = "#memberId", cacheNames = "member")
-	public MemberResponse updateJwtCredentials(Long memberId, String encodedSecretKey, String jwtRefreshToken) {
+	public MemberResponse updateJwtCredentials(Long memberId, String jwtRefreshToken) {
 		Member member = memberRepository.findById(
 				memberId) // OSIV가 작동하기 때문에 select query를 날리지 않고 영속성 컨텍스트의 member를 사용한다
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
-		member.updateJwtCredentials(encodedSecretKey, jwtRefreshToken);
+		member.updateJwtCredentials(jwtRefreshToken);
 		return new MemberResponse(member);
 	}
 

@@ -14,6 +14,5 @@ public class MemberCredentials {
 	private Long id;
 	private String account;
 	private OAuthServer server;
-	private String encodedSecretKey;
 	private String jwtRefreshToken;
 }

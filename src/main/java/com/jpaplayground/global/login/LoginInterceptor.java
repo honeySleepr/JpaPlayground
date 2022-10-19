@@ -11,7 +11,6 @@ import com.jpaplayground.global.login.jwt.JwtProvider;
 import com.jpaplayground.global.login.jwt.JwtVerifier;
 import com.jpaplayground.global.member.MemberCredentials;
 import io.jsonwebtoken.ExpiredJwtException;
-import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -52,21 +51,18 @@ public class LoginInterceptor implements HandlerInterceptor {
 		MemberCredentials memberCredentials) {
 		String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION).split("\\s")[1];
 
-		SecretKey secretKey = jwtProvider.decodeSecretKey(memberCredentials.getEncodedSecretKey());
-
 		try {
-			jwtVerifier.verifyAccessToken(secretKey, accessToken);
+			jwtVerifier.verifyAccessToken(accessToken);
 		} catch (ExpiredJwtException e) {
 			if (request.getHeader(HEADER_REFRESH_TOKEN) == null) {
 				throw new LoginException(ErrorCode.JWT_REFRESH_TOKEN_MISSING);
 			}
 
 			String refreshToken = request.getHeader(HEADER_REFRESH_TOKEN);
-			jwtVerifier.verifyRefreshToken(secretKey, refreshToken);
+			jwtVerifier.verifyRefreshToken(refreshToken);
 			jwtVerifier.verifyMatchingRefreshToken(refreshToken, memberCredentials.getJwtRefreshToken());
 
-			String newAccessToken = jwtProvider.createAccessToken(Long.valueOf(request.getHeader(HEADER_MEMBER_ID)),
-				secretKey);
+			String newAccessToken = jwtProvider.createAccessToken(Long.valueOf(request.getHeader(HEADER_MEMBER_ID)));
 			response.setHeader(HEADER_ACCESS_TOKEN, newAccessToken);
 			log.debug("new AccessToken : {}", newAccessToken);
 

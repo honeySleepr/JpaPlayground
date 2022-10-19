@@ -5,6 +5,8 @@ import com.jpaplayground.global.login.exception.LoginException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -13,7 +15,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class JwtVerifier {
 
-	public void verifyAccessToken(SecretKey secretKey, String accessToken) {
+	private final SecretKey secretKey;
+
+	public JwtVerifier(JwtProperties jwtProperties) {
+		this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.getSecretKey()));
+	}
+
+	public void verifyAccessToken(String accessToken) {
 		try {
 			Jwts.parserBuilder()
 				.setSigningKey(secretKey)
@@ -27,7 +35,7 @@ public class JwtVerifier {
 		}
 	}
 
-	public void verifyRefreshToken(SecretKey secretKey, String refreshToken) {
+	public void verifyRefreshToken(String refreshToken) {
 		try {
 			Jwts.parserBuilder()
 				.setSigningKey(secretKey)

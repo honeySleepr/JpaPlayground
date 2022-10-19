@@ -29,7 +29,6 @@ public class Member {
 	@Column(updatable = false)
 	@Enumerated(EnumType.STRING)
 	private OAuthServer server;
-	private String encodedSecretKey;
 	private String jwtRefreshToken;
 	private Boolean loggedIn;
 
@@ -57,8 +56,7 @@ public class Member {
 		this.server = server;
 	}
 
-	public void updateJwtCredentials(String encodedSecretKey, String jwtRefreshToken) {
-		this.encodedSecretKey = encodedSecretKey;
+	public void updateJwtCredentials(String jwtRefreshToken) {
 		this.jwtRefreshToken = jwtRefreshToken;
 	}
 
@@ -71,7 +69,6 @@ public class Member {
 	}
 
 	public void logOutAndDeleteJwtCredentials() {
-		this.encodedSecretKey = null;
 		this.jwtRefreshToken = null;
 		this.loggedIn = false;
 	}
