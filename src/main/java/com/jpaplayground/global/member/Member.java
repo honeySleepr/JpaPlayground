@@ -29,7 +29,6 @@ public class Member {
 	@Column(updatable = false)
 	@Enumerated(EnumType.STRING)
 	private OAuthServer server;
-	private String jwtRefreshToken;
 	private Boolean loggedIn;
 
 	@Builder
@@ -56,10 +55,6 @@ public class Member {
 		this.server = server;
 	}
 
-	public void updateJwtCredentials(String jwtRefreshToken) {
-		this.jwtRefreshToken = jwtRefreshToken;
-	}
-
 	public Member logInAndUpdateInfo(Member member) {
 		this.name = member.getName();
 		this.email = member.getEmail();
@@ -69,7 +64,6 @@ public class Member {
 	}
 
 	public void logOutAndDeleteJwtCredentials() {
-		this.jwtRefreshToken = null;
 		this.loggedIn = false;
 	}
 }

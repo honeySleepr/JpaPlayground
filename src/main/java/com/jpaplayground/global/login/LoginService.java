@@ -5,13 +5,11 @@ import com.jpaplayground.global.exception.NotFoundException;
 import com.jpaplayground.global.login.oauth.OAuthServer;
 import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
 import com.jpaplayground.global.member.Member;
-import com.jpaplayground.global.member.MemberCredentials;
 import com.jpaplayground.global.member.MemberRepository;
 import com.jpaplayground.global.member.MemberResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,25 +35,6 @@ public class LoginService {
 			});
 
 		return new MemberResponse(member);
-	}
-
-	@Transactional
-	@CacheEvict(key = "#memberId", cacheNames = "member")
-	public MemberResponse updateJwtCredentials(Long memberId, String jwtRefreshToken) {
-		Member member = memberRepository.findById(
-				memberId) // OSIV가 작동하기 때문에 select query를 날리지 않고 영속성 컨텍스트의 member를 사용한다
-			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-		member.updateJwtCredentials(jwtRefreshToken);
-		return new MemberResponse(member);
-	}
-
-	@Cacheable(key = "#memberId", cacheNames = "member")
-	public MemberCredentials findMemberCredentials(Long memberId) {
-		log.debug("====== MemberCredentials Cache Miss");
-
-		return memberRepository.findLoginMemberCredentialsById(memberId)
-			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 	}
 
 	@Transactional

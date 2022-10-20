@@ -32,4 +32,5 @@ public class RedisConfig {
 		builder.cacheDefaults(configuration);
 		return builder.build();
 	}
+
 }

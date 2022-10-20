@@ -12,6 +12,7 @@ import com.jpaplayground.global.login.oauth.OAuthProvider;
 import com.jpaplayground.global.login.oauth.dto.OAuthAccessToken;
 import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
 import com.jpaplayground.global.member.MemberResponse;
+import com.jpaplayground.global.redis.RedisService;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,9 @@ public class LoginController {
 	private final OAuthPropertyHandler oAuthPropertyHandler;
 	private final JwtProvider jwtProvider;
 	private final LoginService loginService;
+	private final RedisService redisService;
 	private final LoginMember loginMember;
+
 
 	@GetMapping("login/{server}/callback")
 	public ResponseEntity<MemberResponse> oAuthLogin(String code, @RequestParam("state") String receivedState,
@@ -48,13 +51,15 @@ public class LoginController {
 		OAuthAccessToken accessToken = oAuthProvider.getAccessToken(code, properties);
 		OAuthUserInfo userInfo = oAuthProvider.getUserInfo(accessToken, properties);
 		log.debug("Login user info : {}", userInfo);
-		Long memberId = loginService.save(userInfo, server).getId();
+
+		MemberResponse memberResponse = loginService.save(userInfo, server);
+		Long memberId = memberResponse.getId();
 
 		String jwtAccessToken = jwtProvider.createAccessToken(memberId);
 		String jwtRefreshToken = jwtProvider.createRefreshToken(memberId);
 		log.debug("JWT AccessToken : {}", jwtAccessToken);
 
-		MemberResponse memberResponse = loginService.updateJwtCredentials(memberId, jwtRefreshToken);
+		redisService.saveJwtRefreshToken(memberId, jwtRefreshToken);
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.set(HEADER_ACCESS_TOKEN, jwtAccessToken);
