@@ -3,6 +3,7 @@ package com.jpaplayground.global.login.jwt;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.login.exception.LoginException;
 import com.jpaplayground.global.redis.RedisService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -24,12 +25,13 @@ public class JwtVerifier {
 		this.redisService = redisService;
 	}
 
-	public void verifyAccessToken(String accessToken) {
+	public Claims verifyAccessToken(String accessToken) {
 		try {
-			Jwts.parserBuilder()
+			return Jwts.parserBuilder()
 				.setSigningKey(secretKey)
 				.build()
-				.parseClaimsJws(accessToken);
+				.parseClaimsJws(accessToken)
+				.getBody();
 		} catch (ExpiredJwtException e) {
 			log.debug("JWT AccessToken 기간 만료");
 			throw e;

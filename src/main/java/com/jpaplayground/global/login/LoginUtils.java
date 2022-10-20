@@ -12,6 +12,7 @@ public class LoginUtils {
 	public static final String BEARER_REGEX = "^[bB]earer\\s.*";
 	public static final String HEADER_ACCESS_TOKEN = "AccessToken";
 	public static final String HEADER_REFRESH_TOKEN = "RefreshToken";
-	public static final String HEADER_MEMBER_ID = "MemberId";
+	public static final String LOGIN_MEMBER = "loginMember";
 	public static final String JWT_ISSUER = "JpaPlayground";
+
 }
