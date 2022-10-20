@@ -9,6 +9,8 @@ import com.jpaplayground.global.login.jwt.JwtProvider;
 import com.jpaplayground.global.login.jwt.JwtVerifier;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -25,13 +28,17 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
 	public static final Pattern bearerPattern = Pattern.compile("^[bB]earer\\s(.*)");
+	private static final Map<String, Set<String>> excludedRequests = Map.of(
+		"/products", Set.of(HttpMethod.GET.toString())
+	);
 	private final JwtVerifier jwtVerifier;
 	private final JwtProvider jwtProvider;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-		/* Todo : `POST /products`는 막고 `GET /products`는 열어주려면 여기서 if문 처리하는 방법 뿐인가? */
-
+		if (isExcludedRequest(request)) {
+			return true;
+		}
 		log.debug("인터셉터 발동 : {}", request.getRequestURI());
 
 		String accessToken = parseBearerToken(request);
@@ -43,7 +50,10 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 		} catch (ExpiredJwtException e) {
 			Long memberId = Long.valueOf(e.getClaims().getSubject());
 
-			String newAccessToken = issueNewAccessToken(refreshToken, memberId);
+			jwtVerifier.verifyRefreshToken(refreshToken);
+			jwtVerifier.verifyMatchingRefreshToken(refreshToken, memberId);
+			String newAccessToken = jwtProvider.createAccessToken(memberId);
+
 			response.setHeader(HEADER_ACCESS_TOKEN, newAccessToken);
 			log.debug("AccessToken 재발급 : {}", newAccessToken);
 			throw new LoginException(ErrorCode.JWT_ACCESS_TOKEN_RENEWED);
@@ -53,10 +63,14 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 		return true;
 	}
 
-	private String issueNewAccessToken(String refreshToken, Long memberId) {
-		jwtVerifier.verifyRefreshToken(refreshToken);
-		jwtVerifier.verifyMatchingRefreshToken(refreshToken, memberId);
-		return jwtProvider.createAccessToken(memberId);
+	private boolean isExcludedRequest(HttpServletRequest request) {
+		String requestURI = request.getRequestURI();
+		String httpMethod = request.getMethod();
+
+		if (excludedRequests.containsKey(requestURI)) {
+			return excludedRequests.get(requestURI).contains(httpMethod);
+		}
+		return false;
 	}
 
 	private String parseBearerToken(HttpServletRequest request) {
