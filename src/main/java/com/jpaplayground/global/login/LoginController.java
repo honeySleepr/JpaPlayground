@@ -1,6 +1,5 @@
 package com.jpaplayground.global.login;
 
-import com.jpaplayground.global.auditing.LoginMember;
 import com.jpaplayground.global.exception.ErrorCode;
 import static com.jpaplayground.global.login.LoginUtils.HEADER_ACCESS_TOKEN;
 import static com.jpaplayground.global.login.LoginUtils.HEADER_REFRESH_TOKEN;
@@ -35,8 +34,6 @@ public class LoginController {
 	private final JwtProvider jwtProvider;
 	private final LoginService loginService;
 	private final RedisService redisService;
-	private final LoginMember loginMember;
-
 
 	@GetMapping("login/{server}/callback")
 	public ResponseEntity<MemberResponse> oAuthLogin(String code, @RequestParam("state") String receivedState,
@@ -70,8 +67,8 @@ public class LoginController {
 	}
 
 	@DeleteMapping("/logout")
-	public ResponseEntity<MemberResponse> logout() {
-		log.debug("Logout Member : {}", loginMember);
-		return ResponseEntity.ok(loginService.logout(loginMember.getId()));
+	public ResponseEntity<MemberResponse> logout(@LoginMemberId Long memberId) {
+		redisService.deleteJwtRefreshToken(memberId);
+		return ResponseEntity.ok(loginService.logout(memberId));
 	}
 }

@@ -9,7 +9,6 @@ import com.jpaplayground.global.member.MemberRepository;
 import com.jpaplayground.global.member.MemberResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,12 +37,12 @@ public class LoginService {
 	}
 
 	@Transactional
-	@CacheEvict(key = "#memberId", cacheNames = "member")
 	public MemberResponse logout(Long memberId) {
-		Member member = memberRepository.findByIdAndLoggedInTrue(memberId)
+		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-		member.logOutAndDeleteJwtCredentials();
+		member.logOut();
 
+		log.debug("로그아웃 성공");
 		return new MemberResponse(member);
 	}
 }

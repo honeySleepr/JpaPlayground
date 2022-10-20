@@ -63,7 +63,7 @@ public class Member {
 		return this;
 	}
 
-	public void logOutAndDeleteJwtCredentials() {
+	public void logOut() {
 		this.loggedIn = false;
 	}
 }

@@ -18,4 +18,8 @@ public class RedisService {
 	public String getJwtRefreshToken(Long memberId) {
 		return redisTemplate.opsForValue().get(String.valueOf(memberId));
 	}
+
+	public void deleteJwtRefreshToken(Long memberId) {
+		redisTemplate.delete(String.valueOf(memberId));
+	}
 }
