@@ -5,7 +5,6 @@ import com.jpaplayground.global.login.exception.LoginException;
 import com.jpaplayground.global.redis.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -33,10 +32,11 @@ public class JwtVerifier {
 				.parseClaimsJws(accessToken)
 				.getBody();
 		} catch (ExpiredJwtException e) {
-			log.debug("JWT AccessToken 기간 만료");
+			log.debug("AccessToken 기간 만료");
 			throw e;
-		} catch (JwtException e) {
-			throw new LoginException(ErrorCode.JWT_ACCESS_TOKEN_INVALID);
+		} catch (Exception e) {
+			log.debug("AccessToken 유효하지 않음");
+			throw new LoginException(ErrorCode.AUTHORIZATION_FAILED);
 		}
 	}
 
@@ -47,16 +47,19 @@ public class JwtVerifier {
 				.build()
 				.parseClaimsJws(refreshToken);
 		} catch (ExpiredJwtException e) {
-			throw new LoginException(ErrorCode.JWT_REFRESH_TOKEN_EXPIRED);
-		} catch (JwtException e) {
-			throw new LoginException(ErrorCode.JWT_REFRESH_TOKEN_INVALID);
+			log.debug("RefreshToken 기간 만료");
+			throw new LoginException(ErrorCode.AUTHORIZATION_FAILED);
+		} catch (Exception e) {
+			log.debug("RefreshToken 유효하지 않음");
+			throw new LoginException(ErrorCode.AUTHORIZATION_FAILED);
 		}
 	}
 
 	public void verifyMatchingRefreshToken(String receivedRefreshToken, Long memberId) {
 		String savedRefreshToken = redisService.getJwtRefreshToken(memberId);
 		if (!receivedRefreshToken.equals(savedRefreshToken)) {
-			throw new LoginException(ErrorCode.JWT_REFRESH_TOKEN_MISMATCH);
+			log.debug("RefreshToken 불일치");
+			throw new LoginException(ErrorCode.AUTHORIZATION_FAILED);
 		}
 	}
 }

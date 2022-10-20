@@ -1,9 +1,7 @@
 package com.jpaplayground.global.login;
 
-import com.jpaplayground.global.exception.ErrorCode;
 import static com.jpaplayground.global.login.LoginUtils.HEADER_ACCESS_TOKEN;
 import static com.jpaplayground.global.login.LoginUtils.HEADER_REFRESH_TOKEN;
-import com.jpaplayground.global.login.exception.LoginException;
 import com.jpaplayground.global.login.jwt.JwtProvider;
 import com.jpaplayground.global.login.oauth.OAuthProperties;
 import com.jpaplayground.global.login.oauth.OAuthPropertyHandler;
@@ -41,9 +39,7 @@ public class LoginController {
 
 		OAuthProvider oAuthProvider = oAuthProviderMap.get(server);
 		OAuthProperties properties = oAuthPropertyHandler.getProperties(server);
-		if (!oAuthProvider.verifyState(receivedState, sentState)) {
-			throw new LoginException(ErrorCode.OAUTH_STATE_MISMATCH);
-		}
+		oAuthProvider.verifyState(receivedState, sentState);
 
 		OAuthAccessToken accessToken = oAuthProvider.getAccessToken(code, properties);
 		OAuthUserInfo userInfo = oAuthProvider.getUserInfo(accessToken, properties);

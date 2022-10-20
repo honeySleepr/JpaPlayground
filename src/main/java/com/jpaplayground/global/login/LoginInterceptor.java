@@ -1,7 +1,6 @@
 package com.jpaplayground.global.login;
 
 import com.jpaplayground.global.exception.ErrorCode;
-import static com.jpaplayground.global.login.LoginUtils.BEARER_REGEX;
 import static com.jpaplayground.global.login.LoginUtils.HEADER_ACCESS_TOKEN;
 import static com.jpaplayground.global.login.LoginUtils.HEADER_REFRESH_TOKEN;
 import static com.jpaplayground.global.login.LoginUtils.LOGIN_MEMBER;
@@ -10,6 +9,8 @@ import com.jpaplayground.global.login.jwt.JwtProvider;
 import com.jpaplayground.global.login.jwt.JwtVerifier;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Slf4j
 public class LoginInterceptor implements HandlerInterceptor {
 
+	public static final Pattern bearerPattern = Pattern.compile("^[bB]earer\\s(.*)");
 	private final JwtVerifier jwtVerifier;
 	private final JwtProvider jwtProvider;
 
@@ -31,9 +33,8 @@ public class LoginInterceptor implements HandlerInterceptor {
 		/* Todo : `POST /products`는 막고 `GET /products`는 열어주려면 여기서 if문 처리하는 방법 뿐인가? */
 
 		log.debug("인터셉터 발동 : {}", request.getRequestURI());
-		checkAuthorizationHeader(request);
 
-		String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION).split("\\s")[1];
+		String accessToken = parseBearerToken(request);
 		String refreshToken = request.getHeader(HEADER_REFRESH_TOKEN);
 		Claims claims;
 
@@ -41,8 +42,10 @@ public class LoginInterceptor implements HandlerInterceptor {
 			claims = jwtVerifier.verifyAccessToken(accessToken);
 		} catch (ExpiredJwtException e) {
 			Long memberId = Long.valueOf(e.getClaims().getSubject());
+
 			String newAccessToken = issueNewAccessToken(refreshToken, memberId);
 			response.setHeader(HEADER_ACCESS_TOKEN, newAccessToken);
+			log.debug("AccessToken 재발급 : {}", newAccessToken);
 			throw new LoginException(ErrorCode.JWT_ACCESS_TOKEN_RENEWED);
 		}
 
@@ -51,22 +54,19 @@ public class LoginInterceptor implements HandlerInterceptor {
 	}
 
 	private String issueNewAccessToken(String refreshToken, Long memberId) {
-		if (refreshToken == null) {
-			/* 에러는 두루뭉실하게 하되 log을 자세하게 찍자 */
-			throw new LoginException(ErrorCode.JWT_REFRESH_TOKEN_MISSING);
-		}
 		jwtVerifier.verifyRefreshToken(refreshToken);
 		jwtVerifier.verifyMatchingRefreshToken(refreshToken, memberId);
-		String newAccessToken = jwtProvider.createAccessToken(memberId);
-		log.debug("new AccessToken : {}", newAccessToken);
-		return newAccessToken;
+		return jwtProvider.createAccessToken(memberId);
 	}
 
-	private void checkAuthorizationHeader(HttpServletRequest request) {
-		String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-
-		if (authHeader == null || !authHeader.matches(BEARER_REGEX)) {
-			throw new LoginException(ErrorCode.JWT_ACCESS_TOKEN_MISSING);
+	private String parseBearerToken(HttpServletRequest request) {
+		String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+		if (header != null) {
+			Matcher matcher = bearerPattern.matcher(header);
+			if (matcher.find()) {
+				return matcher.group(1);
+			}
 		}
+		return null;
 	}
 }

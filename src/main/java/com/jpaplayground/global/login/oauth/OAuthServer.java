@@ -17,7 +17,7 @@ public enum OAuthServer {
 		return Arrays.stream(OAuthServer.values())
 			.filter(oAuthServer -> oAuthServer.hasName(server))
 			.findFirst()
-			.orElseThrow(() -> new NotFoundException(ErrorCode.OAUTH_SERVER_NOT_FOUND));
+			.orElseThrow(() -> new NotFoundException(ErrorCode.OAUTH_FAILED));
 	}
 
 }
