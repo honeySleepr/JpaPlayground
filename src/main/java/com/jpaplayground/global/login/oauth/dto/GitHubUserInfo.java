@@ -1,18 +1,32 @@
 package com.jpaplayground.global.login.oauth.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.ToString;
+import java.util.Map;
 
-@Getter
-@ToString
-public class GitHubUserInfo implements OAuthUserInfo {
+public class GitHubUserInfo extends OAuthUserInfo {
 
-	@JsonProperty(value = "login")
-	private String account;
-	private String name;
-	private String email;
-	@JsonProperty(value = "avatar_url")
-	private String profileImageUrl;
+	public GitHubUserInfo(Map<String, Object> oAuthResponse) {
+		super(oAuthResponse);
+
+	}
+
+	@Override
+	public String getAccount() {
+		return (String) oAuthResponse.get("login");
+	}
+
+	@Override
+	public String getName() {
+		return (String) oAuthResponse.get("name");
+	}
+
+	@Override
+	public String getEmail() {
+		return (String) oAuthResponse.get("email");
+	}
+
+	@Override
+	public String getProfileImageUrl() {
+		return (String) oAuthResponse.get("avatar_url");
+	}
 
 }

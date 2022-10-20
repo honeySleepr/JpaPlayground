@@ -7,7 +7,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class NaverAccessTokenRequest {
+public class OAuthAccessTokenRequest {
 
 	private final String code;
 	@JsonProperty(value = "client_id")
@@ -17,7 +17,7 @@ public class NaverAccessTokenRequest {
 	@JsonProperty(value = "grant_type")
 	private final String grantType;
 
-	public NaverAccessTokenRequest(String code, OAuthProperties oAuthProperties) {
+	public OAuthAccessTokenRequest(String code, OAuthProperties oAuthProperties) {
 		this.grantType = oAuthProperties.getGrantType();
 		this.code = code;
 		this.clientId = oAuthProperties.getClientId();

@@ -5,6 +5,7 @@ import static com.jpaplayground.global.login.LoginUtils.OAUTH_REDIRECT_URI;
 import static com.jpaplayground.global.login.LoginUtils.OAUTH_STATE;
 import com.jpaplayground.global.login.oauth.OAuthProperties;
 import com.jpaplayground.global.login.oauth.OAuthPropertyHandler;
+import com.jpaplayground.global.login.oauth.OAuthServer;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -35,9 +36,9 @@ public class LoginFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest) servletRequest;
 		HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-		String server = parseProvider(request);
-		OAuthProperties properties = oAuthPropertyHandler.getProperties(server);
-		log.debug("Login request to OAuth server : {}", server);
+		OAuthServer oAuthServer = OAuthServer.getOAuthServer(parseProvider(request));
+		OAuthProperties properties = oAuthPropertyHandler.getProperties(oAuthServer);
+		log.debug("로그인 요청 : {}", oAuthServer);
 
 		String state = UUID.randomUUID().toString();
 		request.getSession().setAttribute(OAUTH_STATE, state);

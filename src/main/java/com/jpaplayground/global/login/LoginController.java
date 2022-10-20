@@ -6,11 +6,11 @@ import com.jpaplayground.global.login.jwt.JwtProvider;
 import com.jpaplayground.global.login.oauth.OAuthProperties;
 import com.jpaplayground.global.login.oauth.OAuthPropertyHandler;
 import com.jpaplayground.global.login.oauth.OAuthProvider;
+import com.jpaplayground.global.login.oauth.OAuthServer;
 import com.jpaplayground.global.login.oauth.dto.OAuthAccessToken;
 import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
 import com.jpaplayground.global.member.MemberResponse;
 import com.jpaplayground.global.redis.RedisService;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 @Slf4j
 public class LoginController {
 
-	private final Map<String, OAuthProvider> oAuthProviderMap;
+	private final OAuthProvider oAuthProvider;
 	private final OAuthPropertyHandler oAuthPropertyHandler;
 	private final JwtProvider jwtProvider;
 	private final LoginService loginService;
@@ -37,13 +37,13 @@ public class LoginController {
 	public ResponseEntity<MemberResponse> oAuthLogin(String code, @RequestParam("state") String receivedState,
 		@PathVariable String server, @SessionAttribute("state") String sentState) {
 
-		OAuthProvider oAuthProvider = oAuthProviderMap.get(server);
-		OAuthProperties properties = oAuthPropertyHandler.getProperties(server);
+		OAuthServer oAuthServer = OAuthServer.getOAuthServer(server);
+		OAuthProperties properties = oAuthPropertyHandler.getProperties(oAuthServer);
 		oAuthProvider.verifyState(receivedState, sentState);
 
 		OAuthAccessToken accessToken = oAuthProvider.getAccessToken(code, properties);
-		OAuthUserInfo userInfo = oAuthProvider.getUserInfo(accessToken, properties);
-		log.debug("Login user info : {}", userInfo);
+		OAuthUserInfo userInfo = oAuthProvider.getUserInfo(oAuthServer, accessToken, properties);
+		log.debug("로그인 유저 : {}", userInfo.getAccount());
 
 		MemberResponse memberResponse = loginService.save(userInfo, server);
 		Long memberId = memberResponse.getId();
