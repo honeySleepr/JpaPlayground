@@ -44,7 +44,7 @@ class ProductServiceIntegrationTest {
 		ProductCreateRequest request = new ProductCreateRequest("한무무", 149_000);
 
 		// when
-		ProductResponse savedProduct = productService.save(request);
+		ProductResponse savedProduct = productService.save(request, null);
 
 		// then
 		assertThat(savedProduct.getName()).isEqualTo(request.getName());

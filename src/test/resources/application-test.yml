@@ -1,6 +1,6 @@
 spring:
   config:
-    import: oauth.yml
+    import: properties.yml
 
   datasource:
     # MODE=MySQL;IGNORECASE=TRUE 설정 필요한가?

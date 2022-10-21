@@ -21,14 +21,20 @@ public class Member {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	@Column(updatable = false)
 	private String account;
+
 	private String name;
+
 	private String email;
+
 	private String profileImageUrl;
+
 	@Column(updatable = false)
 	@Enumerated(EnumType.STRING)
 	private OAuthServer server;
+
 	private Boolean loggedIn;
 
 	@Builder
@@ -43,11 +49,11 @@ public class Member {
 
 	public static Member of(String account, String name, String email, String profileImageUrl) {
 		return Member.builder()
-			.account(account)
-			.name(name)
-			.email(email)
-			.profileImageUrl(profileImageUrl)
-			.build();
+					 .account(account)
+					 .name(name)
+					 .email(email)
+					 .profileImageUrl(profileImageUrl)
+					 .build();
 	}
 
 	public void setServer(OAuthServer server) {
@@ -65,4 +71,5 @@ public class Member {
 	public void logOut() {
 		this.loggedIn = false;
 	}
+
 }

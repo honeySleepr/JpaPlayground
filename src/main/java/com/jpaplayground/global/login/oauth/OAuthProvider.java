@@ -53,8 +53,7 @@ public class OAuthProvider {
 		HttpEntity<Object> requestHttpEntity = new HttpEntity<>(headers);
 
 		Map<String, Object> oAuthResponse = restTemplate.exchange(properties.getUserInfoRequestUrl(), HttpMethod.GET,
-			requestHttpEntity, new ParameterizedTypeReference<Map<String, Object>>() {
-			}).getBody();
+			requestHttpEntity, new ParameterizedTypeReference<Map<String, Object>>() {}).getBody();
 
 		return OAuthUserInfoFactory.getOAuthUserInfo(oAuthServer, oAuthResponse);
 	}

@@ -3,6 +3,9 @@ package com.jpaplayground.global.login.oauth.dto;
 import com.jpaplayground.global.member.Member;
 import java.util.Map;
 
+/**
+ * <h2><a href="https://github.com/deepIify/oauth-login-be">코드 참고</a></h2>
+ */
 public abstract class OAuthUserInfo {
 
 	protected Map<String, Object> oAuthResponse;
