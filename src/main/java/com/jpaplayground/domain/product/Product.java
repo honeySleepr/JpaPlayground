@@ -1,7 +1,9 @@
 package com.jpaplayground.domain.product;
 
-import com.jpaplayground.global.auditing.BaseEntity;
+import java.time.LocalDateTime;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -9,27 +11,45 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Product extends BaseEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class Product {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	private String name;
+
 	private Integer price;
+
 	private Boolean deleted;
+
+	@Column(updatable = false)
+	@CreatedDate
+	private LocalDateTime createdAt;
+
+	@LastModifiedDate
+	private LocalDateTime lastModifiedAt;
+
+	@Column(updatable = false)
+	private Long creatorId;
 
 	/**
 	 * `@Builder`를 클래스에 붙이면 모든 필드에 대한 빌더메서드가 만들어지지만, 메서드나 생성자에 붙이면 인자들에 대해서만 빌더 메서드가 만들어진다.
 	 */
 	@Builder
-	private Product(String name, Integer price) {
+	private Product(String name, Integer price, Long creatorId) {
 		this.name = name;
 		this.price = price;
 		this.deleted = false;
+		this.creatorId = creatorId;
 	}
 
 	/**

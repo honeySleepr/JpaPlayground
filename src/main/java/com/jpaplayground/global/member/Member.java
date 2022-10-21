@@ -32,8 +32,7 @@ public class Member {
 	private Boolean loggedIn;
 
 	@Builder
-	private Member(Long id, String account, String name, String email, String profileImageUrl, OAuthServer server) {
-		this.id = id;
+	private Member(String account, String name, String email, String profileImageUrl, OAuthServer server) {
 		this.account = account;
 		this.name = name;
 		this.email = email;

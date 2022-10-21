@@ -20,10 +20,11 @@ public class ProductCreateRequest {
 	@PositiveOrZero
 	private Integer price;
 
-	public Product toEntity() {
+	public Product toEntity(Long memberId) {
 		return Product.builder()
-			.name(name)
-			.price(price)
-			.build();
+					  .name(name)
+					  .price(price)
+					  .creatorId(memberId)
+					  .build();
 	}
 }
