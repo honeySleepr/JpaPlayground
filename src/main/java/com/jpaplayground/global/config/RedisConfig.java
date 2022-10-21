@@ -1,4 +1,4 @@
-package com.jpaplayground.config;
+package com.jpaplayground.global.config;
 
 import java.time.Duration;
 import org.springframework.cache.CacheManager;

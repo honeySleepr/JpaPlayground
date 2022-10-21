@@ -1,8 +1,8 @@
-package com.jpaplayground.config;
+package com.jpaplayground.global.config;
 
-import com.jpaplayground.global.login.LoginFilter;
-import com.jpaplayground.global.login.LoginInterceptor;
 import com.jpaplayground.global.login.LoginMemberArgumentResolver;
+import com.jpaplayground.global.login.filter.LoginFilter;
+import com.jpaplayground.global.login.interceptor.AuthenticationInterceptor;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -17,24 +17,24 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
+	private final AuthenticationInterceptor authenticationInterceptor;
 	private final LoginFilter loginFilter;
-	private final LoginInterceptor loginInterceptor;
 	private final LoginMemberArgumentResolver loginMemberArgumentResolver;
 
 	@Bean
-	public FilterRegistrationBean<LoginFilter> setFilterRegistration() {
+	public FilterRegistrationBean<LoginFilter> setLoginFilter() {
 		FilterRegistrationBean<LoginFilter> filterRegistrationBean = new FilterRegistrationBean<>();
 		filterRegistrationBean.setFilter(loginFilter);
-		filterRegistrationBean.addUrlPatterns("/login/github", "/login/naver", "/login/kakao");
+		filterRegistrationBean.addUrlPatterns("/login/github", "/login/naver");
 		filterRegistrationBean.setOrder(0);
 		return filterRegistrationBean;
 	}
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(loginInterceptor)
-			.addPathPatterns("/**")
-			.excludePathPatterns("/login/**", "/*.ico", "/error", "/css/**");
+		registry.addInterceptor(authenticationInterceptor)
+				.addPathPatterns("/**")
+				.excludePathPatterns("/login/**", "/*.ico", "/error", "/css/**");
 	}
 
 	@Override

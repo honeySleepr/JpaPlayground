@@ -1,4 +1,4 @@
-package com.jpaplayground.global.login;
+package com.jpaplayground.global.login.filter;
 
 import static com.jpaplayground.global.login.LoginUtils.OAUTH_CLIENT_ID;
 import static com.jpaplayground.global.login.LoginUtils.OAUTH_REDIRECT_URI;
@@ -36,7 +36,7 @@ public class LoginFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest) servletRequest;
 		HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-		OAuthServer oAuthServer = OAuthServer.getOAuthServer(parseProvider(request));
+		OAuthServer oAuthServer = OAuthServer.getOAuthServer(parseServer(request));
 		OAuthProperties properties = oAuthPropertyHandler.getProperties(oAuthServer);
 		log.debug("로그인 요청 : {}", oAuthServer);
 
@@ -52,7 +52,7 @@ public class LoginFilter implements Filter {
 		response.sendRedirect(uri.toString());
 	}
 
-	private String parseProvider(HttpServletRequest httpRequest) {
+	private String parseServer(HttpServletRequest httpRequest) {
 		Matcher matcher = pattern.matcher(httpRequest.getRequestURI());
 
 		if (matcher.find()) {
