@@ -45,3 +45,10 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+tasks.withType(Test) {
+	testLogging {
+		showExceptions true
+		events "skipped", "passed", "failed"
+	}
+}
