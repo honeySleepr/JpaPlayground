@@ -1,5 +1,6 @@
 package com.jpaplayground.domain.product;
 
+import com.jpaplayground.domain.reservation.Reservation;
 import com.jpaplayground.global.member.Member;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
@@ -11,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -47,8 +49,12 @@ public class Product {
 	 * `@ManyToOne-@OneToMany` 양방향으로 변경
 	 */
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(updatable = false, name = "created_by")
+	@JoinColumn(updatable = false, name = "CREATED_BY")
 	private Member createdBy;
+
+	@OneToOne
+	@JoinColumn(name = "RESERVATION_ID")
+	private Reservation reservation;
 
 	/**
 	 * `@Builder`를 클래스에 붙이면 모든 필드에 대한 빌더메서드가 만들어지지만, 메서드나 생성자에 붙이면 인자들에 대해서만 빌더 메서드가 만들어진다.
