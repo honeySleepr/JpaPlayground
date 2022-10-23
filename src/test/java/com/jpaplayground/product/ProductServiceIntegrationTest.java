@@ -7,6 +7,7 @@ import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.exception.NotFoundException;
+import com.jpaplayground.global.member.Member;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -30,11 +31,13 @@ class ProductServiceIntegrationTest {
 	@Autowired
 	TestData testData;
 	List<Product> allProducts;
+	Member member1;
 
 	@BeforeEach
 	void init() {
 		testData.init();
 		allProducts = testData.getAllProducts();
+		member1 = testData.getMember1();
 	}
 
 	@Test
@@ -42,9 +45,10 @@ class ProductServiceIntegrationTest {
 	void save() {
 		// given
 		ProductCreateRequest request = new ProductCreateRequest("한무무", 149_000);
+		Long id = member1.getId();
 
 		// when
-		ProductResponse savedProduct = productService.save(request, null);
+		ProductResponse savedProduct = productService.save(request, id);
 
 		// then
 		assertThat(savedProduct.getName()).isEqualTo(request.getName());

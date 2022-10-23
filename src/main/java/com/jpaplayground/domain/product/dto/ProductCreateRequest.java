@@ -1,6 +1,5 @@
 package com.jpaplayground.domain.product.dto;
 
-import com.jpaplayground.domain.product.Product;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
@@ -20,11 +19,4 @@ public class ProductCreateRequest {
 	@PositiveOrZero
 	private Integer price;
 
-	public Product toEntity(Long memberId) {
-		return Product.builder()
-					  .name(name)
-					  .price(price)
-					  .creatorId(memberId)
-					  .build();
-	}
 }

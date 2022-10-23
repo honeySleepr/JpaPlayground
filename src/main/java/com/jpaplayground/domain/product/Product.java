@@ -1,12 +1,16 @@
 package com.jpaplayground.domain.product;
 
+import com.jpaplayground.global.member.Member;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,18 +42,23 @@ public class Product {
 	@LastModifiedDate
 	private LocalDateTime lastModifiedAt;
 
-	@Column(updatable = false)
-	private Long creatorId;
+	/**
+	 * `@OneToMany`(Member->Product) 단방향 관계는 DB 상에는 Many 쪽에 있는 FK를 One 쪽 객체에서 관리하는 구조가 되어버려서 추천하지 않음 그래서 영한님이 추천하신
+	 * `@ManyToOne-@OneToMany` 양방향으로 변경
+	 */
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(updatable = false, name = "created_by")
+	private Member createdBy;
 
 	/**
 	 * `@Builder`를 클래스에 붙이면 모든 필드에 대한 빌더메서드가 만들어지지만, 메서드나 생성자에 붙이면 인자들에 대해서만 빌더 메서드가 만들어진다.
 	 */
 	@Builder
-	private Product(String name, Integer price, Long creatorId) {
+	private Product(String name, Integer price, Member createdBy) {
 		this.name = name;
 		this.price = price;
 		this.deleted = false;
-		this.creatorId = creatorId;
+		this.createdBy = createdBy;
 	}
 
 	/**

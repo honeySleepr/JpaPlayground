@@ -2,6 +2,9 @@ package com.jpaplayground;
 
 import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.domain.product.ProductRepository;
+import com.jpaplayground.global.login.oauth.OAuthServer;
+import com.jpaplayground.global.member.Member;
+import com.jpaplayground.global.member.MemberRepository;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -9,20 +12,39 @@ import org.springframework.stereotype.Component;
 public class TestData {
 
 	private final ProductRepository productRepository;
+	private final MemberRepository memberRepository;
 	private final List<Product> allProducts;
+	private final Member member1;
 
-	public TestData(ProductRepository productRepository, List<Product> allProducts) {
+	public TestData(ProductRepository productRepository, MemberRepository memberRepository) {
 		this.productRepository = productRepository;
+		this.memberRepository = memberRepository;
 		this.allProducts = createProductData();
+		this.member1 = createMember1();
 	}
 
 	public void init() {
 		clear();
+		persistMemberData();
 		persistProductData();
 	}
 
 	private void clear() {
 		productRepository.deleteAll();
+	}
+
+	private Member createMember1() {
+		return Member.builder()
+			.account("testBC")
+			.name("캉캉")
+			.email("spam@naver.com")
+			.profileImageUrl("https://phinf.pstatic.net/contact/20220721_150/1658381007616hcqNL_JPEG/image.jpg")
+			.server(OAuthServer.NAVER)
+			.build();
+	}
+
+	private void persistMemberData() {
+		memberRepository.save(member1);
 	}
 
 	private List<Product> createProductData() {
@@ -52,5 +74,9 @@ public class TestData {
 
 	public List<Product> getAllProducts() {
 		return allProducts;
+	}
+
+	public Member getMember1() {
+		return member1;
 	}
 }
