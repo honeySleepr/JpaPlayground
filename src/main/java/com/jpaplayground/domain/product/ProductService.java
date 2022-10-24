@@ -34,7 +34,7 @@ public class ProductService {
 		Product product = Product.builder()
 			.name(request.getName())
 			.price(request.getPrice())
-			.createdBy(member)
+			.seller(member)
 			.build();
 
 		return new ProductResponse(productRepository.save(product));
@@ -47,4 +47,5 @@ public class ProductService {
 		product.changeDeletedState(true);
 		return new ProductResponse(product);
 	}
+
 }

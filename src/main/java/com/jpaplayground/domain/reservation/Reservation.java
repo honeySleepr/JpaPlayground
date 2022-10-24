@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,16 +27,18 @@ public class Reservation {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private Integer price;
-
 	@Column(updatable = false)
 	@CreatedDate
 	private LocalDateTime createdAt;
 
-	private LocalDateTime dDay;
+	private LocalDateTime timeToMeet;
 
-	@OneToOne
-	@JoinColumn(name = "BUYER_ID")
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "buyer_id")
 	private Member buyer;
 
+	public Reservation(Member buyer, LocalDateTime timeToMeet) {
+		this.buyer = buyer;
+		this.timeToMeet = timeToMeet;
+	}
 }

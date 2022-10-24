@@ -49,22 +49,22 @@ public class Product {
 	 * `@ManyToOne-@OneToMany` 양방향으로 변경
 	 */
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(updatable = false, name = "CREATED_BY")
-	private Member createdBy;
+	@JoinColumn(updatable = false, name = "seller_id")
+	private Member seller;
 
 	@OneToOne
-	@JoinColumn(name = "RESERVATION_ID")
+	@JoinColumn(name = "reservation_id")
 	private Reservation reservation;
 
 	/**
 	 * `@Builder`를 클래스에 붙이면 모든 필드에 대한 빌더메서드가 만들어지지만, 메서드나 생성자에 붙이면 인자들에 대해서만 빌더 메서드가 만들어진다.
 	 */
 	@Builder
-	private Product(String name, Integer price, Member createdBy) {
+	private Product(String name, Integer price, Member seller) {
 		this.name = name;
 		this.price = price;
 		this.deleted = false;
-		this.createdBy = createdBy;
+		this.seller = seller;
 	}
 
 	/**
@@ -84,4 +84,14 @@ public class Product {
 		this.deleted = tf;
 	}
 
+	public void verifySeller(Long sellerId) {
+		if (!seller.getId().equals(sellerId)) {
+			/* Todo: ProductException */
+			throw new IllegalArgumentException();
+		}
+	}
+
+	public void reserve(Reservation reservation) {
+		this.reservation = reservation;
+	}
 }
