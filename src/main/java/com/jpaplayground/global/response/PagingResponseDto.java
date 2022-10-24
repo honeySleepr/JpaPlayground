@@ -7,8 +7,8 @@ import org.springframework.data.domain.Slice;
 @Getter
 public class PagingResponseDto<T> {
 
-	private Paging paging;
-	private List<T> data;
+	private final Paging paging;
+	private final List<T> data;
 
 	public PagingResponseDto(Slice<T> slice) {
 		this.paging = new Paging(slice);

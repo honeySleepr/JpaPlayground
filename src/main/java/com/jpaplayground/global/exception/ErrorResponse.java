@@ -13,9 +13,9 @@ import org.springframework.validation.BindingResult;
 @Getter
 public class ErrorResponse {
 
-	private String message;
-	private int httpStatus;
-	private List<ErrorDetail> errorDetails;
+	private final String message;
+	private final int httpStatus;
+	private final List<ErrorDetail> errorDetails;
 
 	public ErrorResponse(ErrorCode errorCode) {
 		this.message = errorCode.getMessage();
@@ -32,9 +32,9 @@ public class ErrorResponse {
 	@Getter
 	private static class ErrorDetail {
 
-		private String field;
-		private String rejectedValue;
-		private String defaultMessage;
+		private final String field;
+		private final String rejectedValue;
+		private final String defaultMessage;
 
 		private ErrorDetail(String field, String rejectedValue, String defaultMessage) {
 			this.field = field;

@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 public class ProductResponse {
 
-	private Long id;
-	private String name;
-	private Integer price;
+	private final Long id;
+	private final String name;
+	private final Integer price;
 
 	public ProductResponse(Product product) {
 		this.id = product.getId();

@@ -8,11 +8,11 @@ import org.springframework.data.domain.Slice;
 @Getter
 public class Paging {
 
-	private int size;
-	private int page;
-	private boolean last;
-	private int numberOfElements;
-	private List<String> sort;
+	private final int size;
+	private final int page;
+	private final boolean last;
+	private final int numberOfElements;
+	private final List<String> sort;
 
 	public Paging(Slice slice) {
 		this.size = slice.getSize();
