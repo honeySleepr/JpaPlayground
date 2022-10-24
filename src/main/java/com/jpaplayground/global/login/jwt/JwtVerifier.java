@@ -6,8 +6,6 @@ import com.jpaplayground.global.redis.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -20,7 +18,7 @@ public class JwtVerifier {
 	private final RedisService redisService;
 
 	public JwtVerifier(JwtProperties jwtProperties, RedisService redisService) {
-		this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.getSecretKey()));
+		this.secretKey = jwtProperties.getSecretKey();
 		this.redisService = redisService;
 	}
 

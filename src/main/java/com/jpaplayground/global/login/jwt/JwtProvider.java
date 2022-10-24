@@ -2,8 +2,6 @@ package com.jpaplayground.global.login.jwt;
 
 import static com.jpaplayground.global.login.LoginUtils.JWT_ISSUER;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import javax.crypto.SecretKey;
@@ -18,7 +16,7 @@ public class JwtProvider {
 	private LocalDateTime now;
 
 	public JwtProvider(JwtProperties jwtProperties) {
-		this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.getSecretKey()));
+		this.secretKey = jwtProperties.getSecretKey();
 	}
 
 	public String createAccessToken(Long memberId) {
