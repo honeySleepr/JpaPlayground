@@ -2,10 +2,11 @@ package com.jpaplayground.domain.reservation;
 
 import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.domain.product.ProductRepository;
+import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.global.exception.ErrorCode;
-import com.jpaplayground.global.exception.NotFoundException;
 import com.jpaplayground.global.member.Member;
 import com.jpaplayground.global.member.MemberRepository;
+import com.jpaplayground.global.member.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +22,10 @@ public class ReservationService {
 	@Transactional
 	public ReservationResponse create(ReservationCreateRequest request, Long sellerId) {
 		Product product = productRepository.findById(request.getProductId())
-			.orElseThrow(() -> new NotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 
 		Member buyer = memberRepository.findById(request.getBuyerId())
-			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+			.orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 
 		product.verifySeller(sellerId);
 		Reservation reservation = reservationRepository.save(new Reservation(buyer, request.getTimeToMeet()));

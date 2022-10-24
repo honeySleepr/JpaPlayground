@@ -2,10 +2,11 @@ package com.jpaplayground.domain.product;
 
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
+import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.global.exception.ErrorCode;
-import com.jpaplayground.global.exception.NotFoundException;
 import com.jpaplayground.global.member.Member;
 import com.jpaplayground.global.member.MemberRepository;
+import com.jpaplayground.global.member.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -30,7 +31,7 @@ public class ProductService {
 	public ProductResponse save(ProductCreateRequest request, Long memberId) {
 		// TODO : 서비스단 validation
 		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+			.orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 		Product product = Product.builder()
 			.name(request.getName())
 			.price(request.getPrice())
@@ -43,7 +44,7 @@ public class ProductService {
 	@Transactional
 	public ProductResponse delete(Long productId) {
 		Product product = productRepository.findById(productId)
-			.orElseThrow(() -> new NotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 		product.changeDeletedState(true);
 		return new ProductResponse(product);
 	}

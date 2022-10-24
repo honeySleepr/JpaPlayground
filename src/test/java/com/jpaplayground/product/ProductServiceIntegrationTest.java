@@ -5,8 +5,8 @@ import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.domain.product.ProductService;
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
+import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.global.exception.ErrorCode;
-import com.jpaplayground.global.exception.NotFoundException;
 import com.jpaplayground.global.member.Member;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,7 +63,7 @@ class ProductServiceIntegrationTest {
 
 		// when
 		// then
-		assertThatThrownBy(() -> productService.delete(id)).isInstanceOf(NotFoundException.class)
+		assertThatThrownBy(() -> productService.delete(id)).isInstanceOf(ProductException.class)
 			.hasMessage(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
 	}
 

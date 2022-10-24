@@ -1,6 +1,8 @@
 package com.jpaplayground.domain.product;
 
+import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.domain.reservation.Reservation;
+import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.member.Member;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
@@ -86,8 +88,7 @@ public class Product {
 
 	public void verifySeller(Long sellerId) {
 		if (!seller.getId().equals(sellerId)) {
-			/* Todo: ProductException */
-			throw new IllegalArgumentException();
+			throw new ProductException(ErrorCode.NOT_SELLER);
 		}
 	}
 
