@@ -2,13 +2,13 @@ package com.jpaplayground.domain.product;
 
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
-import com.jpaplayground.global.MySlice;
 import com.jpaplayground.global.login.LoginMemberId;
+import com.jpaplayground.global.response.PagingResponse;
+import com.jpaplayground.global.response.SingleResponse;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,20 +23,19 @@ public class ProductController {
 	private final ProductService service;
 
 	@GetMapping("/products")
-	public ResponseEntity<MySlice<ProductResponse>> findAll(Pageable pageable) {
-		return ResponseEntity.ok(new MySlice<>(service.findAll(pageable)));
+	public PagingResponse<ProductResponse> findAll(Pageable pageable) {
+		return new PagingResponse<>(service.findAll(pageable));
 	}
 
 	@PostMapping("/products")
-	public ResponseEntity<ProductResponse> add(@Valid @RequestBody ProductCreateRequest request,
+	public SingleResponse<ProductResponse> add(@Valid @RequestBody ProductCreateRequest request,
 		@LoginMemberId Long memberId) {
-
-		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(request, memberId));
+		return new SingleResponse<>(service.save(request, memberId), HttpStatus.CREATED);
 	}
 
 	@DeleteMapping("/products/{productId}")
-	public ResponseEntity<ProductResponse> delete(@PathVariable Long productId) {
-		return ResponseEntity.ok(service.delete(productId));
+	public SingleResponse<ProductResponse> delete(@PathVariable Long productId) {
+		return new SingleResponse<>(service.delete(productId));
 	}
 
 }
