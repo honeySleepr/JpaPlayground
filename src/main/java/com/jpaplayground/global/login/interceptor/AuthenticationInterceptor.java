@@ -11,12 +11,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -27,10 +26,12 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Slf4j
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
-	public static final Pattern bearerPattern = Pattern.compile("^[bB]earer\\s(.*)");
+	public static final String BEARER_REGEX = "[bB]earer\\s";
+
 	private static final Map<String, Set<String>> excludedRequests = Map.of(
 		"/products", Set.of(HttpMethod.GET.toString())
 	);
+
 	private final JwtVerifier jwtVerifier;
 	private final JwtProvider jwtProvider;
 
@@ -75,12 +76,9 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
 	private String parseBearerToken(HttpServletRequest request) {
 		String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-		if (header != null) {
-			Matcher matcher = bearerPattern.matcher(header);
-			if (matcher.find()) {
-				return matcher.group(1);
-			}
+		if (header == null) {
+			return null;
 		}
-		return null;
+		return header.replaceFirst(BEARER_REGEX, Strings.EMPTY);
 	}
 }

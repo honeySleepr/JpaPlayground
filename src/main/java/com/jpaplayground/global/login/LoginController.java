@@ -4,7 +4,7 @@ import static com.jpaplayground.global.login.LoginUtils.HEADER_ACCESS_TOKEN;
 import static com.jpaplayground.global.login.LoginUtils.HEADER_REFRESH_TOKEN;
 import com.jpaplayground.global.login.jwt.JwtProvider;
 import com.jpaplayground.global.login.oauth.OAuthProperties;
-import com.jpaplayground.global.login.oauth.OAuthPropertyHandler;
+import com.jpaplayground.global.login.oauth.OAuthPropertyMap;
 import com.jpaplayground.global.login.oauth.OAuthProvider;
 import com.jpaplayground.global.login.oauth.OAuthServer;
 import com.jpaplayground.global.login.oauth.dto.OAuthAccessToken;
@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 public class LoginController {
 
 	private final OAuthProvider oAuthProvider;
-	private final OAuthPropertyHandler oAuthPropertyHandler;
+	private final OAuthPropertyMap oAuthPropertyMap;
 	private final JwtProvider jwtProvider;
 	private final LoginService loginService;
 	private final RedisService redisService;
@@ -38,7 +38,7 @@ public class LoginController {
 		@PathVariable String server, @SessionAttribute("state") String sentState) {
 
 		OAuthServer oAuthServer = OAuthServer.getOAuthServer(server);
-		OAuthProperties properties = oAuthPropertyHandler.getProperties(oAuthServer);
+		OAuthProperties properties = oAuthPropertyMap.getProperties(oAuthServer);
 		oAuthProvider.verifyState(receivedState, sentState);
 
 		OAuthAccessToken accessToken = oAuthProvider.getAccessToken(code, properties);

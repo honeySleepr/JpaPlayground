@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 @ConstructorBinding
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "oauth")
-public class OAuthPropertyHandler {
+public class OAuthPropertyMap {
 
 	private final Map<OAuthServer, OAuthProperties> server;
 

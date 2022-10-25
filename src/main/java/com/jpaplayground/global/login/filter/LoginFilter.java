@@ -4,12 +4,10 @@ import static com.jpaplayground.global.login.LoginUtils.OAUTH_CLIENT_ID;
 import static com.jpaplayground.global.login.LoginUtils.OAUTH_REDIRECT_URI;
 import static com.jpaplayground.global.login.LoginUtils.OAUTH_STATE;
 import com.jpaplayground.global.login.oauth.OAuthProperties;
-import com.jpaplayground.global.login.oauth.OAuthPropertyHandler;
+import com.jpaplayground.global.login.oauth.OAuthPropertyMap;
 import com.jpaplayground.global.login.oauth.OAuthServer;
 import java.io.IOException;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletRequest;
@@ -18,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -27,8 +26,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Slf4j
 public class LoginFilter implements Filter {
 
-	public static final Pattern pattern = Pattern.compile("/login/(.*)$");
-	private final OAuthPropertyHandler oAuthPropertyHandler;
+	public static final String LOGIN_REGEX = "/login/";
+	private final OAuthPropertyMap oAuthPropertyMap;
 
 	@Override
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain)
@@ -37,7 +36,7 @@ public class LoginFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) servletResponse;
 
 		OAuthServer oAuthServer = OAuthServer.getOAuthServer(parseServer(request));
-		OAuthProperties properties = oAuthPropertyHandler.getProperties(oAuthServer);
+		OAuthProperties properties = oAuthPropertyMap.getProperties(oAuthServer);
 		log.debug("로그인 요청 : {}", oAuthServer);
 
 		String state = UUID.randomUUID().toString();
@@ -53,12 +52,7 @@ public class LoginFilter implements Filter {
 	}
 
 	private String parseServer(HttpServletRequest httpRequest) {
-		Matcher matcher = pattern.matcher(httpRequest.getRequestURI());
-
-		if (matcher.find()) {
-			return matcher.group(1);
-		}
-		throw new IllegalArgumentException();
+		return httpRequest.getRequestURI().replaceFirst(LOGIN_REGEX, Strings.EMPTY);
 	}
 
 }

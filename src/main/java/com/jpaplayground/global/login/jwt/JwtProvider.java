@@ -15,17 +15,19 @@ import org.springframework.stereotype.Component;
 public class JwtProvider {
 
 	private final SecretKey secretKey;
+	private LocalDateTime now;
 
 	public JwtProvider(JwtProperties jwtProperties) {
 		this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtProperties.getSecretKey()));
 	}
 
 	public String createAccessToken(Long memberId) {
+		now = LocalDateTime.now();
 		return Jwts.builder()
 			.setIssuer(JWT_ISSUER)
 			.setSubject(String.valueOf(memberId))
-			.setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))
-			.setExpiration(Timestamp.valueOf(LocalDateTime.now().plusMinutes(10L)))
+			.setIssuedAt(Timestamp.valueOf(now))
+			.setExpiration(Timestamp.valueOf(now.plusMinutes(10L)))
 			.signWith(secretKey)
 			.compact();
 	}
@@ -34,8 +36,8 @@ public class JwtProvider {
 		return Jwts.builder()
 			.setIssuer(JWT_ISSUER)
 			.setSubject(String.valueOf(memberId))
-			.setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))
-			.setExpiration(Timestamp.valueOf(LocalDateTime.now().plusWeeks(2L)))
+			.setIssuedAt(Timestamp.valueOf(now))
+			.setExpiration(Timestamp.valueOf(now.plusWeeks(2L)))
 			.signWith(secretKey)
 			.compact();
 	}

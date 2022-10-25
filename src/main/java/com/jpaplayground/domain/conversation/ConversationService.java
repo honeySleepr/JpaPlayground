@@ -22,7 +22,8 @@ public class ConversationService {
 	public Conversation save(ConversationCreateRequest request) {
 		Product product = productRepository.findById(request.getProductId())
 			.orElseThrow(() -> new NotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
-		return conversationRepository.save(Conversation.of(request.getContent(), product));
+		Conversation conversation = Conversation.of(request.getContent(), product);
+		return conversationRepository.save(conversation);
 	}
 
 	/* TODO: 지정된 Product에 대한 채팅만 조회 + paging 적용*/

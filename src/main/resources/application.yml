@@ -1,6 +1,6 @@
 spring:
   config:
-    import: classpath:properties.yml
+    import: classpath:auth.yml
 
   datasource:
     # MODE=MySQL;IGNORECASE=TRUE 설정 필요한가?
