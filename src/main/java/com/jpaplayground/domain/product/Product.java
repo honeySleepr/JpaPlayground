@@ -75,10 +75,11 @@ public class Product {
 	 * price가 quantity가 되지만 컴파일 에러로 잡아내지 못한다. 그래서 builder를 사용한다. 생성자 시그니처에서 price, quantity 위치가 바뀌어도 price는 price()에,
 	 * quantity는 quantity()에 들어간다
 	 */
-	public static Product of(String name, Integer price) {
+	public static Product of(String name, Integer price, Member seller) {
 		return Product.builder()
 			.name(name)
 			.price(price)
+			.seller(seller)
 			.build();
 	}
 
@@ -94,5 +95,11 @@ public class Product {
 
 	public void reserve(Reservation reservation) {
 		this.reservation = reservation;
+	}
+
+	public void checkReserved() {
+		if (this.reservation != null) {
+			throw new ProductException(ErrorCode.RESERVED);
+		}
 	}
 }

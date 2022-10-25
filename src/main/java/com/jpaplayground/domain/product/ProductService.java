@@ -43,7 +43,7 @@ public class ProductService {
 
 	@Transactional
 	public ProductResponse delete(Long productId) {
-		Product product = productRepository.findById(productId)
+		Product product = productRepository.findByIdAndDeletedFalse(productId)
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 		product.changeDeletedState(true);
 		return new ProductResponse(product);

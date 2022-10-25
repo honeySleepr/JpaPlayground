@@ -37,7 +37,8 @@ class ProductServiceIntegrationTest {
 	void init() {
 		testData.init();
 		allProducts = testData.getAllProducts();
-		member1 = testData.getMember1();
+		member1 = testData.getAllMembers().get(0);
+
 	}
 
 	@Test

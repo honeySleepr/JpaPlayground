@@ -15,7 +15,8 @@ public enum ErrorCode {
 
 	// Product
 	PRODUCT_NOT_FOUND(NOT_FOUND, "Product를 찾을 수 없습니다"),
-	NOT_SELLER(NOT_FOUND, "해당 제품의 판매자가 아닙니다"),
+	NOT_SELLER(BAD_REQUEST, "해당 제품의 판매자가 아닙니다"),
+	RESERVED(BAD_REQUEST, "이미 예약된 제품입니다"),
 
 	// Member
 	MEMBER_NOT_FOUND(NOT_FOUND, "Member를 찾을 수 없습니다"),
