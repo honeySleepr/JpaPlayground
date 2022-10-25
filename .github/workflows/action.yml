@@ -24,8 +24,7 @@ jobs:
     - name: Swap environment variables
       working-directory: ./src/main/resources
       run: |
-        touch properties.yml
-        echo "${{ secrets.PROPERTIES_YML }}" > ./properties.yml
+        echo "${{ secrets.AUTH_YML }}" >> ./auth.yml
 
     # https://github.com/actions/cache/blob/main/examples.md#java---gradle
     - name: gradle dependency caching
