@@ -1,7 +1,7 @@
 package com.jpaplayground.global.login.oauth;
 
-import com.jpaplayground.domain.product.exception.NotFoundException;
 import com.jpaplayground.global.exception.ErrorCode;
+import com.jpaplayground.global.exception.NotFoundException;
 import java.util.Arrays;
 
 public enum OAuthServer {
@@ -17,7 +17,7 @@ public enum OAuthServer {
 		return Arrays.stream(OAuthServer.values())
 			.filter(oAuthServer -> oAuthServer.hasName(server))
 			.findFirst()
-			.orElseThrow(() -> new NotFoundException(ErrorCode.OAUTH_SERVER_NOT_FOUND));
+			.orElseThrow(() -> new NotFoundException(ErrorCode.OAUTH_FAILED));
 	}
 
 }

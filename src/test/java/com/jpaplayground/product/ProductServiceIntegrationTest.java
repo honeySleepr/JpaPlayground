@@ -5,8 +5,8 @@ import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.domain.product.ProductService;
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
-import com.jpaplayground.domain.product.exception.NotFoundException;
 import com.jpaplayground.global.exception.ErrorCode;
+import com.jpaplayground.global.exception.NotFoundException;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -44,7 +44,7 @@ class ProductServiceIntegrationTest {
 		ProductCreateRequest request = new ProductCreateRequest("한무무", 149_000);
 
 		// when
-		ProductResponse savedProduct = productService.save(request);
+		ProductResponse savedProduct = productService.save(request, null);
 
 		// then
 		assertThat(savedProduct.getName()).isEqualTo(request.getName());
@@ -60,7 +60,7 @@ class ProductServiceIntegrationTest {
 		// when
 		// then
 		assertThatThrownBy(() -> productService.delete(id)).isInstanceOf(NotFoundException.class)
-			.hasMessage(ErrorCode.ENTITY_NOT_FOUND.getMessage());
+			.hasMessage(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
 	}
 
 	@Nested

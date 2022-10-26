@@ -1,6 +1,6 @@
 spring:
   config:
-    import: classpath:oauth.yml
+    import: classpath:auth.yml
 
   datasource:
     # MODE=MySQL;IGNORECASE=TRUE 설정 필요한가?
@@ -14,7 +14,7 @@ spring:
 
   sql:
     init:
-      mode: always
+      mode: never
 
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
@@ -28,6 +28,10 @@ spring:
 
     defer-datasource-initialization: true
 
+  redis:
+    host: 127.0.0.1
+    port: 6379
+
   data:
     web:
       pageable:
@@ -38,3 +42,4 @@ logging:
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql: trace
     com.jpaplayground: debug
+    org.springframework.cache: trace
