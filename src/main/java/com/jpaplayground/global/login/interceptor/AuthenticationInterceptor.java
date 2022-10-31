@@ -1,11 +1,8 @@
 package com.jpaplayground.global.login.interceptor;
 
 import com.jpaplayground.global.exception.ErrorCode;
-import static com.jpaplayground.global.login.LoginUtils.HEADER_ACCESS_TOKEN;
-import static com.jpaplayground.global.login.LoginUtils.HEADER_REFRESH_TOKEN;
 import static com.jpaplayground.global.login.LoginUtils.LOGIN_MEMBER;
 import com.jpaplayground.global.login.exception.LoginException;
-import com.jpaplayground.global.login.jwt.JwtProvider;
 import com.jpaplayground.global.login.jwt.JwtVerifier;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -33,7 +30,6 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 	);
 
 	private final JwtVerifier jwtVerifier;
-	private final JwtProvider jwtProvider;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -43,21 +39,12 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 		log.debug("인터셉터 발동 : {}", request.getRequestURI());
 
 		String accessToken = parseBearerToken(request);
-		String refreshToken = request.getHeader(HEADER_REFRESH_TOKEN);
 		Claims claims;
 
 		try {
 			claims = jwtVerifier.verifyAccessToken(accessToken);
 		} catch (ExpiredJwtException e) {
-			Long memberId = Long.valueOf(e.getClaims().getSubject());
-
-			jwtVerifier.verifyRefreshToken(refreshToken);
-			jwtVerifier.verifyMatchingRefreshToken(refreshToken, memberId);
-			String newAccessToken = jwtProvider.createAccessToken(memberId);
-
-			response.setHeader(HEADER_ACCESS_TOKEN, newAccessToken);
-			log.debug("AccessToken 재발급 : {}", newAccessToken);
-			throw new LoginException(ErrorCode.JWT_ACCESS_TOKEN_RENEWED);
+			throw new LoginException(ErrorCode.JWT_ACCESS_TOKEN_EXPIRED);
 		}
 
 		request.setAttribute(LOGIN_MEMBER, Long.valueOf(claims.getSubject()));

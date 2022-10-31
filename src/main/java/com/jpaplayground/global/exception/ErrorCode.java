@@ -24,7 +24,7 @@ public enum ErrorCode {
 	// Authentication
 	OAUTH_FAILED(UNAUTHORIZED, "OAuth 인증이 실패했습니다"),
 	AUTHORIZATION_FAILED(BAD_REQUEST, "로그인 인증이 실패하였습니다"),
-	JWT_ACCESS_TOKEN_RENEWED(UNAUTHORIZED, "AccessToken이 재발급되었습니다. 다시 요청해주세요");
+	JWT_ACCESS_TOKEN_EXPIRED(UNAUTHORIZED, "AccessToken이 만료되었습니다");
 
 	private final HttpStatus status;
 	private final String message;
