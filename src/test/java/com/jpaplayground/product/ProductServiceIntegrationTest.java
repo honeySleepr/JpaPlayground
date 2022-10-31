@@ -49,7 +49,7 @@ class ProductServiceIntegrationTest {
 		Long id = member1.getId();
 
 		// when
-		ProductResponse savedProduct = productService.save(request, id);
+		ProductResponse savedProduct = productService.save(request);
 
 		// then
 		assertThat(savedProduct.getName()).isEqualTo(request.getName());

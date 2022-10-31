@@ -2,7 +2,6 @@ package com.jpaplayground.domain.product;
 
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
-import com.jpaplayground.global.login.LoginMemberId;
 import com.jpaplayground.global.response.PagingResponse;
 import com.jpaplayground.global.response.SingleResponse;
 import javax.validation.Valid;
@@ -28,9 +27,8 @@ public class ProductController {
 	}
 
 	@PostMapping("/products")
-	public SingleResponse<ProductResponse> add(@Valid @RequestBody ProductCreateRequest request,
-		@LoginMemberId Long memberId) {
-		return new SingleResponse<>(service.save(request, memberId), HttpStatus.CREATED);
+	public SingleResponse<ProductResponse> add(@Valid @RequestBody ProductCreateRequest request) {
+		return new SingleResponse<>(service.save(request), HttpStatus.CREATED);
 	}
 
 	@DeleteMapping("/products/{productId}")

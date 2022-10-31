@@ -19,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -50,6 +51,7 @@ public class Product {
 	 * `@OneToMany`(Member->Product) 단방향 관계는 DB 상에는 Many 쪽에 있는 FK를 One 쪽 객체에서 관리하는 구조가 되어버려서 추천하지 않음 그래서 영한님이 추천하신
 	 * `@ManyToOne-@OneToMany` 양방향으로 변경
 	 */
+	@CreatedBy
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(updatable = false, name = "seller_id")
 	private Member seller;
@@ -62,11 +64,10 @@ public class Product {
 	 * `@Builder`를 클래스에 붙이면 모든 필드에 대한 빌더메서드가 만들어지지만, 메서드나 생성자에 붙이면 인자들에 대해서만 빌더 메서드가 만들어진다.
 	 */
 	@Builder
-	private Product(String name, Integer price, Member seller) {
+	private Product(String name, Integer price) {
 		this.name = name;
 		this.price = price;
 		this.deleted = false;
-		this.seller = seller;
 	}
 
 	/**
@@ -75,12 +76,11 @@ public class Product {
 	 * price가 quantity가 되지만 컴파일 에러로 잡아내지 못한다. 그래서 builder를 사용한다. 생성자 시그니처에서 price, quantity 위치가 바뀌어도 price는 price()에,
 	 * quantity는 quantity()에 들어간다
 	 */
-	public static Product of(String name, Integer price, Member seller) {
+	public static Product of(String name, Integer price) {
 		return Product.builder()
-			.name(name)
-			.price(price)
-			.seller(seller)
-			.build();
+					  .name(name)
+					  .price(price)
+					  .build();
 	}
 
 	public void changeDeletedState(boolean tf) {
