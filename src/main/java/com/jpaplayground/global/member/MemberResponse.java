@@ -6,13 +6,13 @@ import lombok.Getter;
 @Getter
 public class MemberResponse {
 
-	private Long id;
-	private String account;
-	private String name;
-	private String email;
-	private String profileImageUrl;
-	private OAuthServer oAuthServer;
-	private Boolean loggedIn;
+	private final Long id;
+	private final String account;
+	private final String name;
+	private final String email;
+	private final String profileImageUrl;
+	private final OAuthServer oAuthServer;
+	private final Boolean loggedIn;
 
 	public MemberResponse(Member member) {
 		this.id = member.getId();

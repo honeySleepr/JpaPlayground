@@ -1,12 +1,20 @@
 package com.jpaplayground.domain.product;
 
+import com.jpaplayground.domain.product.exception.ProductException;
+import com.jpaplayground.domain.reservation.Reservation;
+import com.jpaplayground.global.exception.ErrorCode;
+import com.jpaplayground.global.member.Member;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,18 +46,27 @@ public class Product {
 	@LastModifiedDate
 	private LocalDateTime lastModifiedAt;
 
-	@Column(updatable = false)
-	private Long creatorId;
+	/**
+	 * `@OneToMany`(Member->Product) 단방향 관계는 DB 상에는 Many 쪽에 있는 FK를 One 쪽 객체에서 관리하는 구조가 되어버려서 추천하지 않음 그래서 영한님이 추천하신
+	 * `@ManyToOne-@OneToMany` 양방향으로 변경
+	 */
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(updatable = false, name = "seller_id")
+	private Member seller;
+
+	@OneToOne
+	@JoinColumn(name = "reservation_id")
+	private Reservation reservation;
 
 	/**
 	 * `@Builder`를 클래스에 붙이면 모든 필드에 대한 빌더메서드가 만들어지지만, 메서드나 생성자에 붙이면 인자들에 대해서만 빌더 메서드가 만들어진다.
 	 */
 	@Builder
-	private Product(String name, Integer price, Long creatorId) {
+	private Product(String name, Integer price, Member seller) {
 		this.name = name;
 		this.price = price;
 		this.deleted = false;
-		this.creatorId = creatorId;
+		this.seller = seller;
 	}
 
 	/**
@@ -58,10 +75,11 @@ public class Product {
 	 * price가 quantity가 되지만 컴파일 에러로 잡아내지 못한다. 그래서 builder를 사용한다. 생성자 시그니처에서 price, quantity 위치가 바뀌어도 price는 price()에,
 	 * quantity는 quantity()에 들어간다
 	 */
-	public static Product of(String name, Integer price) {
+	public static Product of(String name, Integer price, Member seller) {
 		return Product.builder()
 			.name(name)
 			.price(price)
+			.seller(seller)
 			.build();
 	}
 
@@ -69,4 +87,19 @@ public class Product {
 		this.deleted = tf;
 	}
 
+	public void verifySeller(Long sellerId) {
+		if (!seller.getId().equals(sellerId)) {
+			throw new ProductException(ErrorCode.NOT_SELLER);
+		}
+	}
+
+	public void reserve(Reservation reservation) {
+		this.reservation = reservation;
+	}
+
+	public void checkReserved() {
+		if (this.reservation != null) {
+			throw new ProductException(ErrorCode.RESERVED);
+		}
+	}
 }

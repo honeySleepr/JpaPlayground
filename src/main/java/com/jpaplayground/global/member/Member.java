@@ -1,6 +1,9 @@
 package com.jpaplayground.global.member;
 
+import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.global.login.oauth.OAuthServer;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -8,6 +11,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +26,7 @@ public class Member {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	/* Todo: UserInfo embeddedType으로 묶기*/
 	@Column(updatable = false)
 	private String account;
 
@@ -37,6 +42,9 @@ public class Member {
 
 	private Boolean loggedIn;
 
+	@OneToMany(mappedBy = "seller")
+	private final List<Product> products = new ArrayList<>();
+
 	@Builder
 	private Member(String account, String name, String email, String profileImageUrl, OAuthServer server) {
 		this.account = account;
@@ -49,11 +57,11 @@ public class Member {
 
 	public static Member of(String account, String name, String email, String profileImageUrl) {
 		return Member.builder()
-					 .account(account)
-					 .name(name)
-					 .email(email)
-					 .profileImageUrl(profileImageUrl)
-					 .build();
+			.account(account)
+			.name(name)
+			.email(email)
+			.profileImageUrl(profileImageUrl)
+			.build();
 	}
 
 	public void setServer(OAuthServer server) {

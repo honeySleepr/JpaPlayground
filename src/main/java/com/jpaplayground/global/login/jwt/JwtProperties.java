@@ -1,15 +1,22 @@
 package com.jpaplayground.global.login.jwt;
 
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
+import javax.crypto.SecretKey;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 
 @Getter
 @ConstructorBinding
-@RequiredArgsConstructor
 @ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
 
-	private final String secretKey;
+	private final String encodedSecretKey;
+	private final SecretKey secretKey;
+
+	public JwtProperties(String encodedSecretKey) {
+		this.encodedSecretKey = encodedSecretKey;
+		this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(encodedSecretKey));
+	}
 }

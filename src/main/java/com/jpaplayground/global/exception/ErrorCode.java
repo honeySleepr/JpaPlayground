@@ -9,10 +9,19 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 @Getter
 public enum ErrorCode {
 
-	PRODUCT_NOT_FOUND(NOT_FOUND, "Product를 찾을 수 없습니다"),
-	MEMBER_NOT_FOUND(NOT_FOUND, "Member를 찾을 수 없습니다"),
+	// Global
 	INVALID_INPUT_VALUE(BAD_REQUEST, "입력값이 잘못되었습니다"),
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"),
+
+	// Product
+	PRODUCT_NOT_FOUND(NOT_FOUND, "Product를 찾을 수 없습니다"),
+	NOT_SELLER(BAD_REQUEST, "해당 제품의 판매자가 아닙니다"),
+	RESERVED(BAD_REQUEST, "이미 예약된 제품입니다"),
+
+	// Member
+	MEMBER_NOT_FOUND(NOT_FOUND, "Member를 찾을 수 없습니다"),
+
+	// Authentication
 	OAUTH_FAILED(UNAUTHORIZED, "OAuth 인증이 실패했습니다"),
 	AUTHORIZATION_FAILED(BAD_REQUEST, "로그인 인증이 실패하였습니다"),
 	JWT_ACCESS_TOKEN_RENEWED(UNAUTHORIZED, "AccessToken이 재발급되었습니다. 다시 요청해주세요");

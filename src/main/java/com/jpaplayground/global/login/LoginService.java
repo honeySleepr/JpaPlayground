@@ -1,12 +1,12 @@
 package com.jpaplayground.global.login;
 
 import com.jpaplayground.global.exception.ErrorCode;
-import com.jpaplayground.global.exception.NotFoundException;
 import com.jpaplayground.global.login.oauth.OAuthServer;
 import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
 import com.jpaplayground.global.member.Member;
 import com.jpaplayground.global.member.MemberRepository;
 import com.jpaplayground.global.member.MemberResponse;
+import com.jpaplayground.global.member.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class LoginService {
 	@Transactional
 	public MemberResponse logout(Long memberId) {
 		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+			.orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 		member.logOut();
 
 		log.debug("로그아웃 성공");
