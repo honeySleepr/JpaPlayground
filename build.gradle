@@ -1,7 +1,17 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
 plugins {
-	id 'org.springframework.boot' version '2.6.11'
-	id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+	id 'org.springframework.boot' version '2.7.5'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 	id 'java'
+}
+
+//https://github.com/honeySleepr/JpaPlayground/pull/13#issuecomment-1299698610
+//GitHub Action CI test 문제 때문에 적용
+dependencyManagement {
+	imports {
+		SpringBootPlugin.BOM_COORDINATES
+	}
 }
 
 group = 'com'
