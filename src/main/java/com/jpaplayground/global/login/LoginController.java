@@ -13,13 +13,14 @@ import com.jpaplayground.global.login.oauth.dto.OAuthAccessToken;
 import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
 import com.jpaplayground.global.member.MemberResponse;
 import com.jpaplayground.global.redis.RedisService;
-import com.jpaplayground.global.response.SingleResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,7 +41,7 @@ public class LoginController {
 	private final RedisService redisService;
 
 	@GetMapping("login/{server}/callback")
-	public SingleResponse<MemberResponse> oAuthLogin(String code, @RequestParam("state") String receivedState,
+	public ResponseEntity<MemberResponse> oAuthLogin(String code, @RequestParam("state") String receivedState,
 		@PathVariable String server, @SessionAttribute("state") String sentState) {
 
 		OAuthServer oAuthServer = OAuthServer.getOAuthServer(server);
@@ -65,17 +66,17 @@ public class LoginController {
 		headers.set(HEADER_REFRESH_TOKEN, jwtRefreshToken);
 
 		log.debug("로그인 성공");
-		return new SingleResponse<>(memberResponse, headers);
+		return new ResponseEntity<>(memberResponse, headers, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/logout")
-	public SingleResponse<MemberResponse> logout(@LoginMemberId Long memberId) {
+	public ResponseEntity<MemberResponse> logout(@LoginMemberId Long memberId) {
 		redisService.deleteJwtRefreshToken(memberId);
-		return new SingleResponse(loginService.logout(memberId));
+		return ResponseEntity.ok(loginService.logout(memberId));
 	}
 
 	@GetMapping("/jwt/refresh")
-	public SingleResponse<String> refreshToken(HttpServletRequest request, @AccessToken String accessToken) {
+	public ResponseEntity<String> refreshToken(HttpServletRequest request, @AccessToken String accessToken) {
 
 		String refreshToken = request.getHeader(HEADER_REFRESH_TOKEN);
 
@@ -95,7 +96,7 @@ public class LoginController {
 		headers.set(HEADER_ACCESS_TOKEN, newAccessToken);
 
 		log.debug("AccessToken 재발급 : {}", newAccessToken);
-		return new SingleResponse<>("Access Token 재발급 완료", headers);
+		return new ResponseEntity<>("Access Token 재발급 완료", headers, HttpStatus.OK);
 	}
 
 }

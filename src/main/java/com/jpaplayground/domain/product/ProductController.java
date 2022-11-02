@@ -3,11 +3,11 @@ package com.jpaplayground.domain.product;
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
 import com.jpaplayground.global.response.PagingResponse;
-import com.jpaplayground.global.response.SingleResponse;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,13 +27,13 @@ public class ProductController {
 	}
 
 	@PostMapping("/products")
-	public SingleResponse<ProductResponse> add(@Valid @RequestBody ProductCreateRequest request) {
-		return new SingleResponse<>(service.save(request), HttpStatus.CREATED);
+	public ResponseEntity<ProductResponse> add(@Valid @RequestBody ProductCreateRequest request) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(request));
 	}
 
 	@DeleteMapping("/products/{productId}")
-	public SingleResponse<ProductResponse> delete(@PathVariable Long productId) {
-		return new SingleResponse<>(service.delete(productId));
+	public ResponseEntity<ProductResponse> delete(@PathVariable Long productId) {
+		return ResponseEntity.ok(service.delete(productId));
 	}
 
 }
