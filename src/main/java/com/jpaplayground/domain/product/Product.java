@@ -78,9 +78,9 @@ public class Product {
 	 */
 	public static Product of(String name, Integer price) {
 		return Product.builder()
-					  .name(name)
-					  .price(price)
-					  .build();
+			.name(name)
+			.price(price)
+			.build();
 	}
 
 	public void changeDeletedState(boolean tf) {
@@ -100,6 +100,15 @@ public class Product {
 	public void checkReserved() {
 		if (this.reservation != null) {
 			throw new ProductException(ErrorCode.RESERVED);
+		}
+	}
+
+	public void update(String name, Integer price) {
+		if (name != null) {
+			this.name = name;
+		}
+		if (price != null) {
+			this.price = price;
 		}
 	}
 }

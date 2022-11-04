@@ -2,6 +2,8 @@ package com.jpaplayground.domain.product;
 
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
+import com.jpaplayground.domain.product.dto.ProductUpdateRequest;
+import com.jpaplayground.global.login.LoginMemberId;
 import com.jpaplayground.global.response.PagingResponse;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,4 +39,10 @@ public class ProductController {
 		return ResponseEntity.ok(service.delete(productId));
 	}
 
+	@PatchMapping("/products/{productId}")
+	public ResponseEntity<ProductResponse> update(@PathVariable Long productId,
+												  @Valid @RequestBody ProductUpdateRequest request,
+												  @LoginMemberId Long memberId) {
+		return ResponseEntity.ok(service.update(memberId, productId, request));
+	}
 }

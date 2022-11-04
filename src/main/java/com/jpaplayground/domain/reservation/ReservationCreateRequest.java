@@ -12,8 +12,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 @AllArgsConstructor
 public class ReservationCreateRequest {
 
-	private Long productId;
-
 	private Long buyerId;
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")

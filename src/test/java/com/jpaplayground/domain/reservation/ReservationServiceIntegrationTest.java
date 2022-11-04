@@ -42,10 +42,10 @@ class ReservationServiceIntegrationTest {
 		Member buyer = allMembers.get(1);
 		Product product5 = allProducts.get(4);
 		LocalDateTime now = LocalDateTime.now();
-		ReservationCreateRequest request = new ReservationCreateRequest(product5.getId(), buyer.getId(), now);
+		ReservationCreateRequest request = new ReservationCreateRequest(buyer.getId(), now);
 
 		// when
-		ReservationResponse response = reservationService.create(request, seller.getId());
+		ReservationResponse response = reservationService.create(request, product5.getId(), seller.getId());
 
 		// then
 		assertThat(response.getTimeToMeet()).isEqualTo(now);
@@ -60,12 +60,12 @@ class ReservationServiceIntegrationTest {
 		Member buyer = allMembers.get(1);
 		Product reservedProduct = allProducts.get(1);
 		LocalDateTime now = LocalDateTime.now();
-		ReservationCreateRequest request = new ReservationCreateRequest(reservedProduct.getId(), buyer.getId(), now);
+		ReservationCreateRequest request = new ReservationCreateRequest(buyer.getId(), now);
 
 		// when
 
 		// then
-		assertThatThrownBy(() -> reservationService.create(request, seller.getId()))
+		assertThatThrownBy(() -> reservationService.create(request, reservedProduct.getId(), seller.getId()))
 			.isInstanceOf(ProductException.class)
 			.hasMessage(ErrorCode.RESERVED.getMessage());
 	}
@@ -77,12 +77,12 @@ class ReservationServiceIntegrationTest {
 		Member buyer = allMembers.get(1);
 		Product product5 = allProducts.get(4);
 		LocalDateTime now = LocalDateTime.now();
-		ReservationCreateRequest request = new ReservationCreateRequest(product5.getId(), buyer.getId(), now);
+		ReservationCreateRequest request = new ReservationCreateRequest(buyer.getId(), now);
 
 		// when
 
 		// then
-		assertThatThrownBy(() -> reservationService.create(request, buyer.getId()))
+		assertThatThrownBy(() -> reservationService.create(request, product5.getId(), buyer.getId()))
 			.isInstanceOf(ProductException.class)
 			.hasMessage(ErrorCode.NOT_SELLER.getMessage());
 	}

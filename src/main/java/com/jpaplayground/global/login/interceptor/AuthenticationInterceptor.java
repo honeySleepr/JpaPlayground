@@ -23,17 +23,16 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Slf4j
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
-	public static final String BEARER_REGEX = "[bB]earer\\s";
-
-	private static final Map<String, Set<String>> excludedRequests = Map.of(
+	public static final Map<String, Set<String>> allowedUriAndMethods = Map.of(
 		"/products", Set.of(HttpMethod.GET.toString())
 	);
+	public static final String BEARER_REGEX = "[bB]earer\\s";
 
 	private final JwtVerifier jwtVerifier;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-		if (isExcludedRequest(request)) {
+		if (isAllowedRequest(request)) {
 			return true;
 		}
 		log.debug("인터셉터 발동 : {}", request.getRequestURI());
@@ -51,12 +50,12 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 		return true;
 	}
 
-	private boolean isExcludedRequest(HttpServletRequest request) {
+	private boolean isAllowedRequest(HttpServletRequest request) {
 		String requestURI = request.getRequestURI();
 		String httpMethod = request.getMethod();
 
-		if (excludedRequests.containsKey(requestURI)) {
-			return excludedRequests.get(requestURI).contains(httpMethod);
+		if (allowedUriAndMethods.containsKey(requestURI)) {
+			return allowedUriAndMethods.get(requestURI).contains(httpMethod);
 		}
 		return false;
 	}
