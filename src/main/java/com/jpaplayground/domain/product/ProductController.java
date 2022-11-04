@@ -26,7 +26,7 @@ public class ProductController {
 
 	@GetMapping("/products")
 	public PagingResponse<ProductResponse> findAll(Pageable pageable) {
-		return new PagingResponse<>(service.findAll(pageable));
+		return new PagingResponse<>(service.findAllNotDeletedProducts(pageable));
 	}
 
 	@PostMapping("/products")
@@ -35,8 +35,9 @@ public class ProductController {
 	}
 
 	@DeleteMapping("/products/{productId}")
-	public ResponseEntity<ProductResponse> delete(@PathVariable Long productId) {
-		return ResponseEntity.ok(service.delete(productId));
+	public ResponseEntity<Void> delete(@PathVariable Long productId, @LoginMemberId Long memberId) {
+		service.delete(memberId, productId);
+		return ResponseEntity.ok().build();
 	}
 
 	@PatchMapping("/products/{productId}")

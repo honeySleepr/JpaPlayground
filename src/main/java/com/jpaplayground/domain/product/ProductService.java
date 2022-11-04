@@ -20,7 +20,7 @@ public class ProductService {
 
 	//	@Cacheable(key = "#pageable.pageSize+' '+#pageable.pageNumber", cacheNames = "productList")
 	/* TODO: SliceImpl 에 기본생성자가 없어서, 여기서 바로 MySlice로 변환해야겠다 */
-	public Slice<ProductResponse> findAll(Pageable pageable) {
+	public Slice<ProductResponse> findAllNotDeletedProducts(Pageable pageable) {
 		return productRepository.findProductsByDeletedFalse(pageable).map(ProductResponse::new);
 	}
 
@@ -33,12 +33,12 @@ public class ProductService {
 	}
 
 	@Transactional
-	public ProductResponse delete(Long productId) {
+	public void delete(Long memberId, Long productId) {
 		Product product = productRepository.findByIdAndDeletedFalse(productId)
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 
+		product.verifySeller(memberId);
 		product.changeDeletedState(true);
-		return new ProductResponse(product);
 	}
 
 	@Transactional
