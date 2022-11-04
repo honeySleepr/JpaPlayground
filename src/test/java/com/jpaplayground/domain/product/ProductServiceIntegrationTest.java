@@ -56,14 +56,45 @@ class ProductServiceIntegrationTest {
 	}
 
 	@Test
-	@DisplayName("존재하지 않는 product를 삭제하려고 하면 예외가 발생한다")
-	void delete_error() {
+	@DisplayName("판매자가 자신의 product를 삭제 요청을 하면 product가 삭제된다")
+	void delete() {
 		// given
-		Long id = Long.MAX_VALUE;
+		Pageable pageable = Pageable.ofSize(20);
+		int originalCount = productService.findAllNotDeletedProducts(pageable).getNumberOfElements();
+		Product product = allProducts.get(4);
+		Long sellerId = seller.getId();
+
+		// when
+		productService.delete(sellerId, product.getId());
+
+		// then
+		assertThat(productService.findAllNotDeletedProducts(pageable).getNumberOfElements())
+			.isEqualTo(originalCount - 1);
+	}
+
+	@Test
+	@DisplayName("판매자가 아닌 member가 product 삭제 요청을 하면 예외가 발생한다")
+	void delete_not_seller() {
+		// given
+		Product product = allProducts.get(4);
+		Long buyerId = buyer.getId();
 
 		// when
 		// then
-		assertThatThrownBy(() -> productService.delete(id)).isInstanceOf(ProductException.class)
+		assertThatThrownBy(() -> productService.delete(buyerId, product.getId())).isInstanceOf(ProductException.class)
+			.hasMessage(ErrorCode.NOT_SELLER.getMessage());
+	}
+
+	@Test
+	@DisplayName("존재하지 않는 product를 삭제하려고 하면 예외가 발생한다")
+	void delete_error() {
+		// given
+		Long nonExistingProductId = Long.MAX_VALUE;
+
+		// when
+		// then
+		assertThatThrownBy(() -> productService.delete(seller.getId(), nonExistingProductId)).isInstanceOf(
+				ProductException.class)
 			.hasMessage(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
 	}
 
@@ -80,7 +111,7 @@ class ProductServiceIntegrationTest {
 			PageRequest pageRequest = PageRequest.of(page, size);
 
 			//when
-			Slice<ProductResponse> slice = productService.findAll(pageRequest);
+			Slice<ProductResponse> slice = productService.findAllNotDeletedProducts(pageRequest);
 
 			// then
 			List<ProductResponse> content = slice.getContent();
@@ -98,7 +129,7 @@ class ProductServiceIntegrationTest {
 			Pageable pageable = Pageable.ofSize(numberOfTotalProducts);
 
 			// when
-			Slice<ProductResponse> slice = productService.findAll(pageable);
+			Slice<ProductResponse> slice = productService.findAllNotDeletedProducts(pageable);
 
 			// then
 			assertThat(slice.getNumberOfElements()).isEqualTo(numberOfNonDeletedProducts);
@@ -140,7 +171,7 @@ class ProductServiceIntegrationTest {
 	}
 
 	@Test
-	@DisplayName("판매자가 아닌 member가 product 수정 요청을 하면 에러가 발생한다")
+	@DisplayName("판매자가 아닌 member가 product 수정 요청을 하면 예외가 발생한다")
 	void update_not_seller() {
 		// given
 		Product product = allProducts.get(4);
