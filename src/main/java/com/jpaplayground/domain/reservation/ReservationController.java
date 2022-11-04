@@ -1,6 +1,7 @@
 package com.jpaplayground.domain.reservation;
 
 import com.jpaplayground.global.login.LoginMemberId;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ public class ReservationController {
 
 	@PostMapping("/products/{productId}/reservations")
 	public ResponseEntity<ReservationResponse> create(@PathVariable Long productId,
-													  @RequestBody ReservationCreateRequest request,
+													  @Valid @RequestBody ReservationCreateRequest request,
 													  @LoginMemberId Long sellerId) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.create(request, productId, sellerId));
 	}

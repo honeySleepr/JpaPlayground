@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,16 +35,21 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@NotNull
 	private String name;
 
+	@NotNull
 	private Integer price;
 
+	@NotNull
 	private Boolean deleted;
 
+	@NotNull
 	@Column(updatable = false)
 	@CreatedDate
 	private LocalDateTime createdAt;
 
+	@NotNull
 	@LastModifiedDate
 	private LocalDateTime lastModifiedAt;
 
@@ -51,6 +57,7 @@ public class Product {
 	 * `@OneToMany`(Member->Product) 단방향 관계는 DB 상에는 Many 쪽에 있는 FK를 One 쪽 객체에서 관리하는 구조가 되어버려서 추천하지 않음 그래서 영한님이 추천하신
 	 * `@ManyToOne-@OneToMany` 양방향으로 변경
 	 */
+	@NotNull
 	@CreatedBy
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(updatable = false, name = "seller_id")

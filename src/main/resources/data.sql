@@ -1,6 +1,6 @@
-insert into member(account, server)
-values ('Gruzzimo', 'NAVER'),
-       ('honeySleepr', 'GITHUB');
+insert into member(account, server, logged_in)
+values ('Gruzzimo', 'NAVER', false),
+       ('honeySleepr', 'GITHUB', false);
 
 insert into product(name, price, deleted, created_at, last_modified_at, seller_id)
 values ('파이프라인 펀치', 2200, false, '2022-10-24 22:22:20', '2022-10-24 22:22:20', 1),

@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,6 +28,7 @@ public class Member {
 	private Long id;
 
 	/* Todo: UserInfo embeddedType으로 묶기*/
+	@NotNull
 	@Column(updatable = false)
 	private String account;
 
@@ -36,10 +38,12 @@ public class Member {
 
 	private String profileImageUrl;
 
+	@NotNull
 	@Column(updatable = false)
 	@Enumerated(EnumType.STRING)
 	private OAuthServer server;
 
+	@NotNull
 	private Boolean loggedIn;
 
 	@OneToMany(mappedBy = "seller")

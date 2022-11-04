@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,12 +28,15 @@ public class Reservation {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@NotNull
 	@Column(updatable = false)
 	@CreatedDate
 	private LocalDateTime createdAt;
 
+	@NotNull
 	private LocalDateTime timeToMeet;
 
+	@NotNull
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "buyer_id")
 	private Member buyer;
