@@ -39,8 +39,7 @@ public class TestData {
 		this.allReservations = createReservationData();
 		this.allProducts = createProductData();
 		persistMemberData();
-		Long id = allMembers.get(0).getId();
-		httpServletRequest.setAttribute(LOGIN_MEMBER, id); /* 현재 로그인 된 멤버를 지정하기 위함 */
+		httpServletRequest.setAttribute(LOGIN_MEMBER, allMembers.get(0).getId()); /* allMembers.get(0) == 판매자 */
 		persistReservationData();
 		persistProductData();
 	}

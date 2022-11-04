@@ -1,10 +1,9 @@
-package com.jpaplayground.product;
+package com.jpaplayground.domain.product;
 
 import com.jpaplayground.TestData;
-import com.jpaplayground.domain.product.Product;
-import com.jpaplayground.domain.product.ProductService;
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
 import com.jpaplayground.domain.product.dto.ProductResponse;
+import com.jpaplayground.domain.product.dto.ProductUpdateRequest;
 import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.member.Member;
@@ -31,14 +30,15 @@ class ProductServiceIntegrationTest {
 	@Autowired
 	TestData testData;
 	List<Product> allProducts;
-	Member member1;
+	Member seller;
+	Member buyer;
 
 	@BeforeEach
 	void init() {
 		testData.init();
 		allProducts = testData.getAllProducts();
-		member1 = testData.getAllMembers().get(0);
-
+		seller = testData.getAllMembers().get(0);
+		buyer = testData.getAllMembers().get(1);
 	}
 
 	@Test
@@ -46,7 +46,6 @@ class ProductServiceIntegrationTest {
 	void save() {
 		// given
 		ProductCreateRequest request = new ProductCreateRequest("한무무", 149_000);
-		Long id = member1.getId();
 
 		// when
 		ProductResponse savedProduct = productService.save(request);
@@ -85,7 +84,7 @@ class ProductServiceIntegrationTest {
 
 			// then
 			List<ProductResponse> content = slice.getContent();
-			assertThat(content.size()).isEqualTo(size);
+			assertThat(content).hasSize(size);
 		}
 
 		@Test
@@ -107,4 +106,52 @@ class ProductServiceIntegrationTest {
 
 	}
 
+	@Test
+	@DisplayName("제품의 모든 필드를 수정 요청을 하면 모든 필드가 수정된다")
+	void update_all_fields() {
+		// given
+		Product product = allProducts.get(4);
+		ProductUpdateRequest request = new ProductUpdateRequest("수정제품", 1234567);
+		Long sellerId = seller.getId();
+
+		// when
+		ProductResponse updatedProduct = productService.update(sellerId, product.getId(), request);
+
+		// then
+		assertThat(updatedProduct.getName()).isEqualTo(request.getName());
+		assertThat(updatedProduct.getPrice()).isEqualTo(request.getPrice());
+	}
+
+	@Test
+	@DisplayName("제품의 필드 하나만을 수정 요청을 하면 해당 필드만 수정된다")
+	void update_some_fields() {
+		// given
+		Product product = allProducts.get(4);
+		Integer oldPrice = product.getPrice();
+		ProductUpdateRequest request = new ProductUpdateRequest("수정제품", null);
+		Long sellerId = seller.getId();
+
+		// when
+		ProductResponse updatedProduct = productService.update(sellerId, product.getId(), request);
+
+		// then
+		assertThat(updatedProduct.getName()).isEqualTo(request.getName());
+		assertThat(updatedProduct.getPrice()).isEqualTo(oldPrice);
+	}
+
+	@Test
+	@DisplayName("판매자가 아닌 member가 product 수정 요청을 하면 에러가 발생한다")
+	void update_not_seller() {
+		// given
+		Product product = allProducts.get(4);
+		ProductUpdateRequest request = new ProductUpdateRequest("수정제품", null);
+		Long buyerId = buyer.getId();
+
+		// when
+
+		// then
+		assertThatThrownBy(() -> productService.update(buyerId, product.getId(), request))
+			.isInstanceOf(ProductException.class)
+			.hasMessage(ErrorCode.NOT_SELLER.getMessage());
+	}
 }
