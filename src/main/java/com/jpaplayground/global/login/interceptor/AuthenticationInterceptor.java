@@ -32,10 +32,11 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+		log.debug("인터셉터 발동 : {}", request.getRequestURI());
 		if (isAllowedRequest(request)) {
+			log.debug("인터셉터 제외 메서드 : {} {}", request.getMethod(), request.getRequestURI());
 			return true;
 		}
-		log.debug("인터셉터 발동 : {}", request.getRequestURI());
 
 		String accessToken = parseBearerToken(request);
 		Claims claims;
