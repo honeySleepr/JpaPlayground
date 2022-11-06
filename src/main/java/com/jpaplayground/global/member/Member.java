@@ -5,6 +5,7 @@ import com.jpaplayground.global.login.oauth.OAuthServer;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -32,11 +33,8 @@ public class Member {
 	@Column(updatable = false)
 	private String account;
 
-	private String name;
-
-	private String email;
-
-	private String profileImageUrl;
+	@Embedded
+	private OptionalInfo optionalInfo;
 
 	@NotNull
 	@Column(updatable = false)
@@ -49,16 +47,23 @@ public class Member {
 	@OneToMany(mappedBy = "seller")
 	private final List<Product> products = new ArrayList<>();
 
+	/**
+	 * `@Builder`를 클래스에 붙이면 모든 필드에 대한 빌더메서드가 만들어지지만, 메서드나 생성자에 붙이면 인자들에 대해서만 빌더 메서드가 만들어진다.
+	 */
 	@Builder
 	private Member(String account, String name, String email, String profileImageUrl, OAuthServer server) {
 		this.account = account;
-		this.name = name;
-		this.email = email;
-		this.profileImageUrl = profileImageUrl;
+		this.optionalInfo = new OptionalInfo(name, email, profileImageUrl);
 		this.server = server;
 		this.loggedIn = true;
 	}
 
+	/**
+	 * 일반 정적 팩토리 메서드에서는 여기에서 new를 이용해 생성자를 호출하여 반환한다 (ex: `new Product(name, quantity, price)`) 하지만 이때 생성자에서 같은 타입인 인자의
+	 * 순서가 바뀐다면(ex: price<->quantity `Product(String name, Integer price, Integer quantity)`) 입력된 quantity가 price가 되고,
+	 * price가 quantity가 되지만 컴파일 에러로 잡아내지 못한다. 그래서 builder를 사용한다. 생성자 시그니처에서 price, quantity 위치가 바뀌어도 price는 price()에,
+	 * quantity는 quantity()에 들어간다
+	 */
 	public static Member of(String account, String name, String email, String profileImageUrl) {
 		return Member.builder()
 			.account(account)
@@ -73,9 +78,7 @@ public class Member {
 	}
 
 	public Member logInAndUpdateInfo(Member member) {
-		this.name = member.getName();
-		this.email = member.getEmail();
-		this.profileImageUrl = member.getProfileImageUrl();
+		this.optionalInfo = new OptionalInfo(member);
 		this.loggedIn = true;
 		return this;
 	}

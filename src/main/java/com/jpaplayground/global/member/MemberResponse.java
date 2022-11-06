@@ -17,9 +17,10 @@ public class MemberResponse {
 	public MemberResponse(Member member) {
 		this.id = member.getId();
 		this.account = member.getAccount();
-		this.name = member.getName();
-		this.email = member.getEmail();
-		this.profileImageUrl = member.getProfileImageUrl();
+		OptionalInfo optionalInfo = member.getOptionalInfo();
+		this.name = optionalInfo.getName();
+		this.email = optionalInfo.getEmail();
+		this.profileImageUrl = optionalInfo.getProfileImageUrl();
 		this.oAuthServer = member.getServer();
 		this.loggedIn = member.getLoggedIn();
 	}
