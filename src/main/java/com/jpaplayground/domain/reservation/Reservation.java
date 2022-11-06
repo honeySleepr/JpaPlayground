@@ -15,6 +15,7 @@ import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -41,8 +42,20 @@ public class Reservation {
 	@JoinColumn(name = "buyer_id")
 	private Member buyer;
 
+	@NotNull
+	@CreatedBy
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "seller_id")
+	private Member seller;
+
 	public Reservation(Member buyer, LocalDateTime timeToMeet) {
 		this.buyer = buyer;
 		this.timeToMeet = timeToMeet;
+	}
+
+	public void verifySellerOrBuyer(Long memberId) {
+		if (!buyer.getId().equals(memberId) && !seller.getId().equals(memberId)) {
+			throw new IllegalArgumentException("테스트 중");
+		}
 	}
 }

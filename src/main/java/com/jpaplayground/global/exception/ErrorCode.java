@@ -24,7 +24,10 @@ public enum ErrorCode {
 	// Authentication
 	OAUTH_FAILED(UNAUTHORIZED, "OAuth 인증이 실패했습니다"),
 	AUTHORIZATION_FAILED(BAD_REQUEST, "로그인 인증이 실패하였습니다"),
-	JWT_ACCESS_TOKEN_EXPIRED(UNAUTHORIZED, "AccessToken이 만료되었습니다");
+	JWT_ACCESS_TOKEN_EXPIRED(UNAUTHORIZED, "AccessToken이 만료되었습니다"),
+
+	// Reservation
+	RESERVATION_NOT_FOUND(NOT_FOUND, "예약이 없습니다");
 
 	private final HttpStatus status;
 	private final String message;
