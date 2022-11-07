@@ -27,7 +27,9 @@ public class ReservationService {
 		Member buyer = memberRepository.findById(request.getBuyerId())
 			.orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 
-		product.checkReserved();
+		if (product.isReserved()) {
+			throw new ReservationException(ErrorCode.RESERVED);
+		}
 		product.verifySeller(sellerId);
 		Reservation reservation = reservationRepository.save(new Reservation(buyer, request.getTimeToMeet()));
 		product.reserve(reservation);
@@ -38,12 +40,12 @@ public class ReservationService {
 	public ReservationResponse findByProductId(Long productId, Long memberId) {
 		Product product = productRepository.findByIdAndDeletedFalse(productId)
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
-		Reservation reservation = product.getReservation();
-		if (reservation == null) {
+
+		if (!product.isReserved()) {
 			throw new ReservationException(ErrorCode.RESERVATION_NOT_FOUND);
 		}
+		Reservation reservation = product.getReservation();
 		reservation.verifySellerOrBuyer(memberId);
-
 		return new ReservationResponse(productId, reservation);
 	}
 }

@@ -16,7 +16,6 @@ public enum ErrorCode {
 	// Product
 	PRODUCT_NOT_FOUND(NOT_FOUND, "Product를 찾을 수 없습니다"),
 	NOT_SELLER(BAD_REQUEST, "해당 제품의 판매자가 아닙니다"),
-	RESERVED(BAD_REQUEST, "이미 예약된 제품입니다"),
 
 	// Member
 	MEMBER_NOT_FOUND(NOT_FOUND, "Member를 찾을 수 없습니다"),
@@ -27,6 +26,7 @@ public enum ErrorCode {
 	JWT_ACCESS_TOKEN_EXPIRED(UNAUTHORIZED, "AccessToken이 만료되었습니다"),
 
 	// Reservation
+	RESERVED(BAD_REQUEST, "이미 예약된 제품입니다"),
 	RESERVATION_NOT_FOUND(NOT_FOUND, "예약이 없습니다");
 
 	private final HttpStatus status;

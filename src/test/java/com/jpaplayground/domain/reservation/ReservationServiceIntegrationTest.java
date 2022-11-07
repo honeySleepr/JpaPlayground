@@ -66,7 +66,7 @@ class ReservationServiceIntegrationTest {
 
 		// then
 		assertThatThrownBy(() -> reservationService.create(request, reservedProduct.getId(), seller.getId()))
-			.isInstanceOf(ProductException.class)
+			.isInstanceOf(ReservationException.class)
 			.hasMessage(ErrorCode.RESERVED.getMessage());
 	}
 

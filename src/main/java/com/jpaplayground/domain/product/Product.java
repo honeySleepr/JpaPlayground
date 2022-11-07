@@ -93,10 +93,8 @@ public class Product {
 		this.reservation = reservation;
 	}
 
-	public void checkReserved() {
-		if (this.reservation != null) {
-			throw new ProductException(ErrorCode.RESERVED);
-		}
+	public boolean isReserved() {
+		return this.reservation != null;
 	}
 
 	public void update(String name, Integer price) {
