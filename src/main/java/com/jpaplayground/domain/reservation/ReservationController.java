@@ -26,8 +26,8 @@ public class ReservationController {
 	@PostMapping("/reservations")
 	public ResponseEntity<ReservationResponse> create(@PathVariable Long productId,
 													  @Valid @RequestBody ReservationCreateRequest request,
-													  @LoginMemberId Long sellerId) {
-		ReservationResponse body = reservationService.create(request, productId, sellerId);
+													  @LoginMemberId Long memberId) {
+		ReservationResponse body = reservationService.create(request, productId, memberId);
 		return ResponseEntity.status(HttpStatus.CREATED).body(body);
 	}
 

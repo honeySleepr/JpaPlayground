@@ -24,7 +24,7 @@ public class ReservationService {
 	private final ProductRepository productRepository;
 
 	@Transactional
-	public ReservationResponse create(ReservationCreateRequest request, Long productId, Long sellerId) {
+	public ReservationResponse create(ReservationCreateRequest request, Long productId, Long memberId) {
 		Product product = productRepository.findByIdAndDeletedFalse(productId)
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 
@@ -34,11 +34,11 @@ public class ReservationService {
 		if (product.isReserved()) {
 			throw new ReservationException(ErrorCode.RESERVED);
 		}
-		product.verifySeller(sellerId);
+		product.verifySeller(memberId);
 		Reservation reservation = reservationRepository.save(new Reservation(buyer, request.getTimeToMeet()));
 		product.reserve(reservation);
 
-		return new ReservationResponse(productId, reservation);
+		return new ReservationResponse(product, reservation);
 	}
 
 	@Transactional(readOnly = true)
@@ -46,25 +46,26 @@ public class ReservationService {
 		Product product = productRepository.findByIdAndDeletedFalse(productId)
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 
+		Reservation reservation = product.getReservation();
 		if (!product.isReserved()) {
 			throw new ReservationException(ErrorCode.RESERVATION_NOT_FOUND);
 		}
-		Reservation reservation = product.getReservation();
-		reservation.verifySellerOrBuyer(memberId);
-		return new ReservationResponse(productId, reservation);
+		if (!product.isSeller(memberId) && !reservation.isBuyer(memberId)) {
+			throw new ReservationException(ErrorCode.NOT_SELLER_NOR_BUYER);
+		}
+		return new ReservationResponse(product, reservation);
 	}
 
 	@Transactional
 	public ReservationResponse update(Long productId, ReservationUpdateRequest request, Long memberId) {
-		Product product = productRepository.findById(productId)
+		Product product = productRepository.findByIdAndDeletedFalse(productId)
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
-
 		if (!product.isReserved()) {
 			throw new ReservationException(ErrorCode.RESERVATION_NOT_FOUND);
 		}
 		product.verifySeller(memberId);
 		Reservation reservation = product.getReservation();
 		reservation.changeTime(request.getTimeToMeet());
-		return new ReservationResponse(productId, reservation);
+		return new ReservationResponse(product, reservation);
 	}
 }

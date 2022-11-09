@@ -10,7 +10,7 @@ public class ProductResponse {
 	private final String name;
 	private final Integer price;
 	private final Long sellerId;
-	private final Boolean isReserved;
+	private final boolean isReserved;
 
 	public ProductResponse(Product product) {
 		this.id = product.getId();

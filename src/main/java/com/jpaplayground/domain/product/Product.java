@@ -65,7 +65,7 @@ public class Product {
 	@JoinColumn(updatable = false, name = "seller_id")
 	private Member seller;
 
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "reservation_id")
 	private Reservation reservation;
 
@@ -83,8 +83,12 @@ public class Product {
 		this.deleted = deleted;
 	}
 
-	public void verifySeller(Long sellerId) {
-		if (!seller.getId().equals(sellerId)) {
+	public boolean isSeller(Long memberId) {
+		return seller.matchesId(memberId);
+	}
+
+	public void verifySeller(Long memberId) {
+		if (!seller.matchesId(memberId)) {
 			throw new ProductException(ErrorCode.NOT_SELLER);
 		}
 	}
@@ -104,9 +108,5 @@ public class Product {
 		if (price != null) {
 			this.price = price;
 		}
-	}
-
-	public Boolean isReserved() {
-		return this.reservation != null;
 	}
 }
