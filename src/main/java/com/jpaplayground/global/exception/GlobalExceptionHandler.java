@@ -1,5 +1,6 @@
 package com.jpaplayground.global.exception;
 
+import javax.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +14,23 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class GlobalExceptionHandler {
 
 	/**
-	 * `@Valid` 검증 실패 시 발생하는 에러를 처리한다
+	 * Controller 메서드 인자로 입력되는 DTO의 `@Valid` 검증 실패 시 발생하는 에러를 처리한다
 	 */
 	@ExceptionHandler(BindException.class)
 	public ResponseEntity<ErrorResponse> handleBindException(BindException e) {
 		log.error("handleBindException", e);
 		ErrorResponse response = new ErrorResponse(ErrorCode.INVALID_INPUT_VALUE, e.getBindingResult());
+		return new ResponseEntity<>(response, HttpStatus.valueOf(response.getHttpStatus()));
+	}
+
+	/**
+	 * `hibernate.validator.constraints` 또는 `javax.validation.constraints` 패키지의 어노테이션(ex:`@NotNull`)을 Entity의 필드에 사용하였을
+	 * 때, 검증 실패 시 발생하는 에러를 처리한다.
+	 */
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<ErrorResponse> handleValidationException(ConstraintViolationException e) {
+		log.error("ConstraintViolationException 처리", e);
+		ErrorResponse response = new ErrorResponse(ErrorCode.INVALID_INPUT_VALUE, e.getConstraintViolations());
 		return new ResponseEntity<>(response, HttpStatus.valueOf(response.getHttpStatus()));
 	}
 
