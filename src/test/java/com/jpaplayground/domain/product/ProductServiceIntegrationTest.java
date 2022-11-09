@@ -2,6 +2,7 @@ package com.jpaplayground.domain.product;
 
 import com.jpaplayground.TestData;
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
+import com.jpaplayground.domain.product.dto.ProductDeleteResponse;
 import com.jpaplayground.domain.product.dto.ProductResponse;
 import com.jpaplayground.domain.product.dto.ProductUpdateRequest;
 import com.jpaplayground.domain.product.exception.ProductException;
@@ -59,17 +60,14 @@ class ProductServiceIntegrationTest {
 	@DisplayName("판매자가 자신의 product를 삭제 요청을 하면 product가 삭제된다")
 	void delete() {
 		// given
-		Pageable pageable = Pageable.ofSize(20);
-		int originalCount = productService.findAllNotDeletedProducts(pageable).getNumberOfElements();
 		Product product = allProducts.get(4);
 		Long sellerId = seller.getId();
 
 		// when
-		productService.delete(sellerId, product.getId());
+		ProductDeleteResponse response = productService.delete(sellerId, product.getId());
 
 		// then
-		assertThat(productService.findAllNotDeletedProducts(pageable).getNumberOfElements())
-			.isEqualTo(originalCount - 1);
+		assertThat(response.getDeleted()).isTrue();
 	}
 
 	@Test

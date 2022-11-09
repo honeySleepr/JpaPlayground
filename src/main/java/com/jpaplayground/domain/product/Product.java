@@ -15,7 +15,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,10 +36,11 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotNull
+	@NotBlank
 	private String name;
 
 	@NotNull
+	@Positive
 	private Integer price;
 
 	@NotNull
@@ -76,8 +79,8 @@ public class Product {
 		return new Product(name, price);
 	}
 
-	public void changeDeletedState(boolean tf) {
-		this.deleted = tf;
+	public void changeDeletedState(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 	public void verifySeller(Long sellerId) {
@@ -103,5 +106,9 @@ public class Product {
 		if (price != null) {
 			this.price = price;
 		}
+	}
+
+	public Boolean isReserved() {
+		return this.reservation != null;
 	}
 }

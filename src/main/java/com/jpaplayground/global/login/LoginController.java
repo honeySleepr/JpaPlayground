@@ -5,6 +5,7 @@ import static com.jpaplayground.global.login.LoginUtils.HEADER_REFRESH_TOKEN;
 import com.jpaplayground.global.login.jwt.AccessToken;
 import com.jpaplayground.global.login.jwt.JwtProvider;
 import com.jpaplayground.global.login.jwt.JwtVerifier;
+import com.jpaplayground.global.login.jwt.RefreshToken;
 import com.jpaplayground.global.login.oauth.OAuthProperties;
 import com.jpaplayground.global.login.oauth.OAuthPropertyMap;
 import com.jpaplayground.global.login.oauth.OAuthProvider;
@@ -15,7 +16,6 @@ import com.jpaplayground.global.member.MemberResponse;
 import com.jpaplayground.global.redis.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -42,7 +42,8 @@ public class LoginController {
 
 	@GetMapping("login/{server}/callback")
 	public ResponseEntity<MemberResponse> oAuthLogin(String code, @RequestParam("state") String receivedState,
-		@PathVariable String server, @SessionAttribute("state") String sentState) {
+													 @PathVariable String server,
+													 @SessionAttribute("state") String sentState) {
 
 		OAuthServer oAuthServer = OAuthServer.getOAuthServer(server);
 		OAuthProperties properties = oAuthPropertyMap.getProperties(oAuthServer);
@@ -75,11 +76,9 @@ public class LoginController {
 		return ResponseEntity.ok(loginService.logout(memberId));
 	}
 
-	@GetMapping("/jwt/refresh")
-	public ResponseEntity<String> refreshToken(HttpServletRequest request, @AccessToken String accessToken) {
-
-		String refreshToken = request.getHeader(HEADER_REFRESH_TOKEN);
-
+	@GetMapping("/jwt/renew")
+	public ResponseEntity<String> renewAccessToken(@AccessToken String accessToken,
+												   @RefreshToken String refreshToken) {
 		Claims claims;
 		try {
 			claims = jwtVerifier.verifyAccessToken(accessToken);
