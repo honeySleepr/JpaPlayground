@@ -1,5 +1,6 @@
-package com.jpaplayground.domain.reservation;
+package com.jpaplayground.domain.reservation.dto;
 
+import com.jpaplayground.domain.reservation.Reservation;
 import java.time.LocalDateTime;
 import lombok.Getter;
 

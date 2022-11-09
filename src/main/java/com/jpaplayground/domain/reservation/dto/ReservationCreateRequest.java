@@ -1,4 +1,4 @@
-package com.jpaplayground.domain.reservation;
+package com.jpaplayground.domain.reservation.dto;
 
 import java.time.LocalDateTime;
 import javax.validation.constraints.NotNull;

@@ -3,6 +3,10 @@ package com.jpaplayground.domain.reservation;
 import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.domain.product.ProductRepository;
 import com.jpaplayground.domain.product.exception.ProductException;
+import com.jpaplayground.domain.reservation.dto.ReservationCreateRequest;
+import com.jpaplayground.domain.reservation.dto.ReservationResponse;
+import com.jpaplayground.domain.reservation.dto.ReservationUpdateRequest;
+import com.jpaplayground.domain.reservation.exception.ReservationException;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.member.Member;
 import com.jpaplayground.global.member.MemberRepository;
@@ -37,6 +41,7 @@ public class ReservationService {
 		return new ReservationResponse(productId, reservation);
 	}
 
+	@Transactional(readOnly = true)
 	public ReservationResponse findByProductId(Long productId, Long memberId) {
 		Product product = productRepository.findByIdAndDeletedFalse(productId)
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
@@ -46,6 +51,20 @@ public class ReservationService {
 		}
 		Reservation reservation = product.getReservation();
 		reservation.verifySellerOrBuyer(memberId);
+		return new ReservationResponse(productId, reservation);
+	}
+
+	@Transactional
+	public ReservationResponse update(Long productId, ReservationUpdateRequest request, Long memberId) {
+		Product product = productRepository.findById(productId)
+			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
+
+		if (!product.isReserved()) {
+			throw new ReservationException(ErrorCode.RESERVATION_NOT_FOUND);
+		}
+		product.verifySeller(memberId);
+		Reservation reservation = product.getReservation();
+		reservation.changeTime(request.getTimeToMeet());
 		return new ReservationResponse(productId, reservation);
 	}
 }

@@ -87,4 +87,8 @@ public class Member {
 		this.loggedIn = false;
 	}
 
+	public boolean matchesId(Long id) {
+		return this.id.equals(id);
+	}
+
 }
