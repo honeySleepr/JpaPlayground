@@ -24,6 +24,11 @@ JPA와 Spring의 기능들을 학습하며, 간단한 버전의 **당근마켓**
 
 <br>
 
+## PR review
+https://github.com/honeySleepr/JpaPlayground/pulls?q=is%3Apr+is%3Aclosed 
+
+<br>
+
 ## 🤔 고민 & 트러블슈팅
 
 [@SpringBootTest 중 @ConfigurationProperties 클래스 초기화 문제](https://github.com/honeySleepr/JpaPlayground/wiki/@SpringBootTest-%EC%A4%91-@ConfigurationProperties-%ED%81%B4%EB%9E%98%EC%8A%A4-%EC%B4%88%EA%B8%B0%ED%99%94-%EB%AC%B8%EC%A0%9C)  
