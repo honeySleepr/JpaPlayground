@@ -8,6 +8,7 @@ import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.member.Member;
 import java.util.List;
+import javax.validation.ConstraintViolationException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,11 +44,15 @@ class ProductServiceIntegrationTest {
 		buyer = testData.getBuyer();
 	}
 
-	@Test
-	@DisplayName("제품을 등록하면 제품이 저장된다")
-	void save() {
-		// given
-		ProductCreateRequest request = new ProductCreateRequest("한무무", 149_000);
+	@Nested
+	@DisplayName("Product 등록 테스트")
+	class Create {
+
+		@Test
+		@DisplayName("제품을 등록하면 제품이 저장된다")
+		void save() {
+			// given
+			ProductCreateRequest request = new ProductCreateRequest("한무무", 149_000);
 
 		// when
 		ProductResponse savedProduct = productService.save(request);
@@ -141,43 +146,54 @@ class ProductServiceIntegrationTest {
 		// given
 		ProductUpdateRequest request = new ProductUpdateRequest("수정제품", 1234567);
 		Long sellerId = seller.getId();
+		@Nested
+		@DisplayName("Product 수정 테스트")
+		class Update {
 
-		// when
-		ProductResponse updatedProduct = productService.update(sellerId, product.getId(), request);
+			@Test
+			@DisplayName("제품의 모든 필드를 수정 요청을 하면 모든 필드가 수정된다")
+			void update_all_fields() {
+				// given
+				Product product = allProducts.get(4);
+				ProductUpdateRequest request = new ProductUpdateRequest("수정제품", 1234567);
+				Long sellerId = seller.getId();
 
-		// then
-		assertThat(updatedProduct.getName()).isEqualTo(request.getName());
-		assertThat(updatedProduct.getPrice()).isEqualTo(request.getPrice());
-	}
+				// when
+				ProductResponse updatedProduct = productService.update(sellerId, product.getId(), request);
 
-	@Test
-	@DisplayName("제품의 필드 하나만을 수정 요청을 하면 해당 필드만 수정된다")
-	void update_some_fields() {
-		// given
-		Integer oldPrice = product.getPrice();
-		ProductUpdateRequest request = new ProductUpdateRequest("수정제품", null);
-		Long sellerId = seller.getId();
+				// then
+				assertThat(updatedProduct.getName()).isEqualTo(request.getName());
+				assertThat(updatedProduct.getPrice()).isEqualTo(request.getPrice());
+			}
 
-		// when
-		ProductResponse updatedProduct = productService.update(sellerId, product.getId(), request);
+			@Test
+			@DisplayName("제품의 필드 하나만을 수정 요청을 하면 해당 필드만 수정된다")
+			void update_some_fields() {
+				// given
+				Integer oldPrice = product.getPrice();
+				ProductUpdateRequest request = new ProductUpdateRequest("수정제품", null);
+				Long sellerId = seller.getId();
 
-		// then
-		assertThat(updatedProduct.getName()).isEqualTo(request.getName());
-		assertThat(updatedProduct.getPrice()).isEqualTo(oldPrice);
-	}
+				// when
+				ProductResponse updatedProduct = productService.update(sellerId, product.getId(), request);
 
-	@Test
-	@DisplayName("판매자가 아닌 member가 product 수정 요청을 하면 예외가 발생한다")
-	void update_not_seller() {
-		// given
-		ProductUpdateRequest request = new ProductUpdateRequest("수정제품", null);
-		Long buyerId = buyer.getId();
+				// then
+				assertThat(updatedProduct.getName()).isEqualTo(request.getName());
+				assertThat(updatedProduct.getPrice()).isEqualTo(oldPrice);
+			}
 
-		// when
+			@Test
+			@DisplayName("판매자가 아닌 member가 product 수정 요청을 하면 예외가 발생한다")
+			void update_not_seller() {
+				// given
+				ProductUpdateRequest request = new ProductUpdateRequest("수정제품", null);
+				Long buyerId = buyer.getId();
 
-		// then
-		assertThatThrownBy(() -> productService.update(buyerId, product.getId(), request))
-			.isInstanceOf(ProductException.class)
-			.hasMessage(ErrorCode.NOT_SELLER.getMessage());
-	}
-}
+				// when
+
+				// then
+				assertThatThrownBy(() -> productService.update(buyerId, product.getId(), request))
+					.isInstanceOf(ProductException.class)
+					.hasMessage(ErrorCode.NOT_SELLER.getMessage());
+			}
+		}
