@@ -43,3 +43,4 @@ logging:
     org.hibernate.type.descriptor.sql: trace
     com.jpaplayground: debug
     org.springframework.cache: trace
+    org.springframework.transaction.interceptor: trace
