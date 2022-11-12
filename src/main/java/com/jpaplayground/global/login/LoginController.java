@@ -2,7 +2,9 @@ package com.jpaplayground.global.login;
 
 import static com.jpaplayground.global.login.LoginUtils.HEADER_ACCESS_TOKEN;
 import static com.jpaplayground.global.login.LoginUtils.HEADER_REFRESH_TOKEN;
+import com.jpaplayground.global.login.jwt.AccessToken;
 import com.jpaplayground.global.login.jwt.JwtProvider;
+import com.jpaplayground.global.login.jwt.JwtVerifier;
 import com.jpaplayground.global.login.oauth.OAuthProperties;
 import com.jpaplayground.global.login.oauth.OAuthPropertyMap;
 import com.jpaplayground.global.login.oauth.OAuthProvider;
@@ -11,9 +13,13 @@ import com.jpaplayground.global.login.oauth.dto.OAuthAccessToken;
 import com.jpaplayground.global.login.oauth.dto.OAuthUserInfo;
 import com.jpaplayground.global.member.MemberResponse;
 import com.jpaplayground.global.redis.RedisService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +35,7 @@ public class LoginController {
 
 	private final OAuthProvider oAuthProvider;
 	private final OAuthPropertyMap oAuthPropertyMap;
+	private final JwtVerifier jwtVerifier;
 	private final JwtProvider jwtProvider;
 	private final LoginService loginService;
 	private final RedisService redisService;
@@ -59,7 +66,7 @@ public class LoginController {
 		headers.set(HEADER_REFRESH_TOKEN, jwtRefreshToken);
 
 		log.debug("로그인 성공");
-		return ResponseEntity.ok().headers(headers).body(memberResponse);
+		return new ResponseEntity<>(memberResponse, headers, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/logout")
@@ -67,4 +74,29 @@ public class LoginController {
 		redisService.deleteJwtRefreshToken(memberId);
 		return ResponseEntity.ok(loginService.logout(memberId));
 	}
+
+	@GetMapping("/jwt/refresh")
+	public ResponseEntity<String> refreshToken(HttpServletRequest request, @AccessToken String accessToken) {
+
+		String refreshToken = request.getHeader(HEADER_REFRESH_TOKEN);
+
+		Claims claims;
+		try {
+			claims = jwtVerifier.verifyAccessToken(accessToken);
+		} catch (ExpiredJwtException e) {
+			claims = e.getClaims();
+		}
+		Long memberId = Long.valueOf(claims.getSubject());
+
+		jwtVerifier.verifyRefreshToken(refreshToken);
+		jwtVerifier.verifyMatchingRefreshToken(refreshToken, memberId);
+		String newAccessToken = jwtProvider.createAccessToken(memberId);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.set(HEADER_ACCESS_TOKEN, newAccessToken);
+
+		log.debug("AccessToken 재발급 : {}", newAccessToken);
+		return new ResponseEntity<>("Access Token 재발급 완료", headers, HttpStatus.OK);
+	}
+
 }

@@ -20,8 +20,8 @@ public class ReservationService {
 	private final ProductRepository productRepository;
 
 	@Transactional
-	public ReservationResponse create(ReservationCreateRequest request, Long sellerId) {
-		Product product = productRepository.findByIdAndDeletedFalse(request.getProductId())
+	public ReservationResponse create(ReservationCreateRequest request, Long productId, Long sellerId) {
+		Product product = productRepository.findByIdAndDeletedFalse(productId)
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 
 		Member buyer = memberRepository.findById(request.getBuyerId())

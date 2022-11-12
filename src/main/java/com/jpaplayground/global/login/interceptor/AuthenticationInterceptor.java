@@ -1,11 +1,8 @@
 package com.jpaplayground.global.login.interceptor;
 
 import com.jpaplayground.global.exception.ErrorCode;
-import static com.jpaplayground.global.login.LoginUtils.HEADER_ACCESS_TOKEN;
-import static com.jpaplayground.global.login.LoginUtils.HEADER_REFRESH_TOKEN;
 import static com.jpaplayground.global.login.LoginUtils.LOGIN_MEMBER;
 import com.jpaplayground.global.login.exception.LoginException;
-import com.jpaplayground.global.login.jwt.JwtProvider;
 import com.jpaplayground.global.login.jwt.JwtVerifier;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -26,50 +23,40 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Slf4j
 public class AuthenticationInterceptor implements HandlerInterceptor {
 
-	public static final String BEARER_REGEX = "[bB]earer\\s";
-
-	private static final Map<String, Set<String>> excludedRequests = Map.of(
+	public static final Map<String, Set<String>> allowedUriAndMethods = Map.of(
 		"/products", Set.of(HttpMethod.GET.toString())
 	);
+	public static final String BEARER_REGEX = "[bB]earer\\s";
 
 	private final JwtVerifier jwtVerifier;
-	private final JwtProvider jwtProvider;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-		if (isExcludedRequest(request)) {
+		log.debug("인터셉터 발동 : {}", request.getRequestURI());
+		if (isAllowedRequest(request)) {
+			log.debug("인터셉터 제외 메서드 : {} {}", request.getMethod(), request.getRequestURI());
 			return true;
 		}
-		log.debug("인터셉터 발동 : {}", request.getRequestURI());
 
 		String accessToken = parseBearerToken(request);
-		String refreshToken = request.getHeader(HEADER_REFRESH_TOKEN);
 		Claims claims;
 
 		try {
 			claims = jwtVerifier.verifyAccessToken(accessToken);
 		} catch (ExpiredJwtException e) {
-			Long memberId = Long.valueOf(e.getClaims().getSubject());
-
-			jwtVerifier.verifyRefreshToken(refreshToken);
-			jwtVerifier.verifyMatchingRefreshToken(refreshToken, memberId);
-			String newAccessToken = jwtProvider.createAccessToken(memberId);
-
-			response.setHeader(HEADER_ACCESS_TOKEN, newAccessToken);
-			log.debug("AccessToken 재발급 : {}", newAccessToken);
-			throw new LoginException(ErrorCode.JWT_ACCESS_TOKEN_RENEWED);
+			throw new LoginException(ErrorCode.JWT_ACCESS_TOKEN_EXPIRED);
 		}
 
 		request.setAttribute(LOGIN_MEMBER, Long.valueOf(claims.getSubject()));
 		return true;
 	}
 
-	private boolean isExcludedRequest(HttpServletRequest request) {
+	private boolean isAllowedRequest(HttpServletRequest request) {
 		String requestURI = request.getRequestURI();
 		String httpMethod = request.getMethod();
 
-		if (excludedRequests.containsKey(requestURI)) {
-			return excludedRequests.get(requestURI).contains(httpMethod);
+		if (allowedUriAndMethods.containsKey(requestURI)) {
+			return allowedUriAndMethods.get(requestURI).contains(httpMethod);
 		}
 		return false;
 	}
