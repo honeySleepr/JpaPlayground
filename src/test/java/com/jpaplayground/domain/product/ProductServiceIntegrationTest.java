@@ -31,6 +31,7 @@ class ProductServiceIntegrationTest {
 	@Autowired
 	TestData testData;
 	List<Product> allProducts;
+	Product product;
 	Member seller;
 	Member buyer;
 
@@ -38,8 +39,9 @@ class ProductServiceIntegrationTest {
 	void init() {
 		testData.init();
 		allProducts = testData.getAllProducts();
-		seller = testData.getAllMembers().get(0);
-		buyer = testData.getAllMembers().get(1);
+		product = allProducts.get(4);
+		seller = testData.getSeller();
+		buyer = testData.getBuyer();
 	}
 
 	@Test
@@ -60,7 +62,6 @@ class ProductServiceIntegrationTest {
 	@DisplayName("판매자가 자신의 product를 삭제 요청을 하면 product가 삭제된다")
 	void delete() {
 		// given
-		Product product = allProducts.get(4);
 		Long sellerId = seller.getId();
 
 		// when
@@ -74,7 +75,6 @@ class ProductServiceIntegrationTest {
 	@DisplayName("판매자가 아닌 member가 product 삭제 요청을 하면 예외가 발생한다")
 	void delete_not_seller() {
 		// given
-		Product product = allProducts.get(4);
 		Long buyerId = buyer.getId();
 
 		// when
@@ -98,7 +98,7 @@ class ProductServiceIntegrationTest {
 
 	@Nested
 	@DisplayName("Product 조회 시")
-	class FindAll {
+	class FindTest {
 
 		@Test
 		@DisplayName("Paging이 적용된 제품 목록을 반환한다")
@@ -139,7 +139,6 @@ class ProductServiceIntegrationTest {
 	@DisplayName("제품의 모든 필드를 수정 요청을 하면 모든 필드가 수정된다")
 	void update_all_fields() {
 		// given
-		Product product = allProducts.get(4);
 		ProductUpdateRequest request = new ProductUpdateRequest("수정제품", 1234567);
 		Long sellerId = seller.getId();
 
@@ -155,7 +154,6 @@ class ProductServiceIntegrationTest {
 	@DisplayName("제품의 필드 하나만을 수정 요청을 하면 해당 필드만 수정된다")
 	void update_some_fields() {
 		// given
-		Product product = allProducts.get(4);
 		Integer oldPrice = product.getPrice();
 		ProductUpdateRequest request = new ProductUpdateRequest("수정제품", null);
 		Long sellerId = seller.getId();
@@ -172,7 +170,6 @@ class ProductServiceIntegrationTest {
 	@DisplayName("판매자가 아닌 member가 product 수정 요청을 하면 예외가 발생한다")
 	void update_not_seller() {
 		// given
-		Product product = allProducts.get(4);
 		ProductUpdateRequest request = new ProductUpdateRequest("수정제품", null);
 		Long buyerId = buyer.getId();
 
