@@ -2,6 +2,7 @@ package com.jpaplayground.domain.product;
 
 import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.domain.reservation.Reservation;
+import com.jpaplayground.domain.reservation.exception.ReservationException;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.member.Member;
 import java.time.LocalDateTime;
@@ -107,6 +108,24 @@ public class Product {
 		}
 		if (price != null) {
 			this.price = price;
+		}
+	}
+
+	public void verifyReservationDoesNotExist() {
+		if (reservation != null) {
+			throw new ReservationException(ErrorCode.RESERVED);
+		}
+	}
+
+	public void verifyReservationExists() {
+		if (reservation == null) {
+			throw new ReservationException(ErrorCode.RESERVATION_NOT_FOUND);
+		}
+	}
+
+	public void verifySellerOrBuyer(Long memberId) {
+		if (!seller.matchesId(memberId) && !reservation.isBuyer(memberId)) {
+			throw new ReservationException(ErrorCode.NOT_SELLER_NOR_BUYER);
 		}
 	}
 }

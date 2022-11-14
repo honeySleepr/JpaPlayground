@@ -6,7 +6,6 @@ import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.domain.reservation.dto.ReservationCreateRequest;
 import com.jpaplayground.domain.reservation.dto.ReservationResponse;
 import com.jpaplayground.domain.reservation.dto.ReservationUpdateRequest;
-import com.jpaplayground.domain.reservation.exception.ReservationException;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.member.Member;
 import com.jpaplayground.global.member.MemberRepository;
@@ -25,47 +24,45 @@ public class ReservationService {
 
 	@Transactional
 	public ReservationResponse create(ReservationCreateRequest request, Long productId, Long memberId) {
-		Product product = productRepository.findByIdAndDeletedFalse(productId)
-			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
+		Product product = findExistingProduct(productId);
 
-		Member buyer = memberRepository.findById(request.getBuyerId())
-			.orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
-
-		if (product.isReserved()) {
-			throw new ReservationException(ErrorCode.RESERVED);
-		}
+		product.verifyReservationDoesNotExist();
 		product.verifySeller(memberId);
-		Reservation reservation = reservationRepository.save(new Reservation(buyer, request.getTimeToMeet()));
-		product.reserve(reservation);
 
+		Member buyer = findMember(request);
+		Reservation reservation = new Reservation(buyer, request.getTimeToMeet());
+		product.reserve(reservationRepository.save(reservation));
 		return new ReservationResponse(product, reservation);
 	}
 
 	@Transactional(readOnly = true)
 	public ReservationResponse findByProductId(Long productId, Long memberId) {
-		Product product = productRepository.findByIdAndDeletedFalse(productId)
-			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
+		Product product = findExistingProduct(productId);
+		product.verifyReservationExists();
+		product.verifySellerOrBuyer(memberId);
 
 		Reservation reservation = product.getReservation();
-		if (!product.isReserved()) {
-			throw new ReservationException(ErrorCode.RESERVATION_NOT_FOUND);
-		}
-		if (!product.isSeller(memberId) && !reservation.isBuyer(memberId)) {
-			throw new ReservationException(ErrorCode.NOT_SELLER_NOR_BUYER);
-		}
 		return new ReservationResponse(product, reservation);
 	}
 
 	@Transactional
 	public ReservationResponse update(Long productId, ReservationUpdateRequest request, Long memberId) {
-		Product product = productRepository.findByIdAndDeletedFalse(productId)
-			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
-		if (!product.isReserved()) {
-			throw new ReservationException(ErrorCode.RESERVATION_NOT_FOUND);
-		}
+		Product product = findExistingProduct(productId);
+		product.verifyReservationExists();
 		product.verifySeller(memberId);
+
 		Reservation reservation = product.getReservation();
 		reservation.changeTime(request.getTimeToMeet());
 		return new ReservationResponse(product, reservation);
+	}
+
+	private Product findExistingProduct(Long productId) {
+		return productRepository.findByIdAndDeletedFalse(productId)
+			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
+	}
+
+	private Member findMember(ReservationCreateRequest request) {
+		return memberRepository.findById(request.getBuyerId())
+			.orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 	}
 }
