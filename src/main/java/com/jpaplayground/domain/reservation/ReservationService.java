@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReservationService {
 
 	private final ReservationRepository reservationRepository;
@@ -24,20 +25,19 @@ public class ReservationService {
 
 	@Transactional
 	public ReservationResponse create(ReservationCreateRequest request, Long productId, Long memberId) {
-		Product product = findExistingProduct(productId);
+		Product product = findExistingProductOrThrowException(productId);
 
 		product.verifyReservationDoesNotExist();
 		product.verifySeller(memberId);
 
 		Member buyer = findMember(request);
-		Reservation reservation = new Reservation(buyer, request.getTimeToMeet());
-		product.reserve(reservationRepository.save(reservation));
+		Reservation reservation = reservationRepository.save(new Reservation(buyer, request.getTimeToMeet()));
+		product.reserve(reservation);
 		return new ReservationResponse(product, reservation);
 	}
 
-	@Transactional(readOnly = true)
 	public ReservationResponse findByProductId(Long productId, Long memberId) {
-		Product product = findExistingProduct(productId);
+		Product product = findExistingProductOrThrowException(productId);
 		product.verifyReservationExists();
 		product.verifySellerOrBuyer(memberId);
 
@@ -47,7 +47,7 @@ public class ReservationService {
 
 	@Transactional
 	public ReservationResponse update(Long productId, ReservationUpdateRequest request, Long memberId) {
-		Product product = findExistingProduct(productId);
+		Product product = findExistingProductOrThrowException(productId);
 		product.verifyReservationExists();
 		product.verifySeller(memberId);
 
@@ -56,7 +56,19 @@ public class ReservationService {
 		return new ReservationResponse(product, reservation);
 	}
 
-	private Product findExistingProduct(Long productId) {
+	@Transactional
+	public ReservationDeleteResponse delete(Long productId, Long memberId) {
+		Product product = findExistingProductOrThrowException(productId);
+		product.verifyReservationExists();
+		product.verifySeller(memberId);
+
+		Reservation reservation = product.getReservation();
+		product.deleteReservation();
+		reservationRepository.delete(reservation);
+		return new ReservationDeleteResponse(product, reservation);
+	}
+
+	private Product findExistingProductOrThrowException(Long productId) {
 		return productRepository.findByIdAndDeletedFalse(productId)
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 	}

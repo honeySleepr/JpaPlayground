@@ -128,4 +128,8 @@ public class Product {
 			throw new ReservationException(ErrorCode.NOT_SELLER_NOR_BUYER);
 		}
 	}
+
+	public void deleteReservation() {
+		reservation = null;
+	}
 }

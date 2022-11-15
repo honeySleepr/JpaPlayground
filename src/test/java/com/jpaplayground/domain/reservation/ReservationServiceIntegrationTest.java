@@ -2,7 +2,6 @@ package com.jpaplayground.domain.reservation;
 
 import com.jpaplayground.TestData;
 import com.jpaplayground.domain.product.Product;
-import com.jpaplayground.domain.product.ProductRepository;
 import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.domain.reservation.dto.ReservationCreateRequest;
 import com.jpaplayground.domain.reservation.dto.ReservationResponse;
@@ -28,11 +27,10 @@ class ReservationServiceIntegrationTest {
 	@Autowired
 	ReservationService reservationService;
 	@Autowired
-	ProductRepository productRepository;
-	@Autowired
 	TestData testData;
 	Product notReservedProduct;
 	Product reservedProduct;
+	Reservation reservation;
 	Member seller;
 	Member buyer;
 	Member thirdPerson;
@@ -42,6 +40,7 @@ class ReservationServiceIntegrationTest {
 		testData.init();
 		notReservedProduct = testData.getAllProducts().get(4);
 		reservedProduct = testData.getReservedProduct();
+		reservation = testData.getReservation();
 		seller = testData.getSeller();
 		buyer = testData.getBuyer();
 		thirdPerson = testData.getThirdPerson();
@@ -65,11 +64,6 @@ class ReservationServiceIntegrationTest {
 			// then
 			assertThat(response.getTimeToMeet()).isEqualTo(now);
 			assertThat(response.getBuyerId()).isEqualTo(buyer.getId());
-
-			Product foundProduct = productRepository.findByIdAndDeletedFalse(notReservedProduct.getId()).get();
-			Reservation reservation = foundProduct.getReservation();
-			assertThat(reservation.getTimeToMeet()).isEqualTo(now);
-			assertThat(reservation.getBuyer().getId()).isEqualTo(buyer.getId());
 		}
 
 		@Test
@@ -79,6 +73,7 @@ class ReservationServiceIntegrationTest {
 			LocalDateTime now = LocalDateTime.now();
 			ReservationCreateRequest request = new ReservationCreateRequest(buyer.getId(), now);
 
+			// when
 			// then
 			assertThatThrownBy(() -> reservationService.create(request, reservedProduct.getId(), seller.getId()))
 				.isInstanceOf(ReservationException.class)
@@ -92,6 +87,7 @@ class ReservationServiceIntegrationTest {
 			LocalDateTime now = LocalDateTime.now();
 			ReservationCreateRequest request = new ReservationCreateRequest(buyer.getId(), now);
 
+			// when
 			// then
 			assertThatThrownBy(() -> reservationService.create(request, notReservedProduct.getId(), buyer.getId()))
 				.isInstanceOf(ProductException.class)
@@ -123,6 +119,7 @@ class ReservationServiceIntegrationTest {
 		@Test
 		@DisplayName("판매자나 구매자가 아닌 member가 조회 요청 시 예외가 발생한다")
 		void find_not_buyer_nor_sell() {
+			// when
 			// then
 			assertThatThrownBy(() -> reservationService.findByProductId(reservedProduct.getId(), thirdPerson.getId()))
 				.isInstanceOf(ReservationException.class)
@@ -131,7 +128,8 @@ class ReservationServiceIntegrationTest {
 
 		@Test
 		@DisplayName("존재하지 않는 예약을 조회하면 예외가 발생한다")
-		void find_null() {
+		void find_no_reservation() {
+			// when
 			// then
 			assertThatThrownBy(() -> reservationService.findByProductId(notReservedProduct.getId(), seller.getId()))
 				.isInstanceOf(ReservationException.class)
@@ -164,6 +162,7 @@ class ReservationServiceIntegrationTest {
 			LocalDateTime newTime = LocalDateTime.of(2022, 12, 1, 12, 30);
 			ReservationUpdateRequest request = new ReservationUpdateRequest(newTime);
 
+			// when
 			// then
 			assertThatThrownBy(() -> reservationService.update(reservedProduct.getId(), request, buyer.getId()))
 				.isInstanceOf(ProductException.class)
@@ -177,6 +176,7 @@ class ReservationServiceIntegrationTest {
 			LocalDateTime newTime = LocalDateTime.of(2022, 12, 1, 12, 30);
 			ReservationUpdateRequest request = new ReservationUpdateRequest(newTime);
 
+			// when
 			// then
 			assertThatThrownBy(() -> reservationService.update(notReservedProduct.getId(), request, seller.getId()))
 				.isInstanceOf(ReservationException.class)
@@ -184,4 +184,38 @@ class ReservationServiceIntegrationTest {
 		}
 	}
 
+	@Nested
+	@DisplayName("Reservation 삭제 테스트")
+	class DeleteTest {
+
+		@Test
+		@DisplayName("판매자가 예약 삭제 요청 시 예약을 삭제한다")
+		void delete() {
+			// when
+			ReservationDeleteResponse response = reservationService.delete(reservedProduct.getId(), seller.getId());
+
+			// then
+			assertThat(response.isDeleted()).isTrue();
+		}
+
+		@Test
+		@DisplayName("판매자가 아닌 member가 예약 삭제 요청 시 예외가 발생한다")
+		void delete_not_seller() {
+			// when
+			// then
+			assertThatThrownBy(() -> reservationService.delete(reservedProduct.getId(), buyer.getId()))
+				.isInstanceOf(ProductException.class)
+				.hasMessage(ErrorCode.NOT_SELLER.getMessage());
+		}
+
+		@Test
+		@DisplayName("존재하지 않는 예약에 삭제 요청을 하면 예외가 발생한다")
+		void delete_no_reservation() {
+			// when
+			// then
+			assertThatThrownBy(() -> reservationService.delete(notReservedProduct.getId(), seller.getId()))
+				.isInstanceOf(ReservationException.class)
+				.hasMessage(ErrorCode.RESERVATION_NOT_FOUND.getMessage());
+		}
+	}
 }
