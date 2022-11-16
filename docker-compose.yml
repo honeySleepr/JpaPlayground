@@ -1,6 +1,21 @@
 services:
   redis:
     image: redis:latest
+    restart: always
     container_name: carrot_redis
     ports:
       - "6379:6379"
+
+
+  mysql:
+    platform: linux/amd64
+    image: mysql:8.0.31
+    restart: always
+    container_name: carrot_mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=carrot
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - TZ=Asia/Seoul
+      - LC_ALL=C.UTF-8

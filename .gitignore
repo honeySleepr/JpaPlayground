@@ -41,3 +41,6 @@ out/
 ### Other ###
 **/TestAnything.java
 **/auth.yml
+**/env.yml
+**/application-h2.yml
+.env
