@@ -26,7 +26,7 @@ public class ProductController {
 
 	@GetMapping("/products")
 	public PagingResponse<ProductResponse> findAll(Pageable pageable) {
-		return new PagingResponse<>(service.findAllNotDeletedProducts(pageable));
+		return new PagingResponse<>(service.findAll(pageable));
 	}
 
 	@PostMapping("/products")

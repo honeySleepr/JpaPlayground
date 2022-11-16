@@ -10,13 +10,13 @@ public class ProductResponse {
 	private final String name;
 	private final Integer price;
 	private final Long sellerId;
-	private final boolean isReserved;
+	private final boolean reserved;
 
 	public ProductResponse(Product product) {
 		this.id = product.getId();
 		this.name = product.getName();
 		this.price = product.getPrice();
 		this.sellerId = product.getSeller().getId(); /* id 조회 시에는 프록시가 초기화되지 않는다! */
-		this.isReserved = product.isReserved();
+		this.reserved = product.isReserved();
 	}
 }

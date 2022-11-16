@@ -21,8 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -70,7 +70,7 @@ public class LoginController {
 		return new ResponseEntity<>(memberResponse, headers, HttpStatus.OK);
 	}
 
-	@DeleteMapping("/logout")
+	@PatchMapping("/logout")
 	public ResponseEntity<MemberResponse> logout(@LoginMemberId Long memberId) {
 		redisService.deleteJwtRefreshToken(memberId);
 		return ResponseEntity.ok(loginService.logout(memberId));
@@ -95,7 +95,7 @@ public class LoginController {
 		headers.set(HEADER_ACCESS_TOKEN, newAccessToken);
 
 		log.debug("AccessToken 재발급 : {}", newAccessToken);
-		return new ResponseEntity<>("Access Token 재발급 완료", headers, HttpStatus.OK);
+		return new ResponseEntity<>(headers, HttpStatus.OK);
 	}
 
 }
