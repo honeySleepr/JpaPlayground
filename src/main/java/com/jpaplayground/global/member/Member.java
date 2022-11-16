@@ -1,6 +1,7 @@
 package com.jpaplayground.global.member;
 
 import com.jpaplayground.domain.product.Product;
+import com.jpaplayground.global.auditing.BaseTimeEntity;
 import com.jpaplayground.global.login.oauth.OAuthServer;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

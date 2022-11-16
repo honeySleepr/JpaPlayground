@@ -17,7 +17,7 @@ public class ReservationCreateRequest {
 	private Long buyerId;
 
 	@NotNull
-	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+	@DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ss")
 	private LocalDateTime timeToMeet;
 
 }
