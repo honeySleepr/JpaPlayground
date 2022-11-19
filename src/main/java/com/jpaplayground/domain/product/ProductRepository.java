@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-	@EntityGraph(attributePaths = {"reservation", "seller"})
+	@EntityGraph(attributePaths = {"reservation", "seller", "bookmarks"})
 	Optional<Product> findByIdAndDeletedFalse(Long id);
 
 	Slice<Product> findProductsByDeletedFalse(Pageable pageable);

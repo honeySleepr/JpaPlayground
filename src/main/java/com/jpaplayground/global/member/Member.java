@@ -1,5 +1,6 @@
 package com.jpaplayground.global.member;
 
+import com.jpaplayground.domain.bookmark.Bookmark;
 import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.global.auditing.BaseTimeEntity;
 import com.jpaplayground.global.login.oauth.OAuthServer;
@@ -48,6 +49,9 @@ public class Member extends BaseTimeEntity {
 	@OneToMany(mappedBy = "seller")
 	private final List<Product> products = new ArrayList<>();
 
+	@OneToMany(mappedBy = "member")
+	private final List<Bookmark> bookmarks = new ArrayList<>();
+
 	/**
 	 * `@Builder`를 클래스에 붙이면 모든 필드에 대한 빌더메서드가 만들어지지만, 메서드나 생성자에 붙이면 인자들에 대해서만 빌더 메서드가 만들어진다.
 	 */
@@ -92,4 +96,7 @@ public class Member extends BaseTimeEntity {
 		return this.id.equals(id);
 	}
 
+	public void addBookmark(Bookmark bookmark) {
+		this.bookmarks.add(bookmark);
+	}
 }

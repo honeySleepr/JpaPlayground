@@ -1,11 +1,14 @@
 package com.jpaplayground.domain.product;
 
+import com.jpaplayground.domain.bookmark.Bookmark;
 import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.domain.reservation.Reservation;
 import com.jpaplayground.domain.reservation.exception.ReservationException;
 import com.jpaplayground.global.auditing.BaseTimeEntity;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.member.Member;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
@@ -14,6 +17,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -58,6 +62,9 @@ public class Product extends BaseTimeEntity {
 	@JoinColumn(name = "reservation_id")
 	private Reservation reservation;
 
+	@OneToMany(mappedBy = "product")
+	private final List<Bookmark> bookmarks = new ArrayList<>();
+
 	private Product(String name, Integer price) {
 		this.name = name;
 		this.price = price;
@@ -70,10 +77,6 @@ public class Product extends BaseTimeEntity {
 
 	public void changeDeletedState(boolean deleted) {
 		this.deleted = deleted;
-	}
-
-	public boolean isSeller(Long memberId) {
-		return seller.matchesId(memberId);
 	}
 
 	public void verifySeller(Long memberId) {
@@ -119,5 +122,17 @@ public class Product extends BaseTimeEntity {
 
 	public void deleteReservation() {
 		reservation = null;
+	}
+
+	public boolean matchesId(Long id) {
+		return this.id.equals(id);
+	}
+
+	public void addBookmark(Bookmark bookMark) {
+		this.bookmarks.add(bookMark);
+	}
+
+	public int getBookmarkCount() {
+		return this.bookmarks.size();
 	}
 }
