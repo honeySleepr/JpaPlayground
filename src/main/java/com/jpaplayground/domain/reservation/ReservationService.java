@@ -24,8 +24,8 @@ public class ReservationService {
 	private final ProductRepository productRepository;
 
 	@Transactional
-	public ReservationResponse create(ReservationCreateRequest request, Long productId, Long memberId) {
-		Product product = findExistingProductOrThrowException(productId);
+	public ReservationResponse save(ReservationCreateRequest request, Long productId, Long memberId) {
+		Product product = findProduct(productId);
 
 		product.verifyReservationDoesNotExist();
 		product.verifySeller(memberId);
@@ -37,7 +37,7 @@ public class ReservationService {
 	}
 
 	public ReservationResponse findByProductId(Long productId, Long memberId) {
-		Product product = findExistingProductOrThrowException(productId);
+		Product product = findProduct(productId);
 		product.verifyReservationExists();
 		product.verifySellerOrBuyer(memberId);
 
@@ -47,7 +47,7 @@ public class ReservationService {
 
 	@Transactional
 	public ReservationResponse update(Long productId, ReservationUpdateRequest request, Long memberId) {
-		Product product = findExistingProductOrThrowException(productId);
+		Product product = findProduct(productId);
 		product.verifyReservationExists();
 		product.verifySeller(memberId);
 
@@ -58,7 +58,7 @@ public class ReservationService {
 
 	@Transactional
 	public ReservationDeleteResponse delete(Long productId, Long memberId) {
-		Product product = findExistingProductOrThrowException(productId);
+		Product product = findProduct(productId);
 		product.verifyReservationExists();
 		product.verifySeller(memberId);
 
@@ -68,7 +68,7 @@ public class ReservationService {
 		return new ReservationDeleteResponse(product, reservation);
 	}
 
-	private Product findExistingProductOrThrowException(Long productId) {
+	private Product findProduct(Long productId) {
 		return productRepository.findByIdAndDeletedFalse(productId)
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 	}

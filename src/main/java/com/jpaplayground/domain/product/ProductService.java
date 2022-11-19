@@ -23,7 +23,7 @@ public class ProductService {
 	public Slice<ProductResponse> findAll(Pageable pageable) {
 		return productRepository.findProductsByDeletedFalse(pageable).map(ProductResponse::new);
 	}
-
+	/* TODO: product 단건 상세 조회 */
 	@Transactional
 	public ProductResponse save(ProductCreateRequest request) {
 		Product product = Product.of(request.getName(), request.getPrice());

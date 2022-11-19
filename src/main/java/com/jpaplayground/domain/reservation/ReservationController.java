@@ -28,7 +28,7 @@ public class ReservationController {
 	public ResponseEntity<ReservationResponse> create(@PathVariable Long productId,
 													  @Valid @RequestBody ReservationCreateRequest request,
 													  @LoginMemberId Long memberId) {
-		ReservationResponse body = reservationService.create(request, productId, memberId);
+		ReservationResponse body = reservationService.save(request, productId, memberId);
 		return ResponseEntity.status(HttpStatus.CREATED).body(body);
 	}
 
