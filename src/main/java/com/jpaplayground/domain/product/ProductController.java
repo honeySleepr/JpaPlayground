@@ -1,7 +1,6 @@
 package com.jpaplayground.domain.product;
 
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
-import com.jpaplayground.domain.product.dto.ProductDeleteResponse;
 import com.jpaplayground.domain.product.dto.ProductResponse;
 import com.jpaplayground.domain.product.dto.ProductUpdateRequest;
 import com.jpaplayground.global.login.LoginMemberId;
@@ -11,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -32,12 +30,12 @@ public class ProductController {
 	}
 
 	@PostMapping("/products")
-	public ResponseEntity<ProductResponse> add(@Validated @RequestBody ProductCreateRequest request) {
+	public ResponseEntity<ProductResponse> add(@Valid @RequestBody ProductCreateRequest request) {
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(request));
 	}
 
 	@DeleteMapping("/products/{productId}")
-	public ResponseEntity<ProductDeleteResponse> delete(@PathVariable Long productId, @LoginMemberId Long memberId) {
+	public ResponseEntity<ProductResponse> delete(@PathVariable Long productId, @LoginMemberId Long memberId) {
 		return ResponseEntity.ok(service.delete(memberId, productId));
 	}
 

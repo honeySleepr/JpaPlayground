@@ -1,7 +1,6 @@
 package com.jpaplayground.domain.product;
 
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
-import com.jpaplayground.domain.product.dto.ProductDeleteResponse;
 import com.jpaplayground.domain.product.dto.ProductResponse;
 import com.jpaplayground.domain.product.dto.ProductUpdateRequest;
 import com.jpaplayground.domain.product.exception.ProductException;
@@ -34,13 +33,13 @@ public class ProductService {
 	}
 
 	@Transactional
-	public ProductDeleteResponse delete(Long memberId, Long productId) {
+	public ProductResponse delete(Long memberId, Long productId) {
 		Product product = productRepository.findByIdAndDeletedFalse(productId)
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 
 		product.verifySeller(memberId);
 		product.changeDeletedState(true);
-		return new ProductDeleteResponse(product);
+		return new ProductResponse(product);
 	}
 
 	@Transactional

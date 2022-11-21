@@ -76,7 +76,7 @@ public class LoginController {
 		return ResponseEntity.ok(loginService.logout(memberId));
 	}
 
-	@GetMapping("/jwt/renew")
+	@GetMapping("/jwt")
 	public ResponseEntity<String> renewAccessToken(@AccessToken String accessToken,
 												   @RefreshToken String refreshToken) {
 		Claims claims;

@@ -2,7 +2,6 @@ package com.jpaplayground.domain.product;
 
 import com.jpaplayground.TestData;
 import com.jpaplayground.domain.product.dto.ProductCreateRequest;
-import com.jpaplayground.domain.product.dto.ProductDeleteResponse;
 import com.jpaplayground.domain.product.dto.ProductResponse;
 import com.jpaplayground.domain.product.dto.ProductUpdateRequest;
 import com.jpaplayground.domain.product.exception.ProductException;
@@ -65,10 +64,11 @@ class ProductServiceIntegrationTest {
 		Long sellerId = seller.getId();
 
 		// when
-		ProductDeleteResponse response = productService.delete(sellerId, product.getId());
+		ProductResponse response = productService.delete(sellerId, product.getId());
 
 		// then
-		assertThat(response.getDeleted()).isTrue();
+		assertThat(response.getId()).isEqualTo(product.getId());
+		assertThat(response.getSellerId()).isEqualTo(sellerId);
 	}
 
 	@Test
