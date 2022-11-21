@@ -25,6 +25,7 @@ jobs:
       working-directory: ./src/main/resources
       run: |
         echo "${{ secrets.AUTH_YML }}" >> ./auth.yml
+        echo "${{ secrets.ENV_YML }}" >> ./env.yml
 
     # https://github.com/actions/cache/blob/main/examples.md#java---gradle
     - name: gradle dependency caching
@@ -37,5 +38,20 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
 
+    - name: Docker compose
+      run: |
+        export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PW }}
+        docker compose up -d
+        
+        
+    - name: Wait for mysql
+      run: |
+        docker ps
+        while ! docker exec carrot_mysql mysql --user=root --password=${{ secrets.MYSQL_ROOT_PW }} -e "SELECT 1" >/dev/null 2>&1;
+        do
+            sleep 2
+            echo "waiting for mysql.."
+        done
+        
     - name: Test with Gradle
       run: ./gradlew test
