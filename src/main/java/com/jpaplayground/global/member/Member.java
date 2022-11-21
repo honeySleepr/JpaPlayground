@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -28,8 +29,7 @@ public class Member {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	/* Todo: UserInfo embeddedType으로 묶기*/
-	@NotNull
+	@NotBlank
 	@Column(updatable = false)
 	private String account;
 
@@ -85,6 +85,10 @@ public class Member {
 
 	public void logOut() {
 		this.loggedIn = false;
+	}
+
+	public boolean matchesId(Long id) {
+		return this.id.equals(id);
 	}
 
 }

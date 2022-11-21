@@ -35,9 +35,8 @@ public class ProductController {
 	}
 
 	@DeleteMapping("/products/{productId}")
-	public ResponseEntity<Void> delete(@PathVariable Long productId, @LoginMemberId Long memberId) {
-		service.delete(memberId, productId);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<ProductResponse> delete(@PathVariable Long productId, @LoginMemberId Long memberId) {
+		return ResponseEntity.ok(service.delete(memberId, productId));
 	}
 
 	@PatchMapping("/products/{productId}")

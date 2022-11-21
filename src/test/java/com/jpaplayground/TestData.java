@@ -20,12 +20,15 @@ public class TestData {
 	private final MemberRepository memberRepository;
 	private final ReservationRepository reservationRepository;
 	private final HttpServletRequest httpServletRequest;
-	private List<Member> allMembers;
-	private List<Reservation> allReservations;
+	private Member seller;
+	private Member buyer;
+	private Member thirdPerson;
+	private Product reservedProduct;
+	private Reservation reservation;
 	private List<Product> allProducts;
 
 	public TestData(ProductRepository productRepository, MemberRepository memberRepository,
-		ReservationRepository reservationRepository, HttpServletRequest httpServletRequest) {
+					ReservationRepository reservationRepository, HttpServletRequest httpServletRequest) {
 		this.productRepository = productRepository;
 		this.memberRepository = memberRepository;
 		this.reservationRepository = reservationRepository;
@@ -35,55 +38,58 @@ public class TestData {
 	public void init() {
 		clear();
 
-		this.allMembers = createMemberData();
-		this.allReservations = createReservationData();
+		this.seller = createSellerData();
+		this.buyer = createBuyerData();
+		this.thirdPerson = createThirdPersonData();
+		this.reservation = createReservationData();
 		this.allProducts = createProductData();
+		this.reservedProduct = allProducts.get(1);
 		persistMemberData();
-		httpServletRequest.setAttribute(LOGIN_MEMBER, allMembers.get(0).getId()); /* allMembers.get(0) == 판매자 */
+		httpServletRequest.setAttribute(LOGIN_MEMBER, seller.getId());
 		persistReservationData();
 		persistProductData();
+	}
+
+	private Member createSellerData() {
+		return Member.builder()
+			.account("testBC")
+			.server(OAuthServer.NAVER)
+			.build();
+	}
+
+	private Member createBuyerData() {
+		return Member.builder()
+			.account("account2")
+			.server(OAuthServer.GITHUB)
+			.build();
+	}
+
+	private Member createThirdPersonData() {
+		return Member.builder()
+			.account("account3")
+			.server(OAuthServer.GITHUB)
+			.build();
 	}
 
 	private void clear() {
 		productRepository.deleteAll();
 	}
 
-	private List<Reservation> createReservationData() {
-		Member member2 = allMembers.get(1);
-		return List.of(
-			new Reservation(member2, LocalDateTime.now())
-		);
-	}
-
-	private List<Member> createMemberData() {
-		return List.of(
-			Member.builder()
-				.account("testBC")
-				.name("캉캉")
-				.email("spam@naver.com")
-				.profileImageUrl("image1.jpg")
-				.server(OAuthServer.NAVER)
-				.build(),
-			Member.builder()
-				.account("account2")
-				.name("BC2")
-				.email("spam2@naver.com")
-				.profileImageUrl("image2.jpg")
-				.server(OAuthServer.GITHUB)
-				.build());
+	private Reservation createReservationData() {
+		return new Reservation(buyer, LocalDateTime.now());
 	}
 
 	private void persistMemberData() {
-		memberRepository.saveAll(allMembers);
+		memberRepository.save(seller);
+		memberRepository.save(buyer);
+		memberRepository.save(thirdPerson);
 	}
 
 	private void persistReservationData() {
-		reservationRepository.saveAll(allReservations);
+		reservationRepository.save(reservation);
 	}
 
 	private List<Product> createProductData() {
-		Reservation reservation = allReservations.get(0);
-
 		Product deleted = Product.of("노트북파우치", 10000);
 		deleted.changeDeletedState(true);
 		Product reserved = Product.of("와플기계", 30000);
@@ -106,11 +112,27 @@ public class TestData {
 		productRepository.saveAll(allProducts);
 	}
 
+	public Member getSeller() {
+		return seller;
+	}
+
+	public Member getBuyer() {
+		return buyer;
+	}
+
+	public Member getThirdPerson() {
+		return thirdPerson;
+	}
+
 	public List<Product> getAllProducts() {
 		return allProducts;
 	}
 
-	public List<Member> getAllMembers() {
-		return allMembers;
+	public Reservation getReservation() {
+		return reservation;
+	}
+
+	public Product getReservedProduct() {
+		return reservedProduct;
 	}
 }

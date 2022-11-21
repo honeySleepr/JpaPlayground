@@ -33,12 +33,13 @@ public class ProductService {
 	}
 
 	@Transactional
-	public void delete(Long memberId, Long productId) {
+	public ProductResponse delete(Long memberId, Long productId) {
 		Product product = productRepository.findByIdAndDeletedFalse(productId)
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 
 		product.verifySeller(memberId);
 		product.changeDeletedState(true);
+		return new ProductResponse(product);
 	}
 
 	@Transactional

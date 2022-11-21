@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -34,6 +35,10 @@ public class Reservation {
 	private LocalDateTime createdAt;
 
 	@NotNull
+	@LastModifiedDate
+	private LocalDateTime lastModifiedAt;
+
+	@NotNull
 	private LocalDateTime timeToMeet;
 
 	@NotNull
@@ -43,6 +48,14 @@ public class Reservation {
 
 	public Reservation(Member buyer, LocalDateTime timeToMeet) {
 		this.buyer = buyer;
+		this.timeToMeet = timeToMeet;
+	}
+
+	public boolean isBuyer(Long memberId) {
+		return buyer.matchesId(memberId);
+	}
+
+	public void changeTime(LocalDateTime timeToMeet) {
 		this.timeToMeet = timeToMeet;
 	}
 }

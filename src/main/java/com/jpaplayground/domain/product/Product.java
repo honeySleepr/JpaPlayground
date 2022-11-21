@@ -2,6 +2,7 @@ package com.jpaplayground.domain.product;
 
 import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.domain.reservation.Reservation;
+import com.jpaplayground.domain.reservation.exception.ReservationException;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.member.Member;
 import java.time.LocalDateTime;
@@ -15,7 +16,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,10 +37,11 @@ public class Product {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotNull
+	@NotBlank
 	private String name;
 
 	@NotNull
+	@Positive
 	private Integer price;
 
 	@NotNull
@@ -62,7 +66,7 @@ public class Product {
 	@JoinColumn(updatable = false, name = "seller_id")
 	private Member seller;
 
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "reservation_id")
 	private Reservation reservation;
 
@@ -76,12 +80,16 @@ public class Product {
 		return new Product(name, price);
 	}
 
-	public void changeDeletedState(boolean tf) {
-		this.deleted = tf;
+	public void changeDeletedState(boolean deleted) {
+		this.deleted = deleted;
 	}
 
-	public void verifySeller(Long sellerId) {
-		if (!seller.getId().equals(sellerId)) {
+	public boolean isSeller(Long memberId) {
+		return seller.matchesId(memberId);
+	}
+
+	public void verifySeller(Long memberId) {
+		if (!seller.matchesId(memberId)) {
 			throw new ProductException(ErrorCode.NOT_SELLER);
 		}
 	}
@@ -90,10 +98,8 @@ public class Product {
 		this.reservation = reservation;
 	}
 
-	public void checkReserved() {
-		if (this.reservation != null) {
-			throw new ProductException(ErrorCode.RESERVED);
-		}
+	public boolean isReserved() {
+		return this.reservation != null;
 	}
 
 	public void update(String name, Integer price) {
@@ -103,5 +109,27 @@ public class Product {
 		if (price != null) {
 			this.price = price;
 		}
+	}
+
+	public void verifyReservationDoesNotExist() {
+		if (reservation != null) {
+			throw new ReservationException(ErrorCode.RESERVED);
+		}
+	}
+
+	public void verifyReservationExists() {
+		if (reservation == null) {
+			throw new ReservationException(ErrorCode.RESERVATION_NOT_FOUND);
+		}
+	}
+
+	public void verifySellerOrBuyer(Long memberId) {
+		if (!seller.matchesId(memberId) && !reservation.isBuyer(memberId)) {
+			throw new ReservationException(ErrorCode.NOT_SELLER_NOR_BUYER);
+		}
+	}
+
+	public void deleteReservation() {
+		reservation = null;
 	}
 }
