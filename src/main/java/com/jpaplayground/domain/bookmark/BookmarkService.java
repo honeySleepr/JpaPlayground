@@ -26,12 +26,31 @@ public class BookmarkService {
 		Product product = findProduct(productId);
 		Member member = findMember(memberId);
 
-		Bookmark bookmark = member.getBookmarks().stream()
-			.filter(bm -> bm.matchesProduct(product.getId()))
+		member.getBookmarks().stream()
+			.filter(bookmark -> bookmark.matchesProduct(product))
 			.findFirst()
-			.orElseGet(() -> bookmarkRepository.save(new Bookmark(product, member)));
+			.orElseGet(() -> {
+				Bookmark bookmark = new Bookmark(product, member);
+				return bookmarkRepository.save(bookmark);
+			});
 
-		return new BookmarkResponse(bookmark, product.getBookmarkCount());
+		return new BookmarkResponse(product);
+	}
+
+	@Transactional
+	public BookmarkResponse delete(Long productId, Long memberId) {
+		Product product = findProduct(productId);
+		Member member = findMember(memberId);
+
+		member.getBookmarks().stream()
+			.filter(bookmark -> bookmark.matchesProduct(product))
+			.findFirst()
+			.ifPresent(bookmark -> {
+				bookmark.delete();
+				bookmarkRepository.delete(bookmark);
+			});
+
+		return new BookmarkResponse(product);
 	}
 
 	private Product findProduct(Long productId) {
@@ -40,7 +59,7 @@ public class BookmarkService {
 	}
 
 	private Member findMember(Long memberId) {
-		return memberRepository.findById(memberId)
+		return memberRepository.findWithBookmarksById(memberId)
 			.orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 	}
 

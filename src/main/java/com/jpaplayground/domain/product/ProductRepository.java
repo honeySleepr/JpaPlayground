@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
+	// TODO: 상황에 맞게 필요한 Entity만 fetch join 해오는 여러 메서드로 나누기
 	@EntityGraph(attributePaths = {"reservation", "seller", "bookmarks"})
 	Optional<Product> findByIdAndDeletedFalse(Long id);
 

@@ -7,8 +7,8 @@ import com.jpaplayground.domain.reservation.exception.ReservationException;
 import com.jpaplayground.global.auditing.BaseTimeEntity;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.member.Member;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
@@ -63,7 +63,7 @@ public class Product extends BaseTimeEntity {
 	private Reservation reservation;
 
 	@OneToMany(mappedBy = "product")
-	private final List<Bookmark> bookmarks = new ArrayList<>();
+	private final Set<Bookmark> bookmarks = new HashSet<>();
 
 	private Product(String name, Integer price) {
 		this.name = name;
@@ -134,5 +134,9 @@ public class Product extends BaseTimeEntity {
 
 	public int getBookmarkCount() {
 		return this.bookmarks.size();
+	}
+
+	public void deleteBookmark(Bookmark bookmark) {
+		this.bookmarks.remove(bookmark);
 	}
 }

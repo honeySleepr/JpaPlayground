@@ -5,6 +5,7 @@ import com.jpaplayground.global.login.LoginMemberId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +20,12 @@ public class BookmarkController {
 
 	@PostMapping("/bookmarks")
 	public ResponseEntity<BookmarkResponse> create(@PathVariable Long productId, @LoginMemberId Long memberId) {
-		BookmarkResponse save = bookmarkService.save(productId, memberId);
-		return ResponseEntity.status(HttpStatus.CREATED).body(save);
+		BookmarkResponse response = bookmarkService.save(productId, memberId);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
+	@DeleteMapping("/bookmarks")
+	public ResponseEntity<BookmarkResponse> delete(@PathVariable Long productId, @LoginMemberId Long memberId) {
+		return ResponseEntity.ok(bookmarkService.delete(productId, memberId));
+	}
 }

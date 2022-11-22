@@ -39,8 +39,14 @@ public class Bookmark extends BaseTimeEntity {
 		this.member = member;
 	}
 
-	public boolean matchesProduct(Long productId) {
-		return product.matchesId(productId);
+	public boolean matchesProduct(Product product) {
+		return this.product.matchesId(product.getId());
 	}
 
+	public void delete() {
+		product.deleteBookmark(this);
+		member.deleteBookmark(this);
+		product = null;
+		member = null;
+	}
 }
