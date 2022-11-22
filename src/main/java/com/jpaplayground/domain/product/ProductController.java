@@ -31,7 +31,8 @@ public class ProductController {
 
 	@PostMapping("/products")
 	public ResponseEntity<ProductResponse> add(@Valid @RequestBody ProductCreateRequest request) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(service.save(request));
+		ProductResponse save = service.save(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(save);
 	}
 
 	@DeleteMapping("/products/{productId}")
