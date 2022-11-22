@@ -1,9 +1,11 @@
 package com.jpaplayground.domain.bookmark;
 
 import com.jpaplayground.domain.product.Product;
-import com.jpaplayground.global.auditing.BaseTimeEntity;
 import com.jpaplayground.global.member.Member;
+import java.time.LocalDateTime;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -13,17 +15,24 @@ import javax.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Bookmark extends BaseTimeEntity {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
+public class Bookmark {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	// @CreatedBy가 붙은채로는 한 Product에 여러 Bookmark를 등록하는 테스트를 하기 어려워서 제거하였다.
+	@Column(updatable = false)
+	@CreatedDate
+	private LocalDateTime createdAt;
+
+	// @CreatedBy는 여기서는 득보다 실이 많은 것 같아서 포기(테스트에 httpServletRequest 사용해야함, 연관관계 편의메서드 하나로 product와 member를 같이 관리해주기 애매해짐)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
