@@ -85,4 +85,39 @@ class BookmarkServiceIntegrationTest {
 			assertThat(response.getBookmarkCount()).isEqualTo(1); // 이미 같은 member의 북마크가 있으면 개수가 증가하지 않는다.
 		}
 	}
+
+	@Nested
+	@DisplayName("Bookmark 삭제 테스트")
+	class DeleteTest {
+
+		@Test
+		@DisplayName("bookmark 삭제 요청 시 하면 자신의 bookmark가 삭제된다")
+		void delete() {
+			// given
+			Long productId = bookmarkedProduct.getId();
+			Long buyerId = buyer.getId();
+			int initialCount = bookmarkedProduct.getBookmarkCount();
+
+			// when
+			BookmarkResponse response = bookmarkService.delete(productId, buyerId);
+
+			// then
+			assertThat(response.getBookmarkCount()).isEqualTo(initialCount - 1);
+		}
+
+		@Test
+		@DisplayName("bookmark 삭제 요청 시 다른 member의 bookmark는 삭제되지 않는다")
+		void delete_not_yours() {
+			// given
+			Long productId = bookmarkedProduct.getId();
+			Long memberId = thirdPerson.getId();
+			int initialCount = bookmarkedProduct.getBookmarkCount();
+
+			// when
+			BookmarkResponse response = bookmarkService.delete(productId, memberId);
+
+			// then
+			assertThat(response.getBookmarkCount()).isEqualTo(initialCount);
+		}
+	}
 }
