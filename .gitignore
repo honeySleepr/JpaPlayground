@@ -4,8 +4,15 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-
 **/src/test/**/help/
+
+### Custom ###
+**/TestAnything.java
+**/auth*.yml
+**/env*.yml
+**/application-prod.yml
+**/application-h2.yml
+.env
 
 ### STS ###
 .apt_generated
@@ -37,10 +44,3 @@ out/
 
 ### VS Code ###
 .vscode/
-
-### Other ###
-**/TestAnything.java
-**/auth.yml
-**/env.yml
-**/application-h2.yml
-.env

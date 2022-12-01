@@ -1,39 +1,5 @@
 spring:
+  profiles:
+    active: ${CARROT_PROFILE}
   config:
     import: classpath:auth.yml, classpath:env.yml
-
-  datasource:
-    url: jdbc:mysql://localhost:3306/carrot
-    username: root
-    password: ${MYSQL_ROOT_PASSWORD}
-
-  sql:
-    init:
-      mode: always
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-
-    properties:
-      hibernate:
-        format_sql: true
-
-    defer-datasource-initialization: true
-
-  redis:
-    host: 127.0.0.1
-    port: 6379
-
-  data:
-    web:
-      pageable:
-        max-page-size: 50
-
-logging:
-  level:
-    org.hibernate.SQL: debug
-    org.hibernate.type.descriptor.sql: trace
-    com.jpaplayground: debug
-    org.springframework.cache: trace
-    org.springframework.transaction.interceptor: trace
