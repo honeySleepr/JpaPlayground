@@ -8,13 +8,12 @@ JPA와 Spring의 기능들을 학습하며, 간단한 버전의 **당근마켓**
 
 ## 🔨 사용한 기술 스택
 
-<img src="https://img.shields.io/badge/java-ED8B00?style=for-the-badge&logo=java&logoColor=white"> <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=spring boot&logoColor=white">
-<img src="https://img.shields.io/badge/Spring Data JPA-6DB33F?style=for-the-badge&logo=spring&logoColor=white">
+<img src="https://img.shields.io/badge/java-ED8B00?style=for-the-badge&logo=java&logoColor=white"> <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=spring boot&logoColor=white"> <img src="https://img.shields.io/badge/Spring Data JPA-6DB33F?style=for-the-badge&logo=spring&logoColor=white">
 
 <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white"> <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=mysql&logoColor=white">
-<img src="https://img.shields.io/badge/github actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">
 
-[//]: # (<img src="https://img.shields.io/badge/docker-2496ed.svg?style=for-the-badge&logo=docker&logoColor=white">)
+<img src="https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white"> <img src="https://img.shields.io/badge/github actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">  <img src="https://img.shields.io/badge/docker-2496ed.svg?style=for-the-badge&logo=docker&logoColor=white">
+
 
 <br>
 
@@ -23,13 +22,21 @@ JPA와 Spring의 기능들을 학습하며, 간단한 버전의 **당근마켓**
 - Product, Reservation CRUD
 - Bookmark 기능 구현 중
 - 로그인 (OAuth + JWT ) - Spring Security X
-- GitHub Action CI
+- AWS와 GitHub Actions로 CI/CD 파이프라인 구축
+
+<br>
+
+## 배포 URL (API 서버)
+
+http://3.36.222.165/products
 
 <br>
 
 ## API 문서
 
 https://documenter.getpostman.com/view/20860983/2s8YmHykWU
+
+<br>
 
 ## PR review
 
