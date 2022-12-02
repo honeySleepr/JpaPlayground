@@ -3,12 +3,15 @@ package com.jpaplayground.domain.bookmark;
 import com.jpaplayground.domain.bookmark.dto.BookmarkResponse;
 import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.domain.product.ProductRepository;
+import com.jpaplayground.domain.product.dto.ProductResponse;
 import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.member.Member;
 import com.jpaplayground.global.member.MemberRepository;
 import com.jpaplayground.global.member.exception.MemberException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +56,12 @@ public class BookmarkService {
 		return new BookmarkResponse(product);
 	}
 
+	public Slice<ProductResponse> findList(Long memberId, Pageable pageable) {
+		Slice<Bookmark> bookmarks = bookmarkRepository.findAllByMemberId(memberId, pageable);
+		/* Todo: 삭제된 제품은 조회 되지 않도록 하기 */
+		return bookmarks.map(bookmark -> new ProductResponse(bookmark.getProduct()));
+	}
+
 	private Product findProduct(Long productId) {
 		return productRepository.findByIdAndDeletedFalse(productId)
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
@@ -62,7 +71,5 @@ public class BookmarkService {
 		return memberRepository.findWithBookmarksById(memberId)
 			.orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 	}
-
-	// TODO: 조회 - member의 북마크 조회 -> memberController에서 진행
 
 }
