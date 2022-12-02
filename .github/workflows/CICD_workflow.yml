@@ -1,16 +1,18 @@
-name: Java CI with Gradle
+name: CI/CD
 
 on:
   push:
-    branches: [ "dev", "CD" ]
-  pull_request:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches:
+      - CD
+  pull_request_target:
+    types:
+      - closed
+    branches:
+      - main
 
 jobs:
-  job1:
+  jobs1:
+    if: github.event.pull_request.merged == true # pr close 후 정상 merge 된 경우에만 job 실행
     name: 1.Build & Test Jar
     runs-on: ubuntu-latest
 
