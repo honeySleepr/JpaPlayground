@@ -3,3 +3,22 @@ spring:
     active: ${CARROT_PROFILE}
   config:
     import: classpath:auth.yml, classpath:env.yml
+
+  sql:
+    init:
+      mode: always
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+    properties:
+      hibernate:
+        format_sql: true
+
+    defer-datasource-initialization: true
+
+  data:
+    web:
+      pageable:
+        max-page-size: 50
