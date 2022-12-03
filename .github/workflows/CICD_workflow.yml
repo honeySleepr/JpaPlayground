@@ -12,7 +12,7 @@ on:
 
 jobs:
   job1:
-    if: github.event.pull_request.merged == true # pr close 후 정상 merge 된 경우에만 job 실행
+    if: github.ref == 'refs/heads/CD' || github.event.pull_request.merged == true # pr close 후 정상 merge 된 경우에만 job 실행
     name: 1.Build & Test Jar
     runs-on: ubuntu-latest
 
