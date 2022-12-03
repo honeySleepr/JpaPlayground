@@ -1,12 +1,14 @@
 package com.jpaplayground.domain.product;
 
+import com.jpaplayground.domain.bookmark.Bookmark;
 import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.domain.reservation.Reservation;
 import com.jpaplayground.domain.reservation.exception.ReservationException;
+import com.jpaplayground.global.auditing.BaseTimeEntity;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.member.Member;
-import java.time.LocalDateTime;
-import javax.persistence.Column;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
@@ -15,6 +17,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -23,15 +26,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
-public class Product {
+public class Product extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,15 +48,6 @@ public class Product {
 	@NotNull
 	private Boolean deleted;
 
-	@NotNull
-	@Column(updatable = false)
-	@CreatedDate
-	private LocalDateTime createdAt;
-
-	@NotNull
-	@LastModifiedDate
-	private LocalDateTime lastModifiedAt;
-
 	/**
 	 * `@OneToMany`(Member->Product) 단방향 관계는 DB 상에는 Many 쪽에 있는 FK를 One 쪽 객체에서 관리하는 구조가 되어버려서 추천하지 않음 그래서 영한님이 추천하신
 	 * `@ManyToOne-@OneToMany` 양방향으로 변경
@@ -70,6 +62,9 @@ public class Product {
 	@JoinColumn(name = "reservation_id")
 	private Reservation reservation;
 
+	@OneToMany(mappedBy = "product")
+	private final Set<Bookmark> bookmarks = new HashSet<>();
+
 	private Product(String name, Integer price) {
 		this.name = name;
 		this.price = price;
@@ -82,10 +77,6 @@ public class Product {
 
 	public void changeDeletedState(boolean deleted) {
 		this.deleted = deleted;
-	}
-
-	public boolean isSeller(Long memberId) {
-		return seller.matchesId(memberId);
 	}
 
 	public void verifySeller(Long memberId) {
@@ -103,7 +94,7 @@ public class Product {
 	}
 
 	public void update(String name, Integer price) {
-		if (name != null) {
+		if (!name.isBlank()) {
 			this.name = name;
 		}
 		if (price != null) {
@@ -131,5 +122,21 @@ public class Product {
 
 	public void deleteReservation() {
 		reservation = null;
+	}
+
+	public boolean matchesId(Long id) {
+		return this.id.equals(id);
+	}
+
+	public void addBookmark(Bookmark bookMark) {
+		this.bookmarks.add(bookMark);
+	}
+
+	public int getBookmarkCount() {
+		return this.bookmarks.size();
+	}
+
+	public void deleteBookmark(Bookmark bookmark) {
+		this.bookmarks.remove(bookmark);
 	}
 }

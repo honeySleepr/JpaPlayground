@@ -1,24 +1,17 @@
 spring:
   config:
-    import: classpath:auth.yml
+    import: classpath:auth.yml, classpath:env.yml
 
   datasource:
-    # MODE=MySQL;IGNORECASE=TRUE 설정 필요한가?
-    url: jdbc:h2:mem:mydb
-    username: sa
-    password:
-    driverClassName: org.h2.Driver
-
-  h2:
-    console.enabled: true
+    url: jdbc:mysql://localhost:3306/carrot
+    username: root
+    password: ${MYSQL_ROOT_PASSWORD}
 
   sql:
     init:
       mode: always
 
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-
     hibernate:
       ddl-auto: create
 

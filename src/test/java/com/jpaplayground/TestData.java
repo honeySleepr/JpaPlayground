@@ -1,5 +1,7 @@
 package com.jpaplayground;
 
+import com.jpaplayground.domain.bookmark.Bookmark;
+import com.jpaplayground.domain.bookmark.BookmarkRepository;
 import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.domain.product.ProductRepository;
 import com.jpaplayground.domain.reservation.Reservation;
@@ -19,19 +21,24 @@ public class TestData {
 	private final ProductRepository productRepository;
 	private final MemberRepository memberRepository;
 	private final ReservationRepository reservationRepository;
+	private final BookmarkRepository bookmarkRepository;
 	private final HttpServletRequest httpServletRequest;
 	private Member seller;
 	private Member buyer;
 	private Member thirdPerson;
 	private Product reservedProduct;
+	private Product bookmarkedProduct;
 	private Reservation reservation;
 	private List<Product> allProducts;
+	private Bookmark bookmark;
 
 	public TestData(ProductRepository productRepository, MemberRepository memberRepository,
-					ReservationRepository reservationRepository, HttpServletRequest httpServletRequest) {
+					ReservationRepository reservationRepository, BookmarkRepository bookmarkRepository,
+					HttpServletRequest httpServletRequest) {
 		this.productRepository = productRepository;
 		this.memberRepository = memberRepository;
 		this.reservationRepository = reservationRepository;
+		this.bookmarkRepository = bookmarkRepository;
 		this.httpServletRequest = httpServletRequest;
 	}
 
@@ -44,10 +51,17 @@ public class TestData {
 		this.reservation = createReservationData();
 		this.allProducts = createProductData();
 		this.reservedProduct = allProducts.get(1);
+		this.bookmarkedProduct = allProducts.get(2);
+		this.bookmark = createBookmarkData();
 		persistMemberData();
 		httpServletRequest.setAttribute(LOGIN_MEMBER, seller.getId());
 		persistReservationData();
 		persistProductData();
+		persistBookMark();
+	}
+
+	private Bookmark createBookmarkData() {
+		return new Bookmark(bookmarkedProduct, buyer);
 	}
 
 	private Member createSellerData() {
@@ -72,11 +86,18 @@ public class TestData {
 	}
 
 	private void clear() {
+		bookmarkRepository.deleteAll();
 		productRepository.deleteAll();
+		reservationRepository.deleteAll();
+		memberRepository.deleteAll();
 	}
 
 	private Reservation createReservationData() {
 		return new Reservation(buyer, LocalDateTime.now());
+	}
+
+	private void persistBookMark() {
+		bookmarkRepository.save(bookmark);
 	}
 
 	private void persistMemberData() {
@@ -134,5 +155,9 @@ public class TestData {
 
 	public Product getReservedProduct() {
 		return reservedProduct;
+	}
+
+	public Product getBookmarkedProduct() {
+		return bookmarkedProduct;
 	}
 }

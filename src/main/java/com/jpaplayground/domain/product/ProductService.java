@@ -20,15 +20,13 @@ public class ProductService {
 
 	//	@Cacheable(key = "#pageable.pageSize+' '+#pageable.pageNumber", cacheNames = "productList")
 	/* TODO: SliceImpl 에 기본생성자가 없어서, 여기서 바로 MySlice로 변환해야겠다 */
-	public Slice<ProductResponse> findAllNotDeletedProducts(Pageable pageable) {
+	public Slice<ProductResponse> findAll(Pageable pageable) {
 		return productRepository.findProductsByDeletedFalse(pageable).map(ProductResponse::new);
 	}
-
+	/* TODO: product 단건 상세 조회 */
 	@Transactional
 	public ProductResponse save(ProductCreateRequest request) {
-		// TODO : 서비스단 validation
 		Product product = Product.of(request.getName(), request.getPrice());
-
 		return new ProductResponse(productRepository.save(product));
 	}
 

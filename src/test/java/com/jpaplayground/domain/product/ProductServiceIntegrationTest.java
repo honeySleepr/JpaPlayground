@@ -8,6 +8,7 @@ import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.member.Member;
 import java.util.List;
+import javax.validation.ConstraintViolationException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,25 +44,49 @@ class ProductServiceIntegrationTest {
 		buyer = testData.getBuyer();
 	}
 
-	@Test
-	@DisplayName("제품을 등록하면 제품이 저장된다")
-	void save() {
-		// given
-		ProductCreateRequest request = new ProductCreateRequest("한무무", 149_000);
+	@Nested
+	@DisplayName("Product 등록 테스트")
+	class CreateTest {
 
-		// when
-		ProductResponse savedProduct = productService.save(request);
+		@Test
+		@DisplayName("제품을 등록하면 제품이 저장된다")
+		void save() {
+			// given
+			ProductCreateRequest request = new ProductCreateRequest("한무무", 149_000);
 
-		// then
-		assertThat(savedProduct.getName()).isEqualTo(request.getName());
-		assertThat(savedProduct.getPrice()).isEqualTo(request.getPrice());
+			// when
+			ProductResponse savedProduct = productService.save(request);
+
+			// then
+			assertThat(savedProduct.getName()).isEqualTo(request.getName());
+			assertThat(savedProduct.getPrice()).isEqualTo(request.getPrice());
+		}
+
+		@Test
+		@DisplayName("제약조건을 위반하는 값 입력 시 예외가 발생한다.")
+		void save_negative() {
+			// given
+			ProductCreateRequest request1 = new ProductCreateRequest("한무무", -1000);
+			ProductCreateRequest request2 = new ProductCreateRequest(" ", 1000);
+			// when
+
+			// then
+			assertThatThrownBy(() -> productService.save(request1)).isInstanceOf(ConstraintViolationException.class);
+			assertThatThrownBy(() -> productService.save(request2)).isInstanceOf(ConstraintViolationException.class);
+
+		}
 	}
 
-	@Test
-	@DisplayName("판매자가 자신의 product를 삭제 요청을 하면 product가 삭제된다")
-	void delete() {
-		// given
-		Long sellerId = seller.getId();
+	@Nested
+	@DisplayName("Product 삭제 테스트")
+	class DeleteTest {
+
+		@Test
+		@DisplayName("판매자가 자신의 product를 삭제 요청을 하면 product가 삭제된다")
+		void delete() {
+			// given
+			Long sellerId = seller.getId();
+			Long productId = product.getId();
 
 		// when
 		ProductResponse response = productService.delete(sellerId, product.getId());
@@ -71,33 +96,37 @@ class ProductServiceIntegrationTest {
 		assertThat(response.getSellerId()).isEqualTo(sellerId);
 	}
 
-	@Test
-	@DisplayName("판매자가 아닌 member가 product 삭제 요청을 하면 예외가 발생한다")
-	void delete_not_seller() {
-		// given
-		Long buyerId = buyer.getId();
+		@Test
+		@DisplayName("판매자가 아닌 member가 product 삭제 요청을 하면 예외가 발생한다")
+		void delete_not_seller() {
+			// given
+			Long productId = product.getId();
+			Long buyerId = buyer.getId();
 
-		// when
-		// then
-		assertThatThrownBy(() -> productService.delete(buyerId, product.getId())).isInstanceOf(ProductException.class)
-			.hasMessage(ErrorCode.NOT_SELLER.getMessage());
-	}
+			// when
+			// then
+			assertThatThrownBy(() -> productService.delete(buyerId, productId))
+				.isInstanceOf(ProductException.class)
+				.hasMessage(ErrorCode.NOT_SELLER.getMessage());
+		}
 
-	@Test
-	@DisplayName("존재하지 않는 product를 삭제하려고 하면 예외가 발생한다")
-	void delete_error() {
-		// given
-		Long nonExistingProductId = Long.MAX_VALUE;
+		@Test
+		@DisplayName("존재하지 않는 product를 삭제하려고 하면 예외가 발생한다")
+		void delete_error() {
+			// given
+			Long nonExistingProductId = Long.MAX_VALUE;
+			Long sellerId = seller.getId();
 
-		// when
-		// then
-		assertThatThrownBy(() -> productService.delete(seller.getId(), nonExistingProductId)).isInstanceOf(
-				ProductException.class)
-			.hasMessage(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
+			// when
+			// then
+			assertThatThrownBy(() -> productService.delete(sellerId, nonExistingProductId))
+				.isInstanceOf(ProductException.class)
+				.hasMessage(ErrorCode.PRODUCT_NOT_FOUND.getMessage());
+		}
 	}
 
 	@Nested
-	@DisplayName("Product 조회 시")
+	@DisplayName("Product 조회 테스트")
 	class FindTest {
 
 		@Test
@@ -109,7 +138,7 @@ class ProductServiceIntegrationTest {
 			PageRequest pageRequest = PageRequest.of(page, size);
 
 			//when
-			Slice<ProductResponse> slice = productService.findAllNotDeletedProducts(pageRequest);
+			Slice<ProductResponse> slice = productService.findAll(pageRequest);
 
 			// then
 			List<ProductResponse> content = slice.getContent();
@@ -124,10 +153,13 @@ class ProductServiceIntegrationTest {
 			int numberOfNonDeletedProducts = (int) allProducts.stream()
 				.filter(product -> !product.getDeleted())
 				.count();
+			System.out.println("@@@@@@@@@@@@@@@@");
+			System.out.println("numberOfTotalProducts = " + numberOfTotalProducts);
+			System.out.println("numberOfNonDeletedProducts = " + numberOfNonDeletedProducts);
 			Pageable pageable = Pageable.ofSize(numberOfTotalProducts);
 
 			// when
-			Slice<ProductResponse> slice = productService.findAllNotDeletedProducts(pageable);
+			Slice<ProductResponse> slice = productService.findAll(pageable);
 
 			// then
 			assertThat(slice.getNumberOfElements()).isEqualTo(numberOfNonDeletedProducts);
@@ -135,49 +167,57 @@ class ProductServiceIntegrationTest {
 
 	}
 
-	@Test
-	@DisplayName("제품의 모든 필드를 수정 요청을 하면 모든 필드가 수정된다")
-	void update_all_fields() {
-		// given
-		ProductUpdateRequest request = new ProductUpdateRequest("수정제품", 1234567);
-		Long sellerId = seller.getId();
+	@Nested
+	@DisplayName("Product 수정 테스트")
+	class UpdateTest {
 
-		// when
-		ProductResponse updatedProduct = productService.update(sellerId, product.getId(), request);
+		@Test
+		@DisplayName("제품의 모든 필드를 수정 요청을 하면 모든 필드가 수정된다")
+		void update_all_fields() {
+			// given
+			Long productId = product.getId();
+			Long sellerId = seller.getId();
+			ProductUpdateRequest request = new ProductUpdateRequest("수정제품", 1234567);
 
-		// then
-		assertThat(updatedProduct.getName()).isEqualTo(request.getName());
-		assertThat(updatedProduct.getPrice()).isEqualTo(request.getPrice());
-	}
+			// when
+			ProductResponse updatedProduct = productService.update(sellerId, productId, request);
 
-	@Test
-	@DisplayName("제품의 필드 하나만을 수정 요청을 하면 해당 필드만 수정된다")
-	void update_some_fields() {
-		// given
-		Integer oldPrice = product.getPrice();
-		ProductUpdateRequest request = new ProductUpdateRequest("수정제품", null);
-		Long sellerId = seller.getId();
+			// then
+			assertThat(updatedProduct.getName()).isEqualTo(request.getName());
+			assertThat(updatedProduct.getPrice()).isEqualTo(request.getPrice());
+		}
 
-		// when
-		ProductResponse updatedProduct = productService.update(sellerId, product.getId(), request);
+		@Test
+		@DisplayName("제품의 필드 하나만을 수정 요청을 하면 해당 필드만 수정된다")
+		void update_some_fields() {
+			// given
+			Long productId = product.getId();
+			Integer oldPrice = product.getPrice();
+			ProductUpdateRequest request = new ProductUpdateRequest("수정제품", null);
+			Long sellerId = seller.getId();
 
-		// then
-		assertThat(updatedProduct.getName()).isEqualTo(request.getName());
-		assertThat(updatedProduct.getPrice()).isEqualTo(oldPrice);
-	}
+			// when
+			ProductResponse updatedProduct = productService.update(sellerId, productId, request);
 
-	@Test
-	@DisplayName("판매자가 아닌 member가 product 수정 요청을 하면 예외가 발생한다")
-	void update_not_seller() {
-		// given
-		ProductUpdateRequest request = new ProductUpdateRequest("수정제품", null);
-		Long buyerId = buyer.getId();
+			// then
+			assertThat(updatedProduct.getName()).isEqualTo(request.getName());
+			assertThat(updatedProduct.getPrice()).isEqualTo(oldPrice);
+		}
 
-		// when
+		@Test
+		@DisplayName("판매자가 아닌 member가 product 수정 요청을 하면 예외가 발생한다")
+		void update_not_seller() {
+			// given
+			Long productId = product.getId();
+			ProductUpdateRequest request = new ProductUpdateRequest("수정제품", null);
+			Long buyerId = buyer.getId();
 
-		// then
-		assertThatThrownBy(() -> productService.update(buyerId, product.getId(), request))
-			.isInstanceOf(ProductException.class)
-			.hasMessage(ErrorCode.NOT_SELLER.getMessage());
+			// when
+
+			// then
+			assertThatThrownBy(() -> productService.update(buyerId, productId, request))
+				.isInstanceOf(ProductException.class)
+				.hasMessage(ErrorCode.NOT_SELLER.getMessage());
+		}
 	}
 }

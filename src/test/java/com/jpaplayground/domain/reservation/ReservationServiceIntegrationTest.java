@@ -58,7 +58,7 @@ class ReservationServiceIntegrationTest {
 			ReservationCreateRequest request = new ReservationCreateRequest(buyer.getId(), now);
 
 			// when
-			ReservationResponse response = reservationService.create(request, notReservedProduct.getId(),
+			ReservationResponse response = reservationService.save(request, notReservedProduct.getId(),
 				seller.getId());
 
 			// then
@@ -75,7 +75,7 @@ class ReservationServiceIntegrationTest {
 
 			// when
 			// then
-			assertThatThrownBy(() -> reservationService.create(request, reservedProduct.getId(), seller.getId()))
+			assertThatThrownBy(() -> reservationService.save(request, reservedProduct.getId(), seller.getId()))
 				.isInstanceOf(ReservationException.class)
 				.hasMessage(ErrorCode.RESERVED.getMessage());
 		}
@@ -89,7 +89,7 @@ class ReservationServiceIntegrationTest {
 
 			// when
 			// then
-			assertThatThrownBy(() -> reservationService.create(request, notReservedProduct.getId(), buyer.getId()))
+			assertThatThrownBy(() -> reservationService.save(request, notReservedProduct.getId(), buyer.getId()))
 				.isInstanceOf(ProductException.class)
 				.hasMessage(ErrorCode.NOT_SELLER.getMessage());
 		}
