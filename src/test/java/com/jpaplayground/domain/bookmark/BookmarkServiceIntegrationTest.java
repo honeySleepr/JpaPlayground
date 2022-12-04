@@ -3,9 +3,10 @@ package com.jpaplayground.domain.bookmark;
 import com.jpaplayground.TestData;
 import com.jpaplayground.domain.bookmark.dto.BookmarkResponse;
 import com.jpaplayground.domain.product.Product;
+import com.jpaplayground.domain.product.ProductService;
+import com.jpaplayground.domain.product.dto.ProductResponse;
 import com.jpaplayground.global.member.Member;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
@@ -22,9 +24,12 @@ class BookmarkServiceIntegrationTest {
 	@Autowired
 	BookmarkService bookmarkService;
 	@Autowired
+	ProductService productService;
+	@Autowired
 	TestData testData;
 
 	Product notBookmarkedProduct;
+	List<Product> allProducts;
 	Member seller;
 	Member buyer;
 	Member thirdPerson;
@@ -32,15 +37,11 @@ class BookmarkServiceIntegrationTest {
 	@Autowired
 	BookmarkRepository bookmarkRepository;
 
-	/*------------*/
-	@PersistenceContext
-	EntityManager em;
-	/*------------*/
-
 	@BeforeEach
 	void init() {
 		testData.init();
 		this.notBookmarkedProduct = testData.getAllProducts().get(4);
+		this.allProducts = testData.getAllProducts();
 		this.seller = testData.getSeller();
 		this.buyer = testData.getBuyer();
 		this.thirdPerson = testData.getThirdPerson();
@@ -130,6 +131,60 @@ class BookmarkServiceIntegrationTest {
 
 			// then
 			assertThat(response.getBookmarkCount()).isEqualTo(initialCount);
+		}
+	}
+
+	@Nested
+	@DisplayName("Bookmark 조회 테스트")
+	class FindTest {
+
+		@Test
+		@DisplayName("Bookmark 제품 조회 시 지정된 Member의 Bookmark 제품들만 조회된다")
+		void find() {
+			// given
+			Long memberId = buyer.getId();
+			Product product1 = allProducts.get(4);
+			Product product2 = allProducts.get(5);
+			Product product3 = allProducts.get(6);
+			bookmarkRepository.save(new Bookmark(product1, buyer));
+			bookmarkRepository.save(new Bookmark(product2, buyer));
+			bookmarkRepository.save(new Bookmark(product3, buyer));
+			long size = bookmarkRepository.count();
+			bookmarkRepository.save(new Bookmark(product3, thirdPerson));
+			Pageable pageable = Pageable.ofSize(10);
+
+			// when
+			List<ProductResponse> content = bookmarkService.findList(memberId, pageable).getContent();
+
+			// then
+			assertThat(content).hasSize((int) size);
+			assertThat(content.get(0).getName()).isEqualTo(product1.getName());
+			assertThat(content.get(1).getName()).isEqualTo(product2.getName());
+			assertThat(content.get(2).getName()).isEqualTo(product3.getName());
+		}
+
+		@Test
+		@DisplayName("Bookmark 제품 조회 시 삭제된 제품은 조회되지 않는다")
+		void find_not_deleted() {
+			// given
+			Long memberId = buyer.getId();
+			Product product1 = allProducts.get(4);
+			Product product2 = allProducts.get(5);
+			Product product3 = allProducts.get(6);
+			bookmarkRepository.save(new Bookmark(product1, buyer));
+			bookmarkRepository.save(new Bookmark(product2, buyer));
+			bookmarkRepository.save(new Bookmark(product3, buyer));
+			long size = bookmarkRepository.count();
+			productService.delete(seller.getId(), product1.getId());
+			Pageable pageable = Pageable.ofSize(10);
+
+			// when
+			List<ProductResponse> content = bookmarkService.findList(memberId, pageable).getContent();
+
+			// then
+			assertThat(content).hasSize((int) size - 1);
+			assertThat(content.get(0).getName()).isEqualTo(product2.getName());
+			assertThat(content.get(1).getName()).isEqualTo(product3.getName());
 		}
 	}
 }
