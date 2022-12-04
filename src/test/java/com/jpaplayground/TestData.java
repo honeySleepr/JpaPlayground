@@ -1,6 +1,5 @@
 package com.jpaplayground;
 
-import com.jpaplayground.domain.bookmark.Bookmark;
 import com.jpaplayground.domain.bookmark.BookmarkRepository;
 import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.domain.product.ProductRepository;
@@ -27,10 +26,8 @@ public class TestData {
 	private Member buyer;
 	private Member thirdPerson;
 	private Product reservedProduct;
-	private Product bookmarkedProduct;
 	private Reservation reservation;
-	private List<Product> allProducts;
-	private Bookmark bookmark;
+	private List<Product> allProducts; // get(0): deleted, get(1): reserved
 
 	public TestData(ProductRepository productRepository, MemberRepository memberRepository,
 					ReservationRepository reservationRepository, BookmarkRepository bookmarkRepository,
@@ -51,17 +48,11 @@ public class TestData {
 		this.reservation = createReservationData();
 		this.allProducts = createProductData();
 		this.reservedProduct = allProducts.get(1);
-		this.bookmarkedProduct = allProducts.get(2);
-		this.bookmark = createBookmarkData();
+
 		persistMemberData();
 		httpServletRequest.setAttribute(LOGIN_MEMBER, seller.getId());
 		persistReservationData();
 		persistProductData();
-		persistBookMark();
-	}
-
-	private Bookmark createBookmarkData() {
-		return new Bookmark(bookmarkedProduct, buyer);
 	}
 
 	private Member createSellerData() {
@@ -94,10 +85,6 @@ public class TestData {
 
 	private Reservation createReservationData() {
 		return new Reservation(buyer, LocalDateTime.now());
-	}
-
-	private void persistBookMark() {
-		bookmarkRepository.save(bookmark);
 	}
 
 	private void persistMemberData() {
@@ -157,7 +144,4 @@ public class TestData {
 		return reservedProduct;
 	}
 
-	public Product getBookmarkedProduct() {
-		return bookmarkedProduct;
-	}
 }

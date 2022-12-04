@@ -4,6 +4,8 @@ import com.jpaplayground.TestData;
 import com.jpaplayground.domain.bookmark.dto.BookmarkResponse;
 import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.global.member.Member;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,15 +25,21 @@ class BookmarkServiceIntegrationTest {
 	TestData testData;
 
 	Product notBookmarkedProduct;
-	Product bookmarkedProduct;
 	Member seller;
 	Member buyer;
 	Member thirdPerson;
 
+	@Autowired
+	BookmarkRepository bookmarkRepository;
+
+	/*------------*/
+	@PersistenceContext
+	EntityManager em;
+	/*------------*/
+
 	@BeforeEach
 	void init() {
 		testData.init();
-		this.bookmarkedProduct = testData.getBookmarkedProduct();
 		this.notBookmarkedProduct = testData.getAllProducts().get(4);
 		this.seller = testData.getSeller();
 		this.buyer = testData.getBuyer();
@@ -61,8 +69,9 @@ class BookmarkServiceIntegrationTest {
 		@DisplayName("한 제품에 여러명의 북마크를 등록할 수 있다")
 		void save_multiple() {
 			// given
-			Long productId = bookmarkedProduct.getId();
+			Long productId = notBookmarkedProduct.getId();
 			Long memberId = thirdPerson.getId();
+			bookmarkRepository.save(new Bookmark(notBookmarkedProduct, buyer));
 
 			// when
 			BookmarkResponse response = bookmarkService.save(productId, memberId);
@@ -75,8 +84,9 @@ class BookmarkServiceIntegrationTest {
 		@DisplayName("한 제품에 member 당 하나의 북마크만 등록할 수 있다")
 		void save_one_per_member() {
 			// given
-			Long productId = bookmarkedProduct.getId();
+			Long productId = notBookmarkedProduct.getId();
 			Long memberId = buyer.getId();
+			bookmarkRepository.save(new Bookmark(notBookmarkedProduct, buyer));
 
 			// when
 			BookmarkResponse response = bookmarkService.save(productId, memberId);
@@ -91,12 +101,13 @@ class BookmarkServiceIntegrationTest {
 	class DeleteTest {
 
 		@Test
-		@DisplayName("bookmark 삭제 요청 시 하면 자신의 bookmark가 삭제된다")
+		@DisplayName("bookmark 삭제 요청 시 자신의 bookmark가 삭제된다")
 		void delete() {
 			// given
-			Long productId = bookmarkedProduct.getId();
+			Long productId = notBookmarkedProduct.getId();
 			Long buyerId = buyer.getId();
-			int initialCount = bookmarkedProduct.getBookmarkCount();
+			bookmarkRepository.save(new Bookmark(notBookmarkedProduct, buyer));
+			int initialCount = notBookmarkedProduct.getBookmarkCount();
 
 			// when
 			BookmarkResponse response = bookmarkService.delete(productId, buyerId);
@@ -109,9 +120,10 @@ class BookmarkServiceIntegrationTest {
 		@DisplayName("bookmark 삭제 요청 시 다른 member의 bookmark는 삭제되지 않는다")
 		void delete_not_yours() {
 			// given
-			Long productId = bookmarkedProduct.getId();
+			Long productId = notBookmarkedProduct.getId();
 			Long memberId = thirdPerson.getId();
-			int initialCount = bookmarkedProduct.getBookmarkCount();
+			bookmarkRepository.save(new Bookmark(notBookmarkedProduct, buyer));
+			int initialCount = notBookmarkedProduct.getBookmarkCount();
 
 			// when
 			BookmarkResponse response = bookmarkService.delete(productId, memberId);
