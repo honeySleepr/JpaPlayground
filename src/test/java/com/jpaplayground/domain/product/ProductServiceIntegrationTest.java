@@ -29,7 +29,10 @@ class ProductServiceIntegrationTest {
 	@Autowired
 	ProductService productService;
 	@Autowired
+	ProductRepository productRepository;
+	@Autowired
 	TestData testData;
+
 	List<Product> allProducts;
 	Product product;
 	Member seller;
@@ -88,13 +91,14 @@ class ProductServiceIntegrationTest {
 			Long sellerId = seller.getId();
 			Long productId = product.getId();
 
-		// when
-		ProductResponse response = productService.delete(sellerId, product.getId());
+			// when
+			ProductResponse response = productService.delete(sellerId, product.getId());
 
-		// then
-		assertThat(response.getId()).isEqualTo(product.getId());
-		assertThat(response.getSellerId()).isEqualTo(sellerId);
-	}
+			// then
+			assertThat(productRepository.findById(productId).get().getDeleted()).isTrue();
+			assertThat(response.getId()).isEqualTo(product.getId());
+			assertThat(response.getSellerId()).isEqualTo(sellerId);
+		}
 
 		@Test
 		@DisplayName("판매자가 아닌 member가 product 삭제 요청을 하면 예외가 발생한다")

@@ -112,7 +112,7 @@ public class TestData {
 
 	private List<Product> createProductData() {
 		Product deleted = Product.of("노트북파우치", 10000);
-		deleted.changeDeletedState(true);
+		deleted.delete();
 		Product reserved = Product.of("와플기계", 30000);
 		reserved.reserve(reservation);
 
