@@ -31,6 +31,7 @@ public class Member extends BaseTimeEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@NotNull
 	@NotBlank
 	@Column(updatable = false)
 	private String account;

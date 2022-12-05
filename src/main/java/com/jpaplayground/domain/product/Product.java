@@ -41,7 +41,8 @@ public class Product extends BaseTimeEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotBlank
+	@NotNull
+	@NotBlank // @NotBlank만 썼을 때는 table에 not null 제약조건이 붙지않는다
 	private String name;
 
 	@NotNull

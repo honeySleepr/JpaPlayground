@@ -70,7 +70,7 @@ public class ReservationService {
 	}
 
 	private Product findProduct(Long productId) {
-		return productRepository.findByIdAndDeletedFalse(productId)
+		return productRepository.findProductById(productId)
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 	}
 

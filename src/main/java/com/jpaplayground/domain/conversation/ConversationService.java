@@ -20,7 +20,7 @@ public class ConversationService {
 
 	@Transactional
 	public Conversation save(ConversationCreateRequest request) {
-		Product product = productRepository.findByIdAndDeletedFalse(request.getProductId())
+		Product product = productRepository.findProductById(request.getProductId())
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 		return conversationRepository.save(Conversation.of(request.getContent(), product));
 	}
