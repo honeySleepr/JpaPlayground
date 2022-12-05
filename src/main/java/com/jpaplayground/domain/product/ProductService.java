@@ -26,6 +26,11 @@ public class ProductService {
 		return productRepository.findProductsByDeletedFalse(pageable).map(ProductResponse::new);
 	}
 
+	public Slice<ProductResponse> findSellingProductsByMember(Long memberId, Pageable pageable) {
+		Slice<Product> products = productRepository.findSellingProductsBySellerId(memberId, pageable);
+		return products.map(ProductResponse::new);
+	}
+
 	/* TODO: product 단건 상세 조회 */
 	@Transactional
 	public ProductResponse save(ProductCreateRequest request) {
