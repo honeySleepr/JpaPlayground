@@ -25,7 +25,7 @@ public class BookmarkService {
 	private final MemberRepository memberRepository;
 
 	@Transactional
-	public BookmarkResponse save(Long productId, Long memberId) {
+	public BookmarkResponse save(Long productId, Long memberId) { // select 쿼리 2
 		Product product = findProduct(productId);
 		Member member = findMember(memberId);
 
@@ -41,7 +41,19 @@ public class BookmarkService {
 	}
 
 	@Transactional
-	public BookmarkResponse delete(Long productId, Long memberId) {
+	public BookmarkResponse save2(Long productId, Long memberId) { // select 쿼리 3
+		Bookmark bookmark = bookmarkRepository.findByProductIdAndMemberId(productId, memberId)
+			.orElseGet(() -> {
+				Product product = findProduct(productId);
+				Member member = findMember(memberId);
+				return bookmarkRepository.save(new Bookmark(product, member));
+			});
+
+		return new BookmarkResponse(bookmark.getProduct());
+	}
+
+	@Transactional
+	public BookmarkResponse delete(Long productId, Long memberId) { // select 쿼리 2
 		Product product = findProduct(productId);
 		Member member = findMember(memberId);
 
@@ -52,6 +64,16 @@ public class BookmarkService {
 				bookmark.delete();
 				bookmarkRepository.delete(bookmark);
 			});
+
+		return new BookmarkResponse(product);
+	}
+
+	@Transactional
+	public BookmarkResponse delete2(Long productId, Long memberId) { // select 쿼리 1
+		Bookmark bookmark = bookmarkRepository.findByProductIdAndMemberId(productId, memberId).orElseThrow();
+		Product product = bookmark.getProduct();
+		bookmark.delete();
+		bookmarkRepository.delete(bookmark);
 
 		return new BookmarkResponse(product);
 	}
