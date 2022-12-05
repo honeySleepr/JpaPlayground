@@ -26,13 +26,14 @@ public class ReservationService {
 	@Transactional
 	public ReservationResponse save(ReservationCreateRequest request, Long productId, Long memberId) {
 		Product product = findProduct(productId);
-
 		product.verifyReservationDoesNotExist();
 		product.verifySeller(memberId);
 
-		Member buyer = findMember(request);
-		Reservation reservation = reservationRepository.save(new Reservation(buyer, request.getTimeToMeet()));
+		Member buyer = findMember(
+			request); // 여기서는 `getReferenceById()`를 써도되지 않을까 했으나, 클라이언트에서 보내주는 값이므로 검증이 필요하여 `findById()` 그대로 사용
+		Reservation reservation = new Reservation(buyer, request.getTimeToMeet());
 		product.reserve(reservation);
+		reservationRepository.save(reservation);
 		return new ReservationResponse(product, reservation);
 	}
 
@@ -77,4 +78,5 @@ public class ReservationService {
 		return memberRepository.findById(request.getBuyerId())
 			.orElseThrow(() -> new MemberException(ErrorCode.MEMBER_NOT_FOUND));
 	}
+
 }

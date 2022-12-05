@@ -80,7 +80,6 @@ public class BookmarkService {
 
 	public Slice<ProductResponse> findList(Long memberId, Pageable pageable) {
 		Slice<Bookmark> bookmarks = bookmarkRepository.findAllByMemberId(memberId, pageable);
-		/* Todo: 삭제된 제품은 조회 되지 않도록 하기 */
 		return bookmarks.map(bookmark -> new ProductResponse(bookmark.getProduct()));
 	}
 

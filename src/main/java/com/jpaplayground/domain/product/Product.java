@@ -74,10 +74,16 @@ public class Product extends BaseTimeEntity {
 	@OneToMany(mappedBy = "product")
 	private final Set<Bookmark> bookmarks = new HashSet<>();
 
+	@NotNull
+	@Column(columnDefinition = "enum('SELLING','RESERVED','SOLD')")
+	@Enumerated(EnumType.STRING)
+	private ProductStatus status;
+
 	private Product(String name, Integer price) {
 		this.name = name;
 		this.price = price;
 		this.deleted = false;
+		this.status = ProductStatus.SELLING;
 	}
 
 	public static Product of(String name, Integer price) {
@@ -99,6 +105,7 @@ public class Product extends BaseTimeEntity {
 
 	public void reserve(Reservation reservation) {
 		this.reservation = reservation;
+		this.status = ProductStatus.RESERVED;
 	}
 
 	public boolean isReserved() {
