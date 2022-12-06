@@ -8,6 +8,27 @@ spring:
     host: 127.0.0.1
     port: 6379
 
+  sql:
+    init:
+      mode: always
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+
+    defer-datasource-initialization: true
+
+  data:
+    web:
+      pageable:
+        max-page-size: 50
+        default-page-size: 10
+
 logging:
   level:
     org.hibernate.SQL: debug

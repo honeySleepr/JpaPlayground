@@ -12,7 +12,7 @@ on:
 
 jobs:
   job1:
-    if: github.ref == 'refs/heads/CD' || github.event.pull_request.merged == true # pr close 후 정상 merge 된 경우에만 job 실행
+    if: github.ref == 'refs/heads/CD' || github.event.pull_request.merged == true # CD 브랜치에서 push 하거나, pr close 후 main 브랜치에 정상 merge 된 경우에만 job 실행
     name: 1.Build & Test Jar
     runs-on: ubuntu-latest
 
@@ -105,8 +105,14 @@ jobs:
     needs: job2
     name: 3. Deploy to AWS EC2
     runs-on: ubuntu-latest
-    
+
     steps:
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
       # https://github.com/marketplace/actions/ssh-remote-commands
       - name: executing remote ssh commands using ssh key
         uses: appleboy/ssh-action@master
@@ -118,7 +124,7 @@ jobs:
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/carrot:latest
             sudo docker stop $(sudo docker ps -a -q) || true
             sudo docker system prune -f
-            sudo docker run -d -p 80:8080 -e REDIS_PORT=1111 -e REDIS_HOST_IP=10.0.10.121 --name carrot ${{ secrets.DOCKERHUB_USERNAME }}/carrot:latest
+            sudo docker run -d --restart always -p 80:8080 -e --name carrot ${{ secrets.DOCKERHUB_USERNAME }}/carrot:latest
             
             # 서버 health check. 일정 시간내로 서버가 뜨지 않으면 action 강제 종료 (email로 실패 결과가 자동으로 전달됨)
             TIMER=60
