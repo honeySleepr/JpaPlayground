@@ -50,6 +50,9 @@ dependencies {
 
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// Actuator for health check
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('test') {
@@ -61,4 +64,9 @@ tasks.withType(Test) {
 		showExceptions true
 		events "skipped", "passed", "failed"
 	}
+}
+
+// plain.jar 파일 생성 방지
+jar {
+	enabled = false
 }

@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/products/{productId}")
+@RequestMapping("/reservations/products/{productId}")
 public class ReservationController {
 
 	private final ReservationService reservationService;
 
-	@PostMapping("/reservations")
+	@PostMapping
 	public ResponseEntity<ReservationResponse> create(@PathVariable Long productId,
 													  @Valid @RequestBody ReservationCreateRequest request,
 													  @LoginMemberId Long memberId) {
@@ -32,19 +32,19 @@ public class ReservationController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(body);
 	}
 
-	@GetMapping("/reservations")
+	@GetMapping
 	public ResponseEntity<ReservationResponse> find(@PathVariable Long productId, @LoginMemberId Long memberId) {
 		return ResponseEntity.ok(reservationService.findByProductId(productId, memberId));
 	}
 
-	@PatchMapping("/reservations")
+	@PatchMapping
 	public ResponseEntity<ReservationResponse> updateTimeToMeet(@PathVariable Long productId,
 																@RequestBody ReservationUpdateRequest request,
 																@LoginMemberId Long memberId) {
 		return ResponseEntity.ok(reservationService.update(productId, request, memberId));
 	}
 
-	@DeleteMapping("/reservations")
+	@DeleteMapping
 	public ResponseEntity<ReservationDeleteResponse> delete(@PathVariable Long productId,
 															@LoginMemberId Long memberId) {
 		return ResponseEntity.ok(reservationService.delete(productId, memberId));

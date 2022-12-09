@@ -13,18 +13,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/products/{productId}")
+@RequestMapping("/bookmarks/products/{productId}")
 public class BookmarkController {
 
 	private final BookmarkService bookmarkService;
 
-	@PostMapping("/bookmarks")
+	@PostMapping
 	public ResponseEntity<BookmarkResponse> create(@PathVariable Long productId, @LoginMemberId Long memberId) {
 		BookmarkResponse response = bookmarkService.save(productId, memberId);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
-	@DeleteMapping("/bookmarks")
+	@DeleteMapping
 	public ResponseEntity<BookmarkResponse> delete(@PathVariable Long productId, @LoginMemberId Long memberId) {
 		return ResponseEntity.ok(bookmarkService.delete(productId, memberId));
 	}

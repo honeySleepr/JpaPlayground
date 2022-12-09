@@ -1,0 +1,108 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - CD
+  pull_request_target:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  job1:
+    if: github.ref == 'refs/heads/CD' || github.event.pull_request.merged == true # CD 브랜치에서 push 하거나, pr close 후 main 브랜치에 정상 merge 된 경우에만 job 실행
+    name: 1.Build and push to GitHub Packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Swap environment variables
+        working-directory: ./src/main/resources
+        run: |
+          echo "${{ secrets.AUTH_PROD_YML }}" >> ./auth.yml
+          echo "${{ secrets.ENV_PROD_YML }}" >> ./env.yml
+          echo "${{ secrets.APPLICATION_PROD_YML }}" >> ./application-prod.yml
+
+      - name: Docker compose
+        run: |
+          export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}  
+          docker compose up -d
+
+      - name: Wait for mysql
+        run: |
+          docker ps
+          while ! docker exec carrot_mysql mysql --user=root --password=${{ secrets.MYSQL_ROOT_PASSWORD }} -e "SELECT 1" >/dev/null 2>&1;
+          do
+              sleep 2
+              echo "waiting for mysql.."
+          done
+
+      - name: Test and build with Gradle
+        run: MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} ./gradlew build
+
+      - name: Set env GITHUB_ID_LC (Lower-Case)
+        env:
+          ID: '${{ github.repository_owner }}'
+        run: echo "GITHUB_ID_LC=${ID,,}" >> $GITHUB_ENV # 환경변수를 세팅한 단계에서 바로 사용할 수는 없다
+
+      - name: Build image
+        run: sudo docker build -t ghcr.io/${{ env.GITHUB_ID_LC }}/carrot:latest .
+
+      - name: Login to Github Packages(Container Registry)
+        run: echo ${{ secrets.PACKAGES_TOKEN }} | sudo docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+
+      - name: Push image to GitHub Packages(Container Registry)
+        run: sudo docker push ghcr.io/${{ env.GITHUB_ID_LC }}/carrot:latest
+
+  # ----------------------------------------------------------------------------
+  job2:
+    needs: job1
+    name: 2. Deploy to AWS EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set env GITHUB_ID_LC (Lower-Case)
+        env:
+          ID: '${{ github.repository_owner }}'
+        run: echo "GITHUB_ID_LC=${ID,,}" >> $GITHUB_ENV
+
+      # https://github.com/marketplace/actions/ssh-remote-commands
+      - name: executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.PUBLIC_EC2_IP }}
+          username: ubuntu
+          key: ${{ secrets.PUBLIC_EC2_SSH_KEY }}
+          script: |
+            echo ${{ secrets.PACKAGES_TOKEN }} | sudo docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+            sudo docker pull ghcr.io/${{ env.GITHUB_ID_LC }}/carrot:latest
+            sudo docker stop $(sudo docker ps -a -q) || true
+            sudo docker system prune -f
+            sudo docker run -d --restart always -p 80:8080 --name carrot ghcr.io/${{ env.GITHUB_ID_LC }}/carrot:latest
+            
+            # 서버 health check. 일정 시간내로 서버가 뜨지 않으면 action 강제 종료 (email로 실패 결과가 자동으로 전달됨)
+            TIMER=60
+            while [[ ! $(curl -s "http://${{ secrets.PUBLIC_EC2_IP }}/actuator/health" | grep "UP") && TIMER -gt 0 ]];
+            do
+              sleep 5
+              echo "Waiting for Spring Boot.."
+              let TIMER-=5
+            done
+            
+            if [ $TIMER -eq 0 ];
+            then
+              echo "HEALTH CHECK FAILED"
+              exit 1
+            else
+              echo "SUCCESS"
+            fi
