@@ -65,3 +65,8 @@ tasks.withType(Test) {
 		events "skipped", "passed", "failed"
 	}
 }
+
+// plain.jar 파일 생성 방지
+jar {
+	enabled = false
+}

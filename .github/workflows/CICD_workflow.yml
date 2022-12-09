@@ -13,16 +13,18 @@ on:
 jobs:
   job1:
     if: github.ref == 'refs/heads/CD' || github.event.pull_request.merged == true # CD 브랜치에서 push 하거나, pr close 후 main 브랜치에 정상 merge 된 경우에만 job 실행
-    name: 1.Build & Test Jar
+    name: 1.Build and push to GitHub Packages
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
           java-version: '11'
           distribution: 'temurin'
+          cache: 'gradle'
 
       - name: Swap environment variables
         working-directory: ./src/main/resources
@@ -30,17 +32,6 @@ jobs:
           echo "${{ secrets.AUTH_PROD_YML }}" >> ./auth.yml
           echo "${{ secrets.ENV_PROD_YML }}" >> ./env.yml
           echo "${{ secrets.APPLICATION_PROD_YML }}" >> ./application-prod.yml
-
-      # https://github.com/actions/cache/blob/main/examples.md#java---gradle
-      - name: gradle dependency caching
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
 
       - name: Docker compose
         run: |
@@ -56,62 +47,34 @@ jobs:
               echo "waiting for mysql.."
           done
 
-      - name: Test with Gradle
+      - name: Test and build with Gradle
         run: MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }} ./gradlew build
 
-        # 다음 job으로 전달하기 위해 jar 파일 임시 저장
-      - name: Create artifact(jar)
-        uses: actions/upload-artifact@v3
-        with:
-          name: jar_file
-          path: ./build/libs
+      - name: Set env GITHUB_ID_LC (Lower-Case)
+        env:
+          ID: '${{ github.repository_owner }}'
+        run: echo "GITHUB_ID_LC=${ID,,}" >> $GITHUB_ENV # 환경변수를 세팅한 단계에서 바로 사용할 수는 없다
+
+      - name: Build image
+        run: sudo docker build -t ghcr.io/${{ env.GITHUB_ID_LC }}/carrot:latest .
+
+      - name: Login to Github Packages(Container Registry)
+        run: echo ${{ secrets.PACKAGES_TOKEN }} | sudo docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+
+      - name: Push image to GitHub Packages(Container Registry)
+        run: sudo docker push ghcr.io/${{ env.GITHUB_ID_LC }}/carrot:latest
 
   # ----------------------------------------------------------------------------
   job2:
     needs: job1
-    name: 2.Build & Push Docker Image
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout to current branch
-        uses: actions/checkout@v3
-
-      # job1에서 만든 artifact 꺼내서 사용
-      - name: Get artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: jar_file
-          path: ./build/libs
-
-      # https://github.com/marketplace/actions/build-and-push-docker-images
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-      - name: Build and push
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          push: true
-          tags: gruzzimo/carrot:latest
-
-  # ----------------------------------------------------------------------------
-  job3:
-    needs: job2
-    name: 3. Deploy to AWS EC2
+    name: 2. Deploy to AWS EC2
     runs-on: ubuntu-latest
 
     steps:
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Set env GITHUB_ID_LC (Lower-Case)
+        env:
+          ID: '${{ github.repository_owner }}'
+        run: echo "GITHUB_ID_LC=${ID,,}" >> $GITHUB_ENV
 
       # https://github.com/marketplace/actions/ssh-remote-commands
       - name: executing remote ssh commands using ssh key
@@ -121,10 +84,11 @@ jobs:
           username: ubuntu
           key: ${{ secrets.PUBLIC_EC2_SSH_KEY }}
           script: |
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/carrot:latest
+            echo ${{ secrets.PACKAGES_TOKEN }} | sudo docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+            sudo docker pull ghcr.io/${{ env.GITHUB_ID_LC }}/carrot:latest
             sudo docker stop $(sudo docker ps -a -q) || true
             sudo docker system prune -f
-            sudo docker run -d --restart always -p 80:8080 -e --name carrot ${{ secrets.DOCKERHUB_USERNAME }}/carrot:latest
+            sudo docker run -d --restart always -p 80:8080 --name carrot ghcr.io/${{ env.GITHUB_ID_LC }}/carrot:latest
             
             # 서버 health check. 일정 시간내로 서버가 뜨지 않으면 action 강제 종료 (email로 실패 결과가 자동으로 전달됨)
             TIMER=60
