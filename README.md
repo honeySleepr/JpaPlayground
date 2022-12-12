@@ -28,7 +28,7 @@ JPA와 Spring의 기능들을 학습하며, 간단한 버전의 **당근마켓**
 
 ## 배포 URL (API 서버)
 
-http://3.36.222.165/products
+http://13.209.232.84/products
 
 <br>
 
