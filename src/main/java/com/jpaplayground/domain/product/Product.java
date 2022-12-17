@@ -145,14 +145,15 @@ public class Product extends BaseTimeEntity {
 
 	public void deleteReservation() {
 		reservation = null;
+		status = ProductStatus.SELLING;
 	}
 
 	public boolean matchesId(Long id) {
 		return this.id.equals(id);
 	}
 
-	public void addBookmark(Bookmark bookMark) {
-		this.bookmarks.add(bookMark);
+	public void addBookmark(Bookmark bookmark) {
+		this.bookmarks.add(bookmark);
 	}
 
 	public int getBookmarkCount() {
@@ -161,5 +162,9 @@ public class Product extends BaseTimeEntity {
 
 	public void deleteBookmark(Bookmark bookmark) {
 		this.bookmarks.remove(bookmark);
+	}
+
+	public void changeStatusToSold() {
+		status = ProductStatus.SOLD;
 	}
 }

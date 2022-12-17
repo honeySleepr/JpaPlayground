@@ -3,9 +3,10 @@ package com.jpaplayground.global.member;
 import com.jpaplayground.global.login.oauth.OAuthServer;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MemberRepository extends CrudRepository<Member, Long> {
+// getReferenceById 사용하기 위해 JpaRepository로 변경
+public interface MemberRepository extends JpaRepository<Member, Long> {
 
 	Optional<Member> findByAccountAndServer(String account, OAuthServer server);
 
