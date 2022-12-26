@@ -2,6 +2,8 @@ package com.jpaplayground.domain.reservation;
 
 import com.jpaplayground.TestData;
 import com.jpaplayground.domain.product.Product;
+import com.jpaplayground.domain.product.ProductRepository;
+import com.jpaplayground.domain.product.ProductStatus;
 import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.domain.reservation.dto.ReservationCreateRequest;
 import com.jpaplayground.domain.reservation.dto.ReservationResponse;
@@ -12,6 +14,8 @@ import com.jpaplayground.global.member.Member;
 import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,6 +30,9 @@ class ReservationServiceIntegrationTest {
 
 	@Autowired
 	ReservationService reservationService;
+
+	@Autowired
+	ProductRepository productRepository;
 	@Autowired
 	TestData testData;
 	Product notReservedProduct;
@@ -51,19 +58,27 @@ class ReservationServiceIntegrationTest {
 	class CreateTest {
 
 		@Test
-		@DisplayName("판매자가 자신이 등록한 제품의 예약을 요청을 하면 예약이 생성된다")
+		@DisplayName("판매자가 자신이 등록한 제품의 예약을 요청을 하면 예약이 생성되고, 제품 상태가 예약중으로 변경된다")
 		void create() {
 			// given
+			Long productId = notReservedProduct.getId();
 			LocalDateTime now = LocalDateTime.now();
 			ReservationCreateRequest request = new ReservationCreateRequest(buyer.getId(), now);
+			if (notReservedProduct.getStatus() == ProductStatus.RESERVED) {
+				fail("이미 예약중인 제품");
+			}
 
 			// when
-			ReservationResponse response = reservationService.save(request, notReservedProduct.getId(),
-				seller.getId());
+			ReservationResponse response = reservationService.save(request, productId, seller.getId());
 
 			// then
-			assertThat(response.getTimeToMeet()).isEqualTo(now);
-			assertThat(response.getBuyerId()).isEqualTo(buyer.getId());
+			Product foundProduct = productRepository.findById(productId).get();
+
+			assertAll(
+				() -> assertThat(response.getTimeToMeet()).isEqualTo(now),
+				() -> assertThat(response.getBuyerId()).isEqualTo(buyer.getId()),
+				() -> assertThat(foundProduct.getStatus()).isEqualTo(ProductStatus.RESERVED)
+			);
 		}
 
 		@Test
