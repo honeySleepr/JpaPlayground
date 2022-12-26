@@ -1,8 +1,12 @@
 package com.jpaplayground.domain.purchaserecord;
 
+import com.jpaplayground.domain.product.dto.ProductResponse;
 import com.jpaplayground.global.login.LoginMemberId;
+import com.jpaplayground.global.response.PagingResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,5 +25,10 @@ public class PurchaseRecordController {
 		PurchaseRecordResponse response = purchaseRecordService.sellProduct(memberId, productId,
 			purchaseRequestDto.getBuyerId());
 		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/members/purchase-records/products")
+	public PagingResponse<ProductResponse> findProductsBoughtByMember(@LoginMemberId Long memberId, Pageable pageable) {
+		return new PagingResponse<>(purchaseRecordService.findProductsBoughtByMember(memberId, pageable));
 	}
 }
