@@ -163,4 +163,10 @@ public class Product extends BaseTimeEntity {
 	public void changeStatusToSold() {
 		status = ProductStatus.SOLD;
 	}
+
+	public void verifyNotSold() {
+		if (status == ProductStatus.SOLD) {
+			throw new ProductException(ErrorCode.PRODUCT_SOLD);
+		}
+	}
 }

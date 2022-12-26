@@ -25,12 +25,11 @@ public class PurchaseRecordService {
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 
 		product.verifySeller(memberId);
-		product.changeStatusToSold();
+		product.verifyNotSold();
 
 		Member buyer = memberRepository.getReferenceById(buyerId);
 		PurchaseRecord purchaseRecord = new PurchaseRecord(buyer, product);
-		PurchaseRecord save = purchaseRecordRepository.save(purchaseRecord);
 
-		return new PurchaseRecordResponse(save);
+		return new PurchaseRecordResponse(purchaseRecordRepository.save(purchaseRecord));
 	}
 }

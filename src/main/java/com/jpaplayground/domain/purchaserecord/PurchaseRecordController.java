@@ -14,7 +14,7 @@ public class PurchaseRecordController {
 
 	private final PurchaseRecordService purchaseRecordService;
 
-	@PostMapping("/orders/products/{productId}")
+	@PostMapping("/purchase-records/products/{productId}")
 	public ResponseEntity<PurchaseRecordResponse> sellProduct(@PathVariable Long productId,
 															  @LoginMemberId Long memberId,
 															  @RequestBody PurchaseRequestDto purchaseRequestDto) {

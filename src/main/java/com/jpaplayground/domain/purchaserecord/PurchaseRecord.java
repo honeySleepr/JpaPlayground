@@ -48,6 +48,7 @@ public class PurchaseRecord {
 
 	public PurchaseRecord(Member buyer, Product product) {
 		this.product = product;
+		product.changeStatusToSold();
 		this.buyer = buyer;
 	}
 }
