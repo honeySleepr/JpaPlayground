@@ -8,9 +8,11 @@ import com.jpaplayground.domain.product.exception.ProductException;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.member.Member;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.validation.ConstraintViolationException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -131,14 +133,15 @@ class ProductServiceIntegrationTest {
 
 	@Nested
 	@DisplayName("Product 조회 테스트")
-	class FindTest {
+	class FindAllTest {
 
 		@Test
 		@DisplayName("Paging이 적용된 제품 목록을 반환한다")
-		void paging() {
+		void findAll_paging() {
 			//given
 			int page = 1;
 			int size = 3;
+			int offSet = page * size + 1;
 			PageRequest pageRequest = PageRequest.of(page, size);
 
 			//when
@@ -147,11 +150,14 @@ class ProductServiceIntegrationTest {
 			// then
 			List<ProductResponse> content = slice.getContent();
 			assertThat(content).hasSize(size);
+			for (int i = 0; i < size; i++) {
+				assertThat(content.get(i).getName()).isEqualTo(allProducts.get(offSet + i).getName());
+			}
 		}
 
 		@Test
 		@DisplayName("삭제된 제품은 조회되지 않는다")
-		void filter_deleted() {
+		void findAll_exclude_deleted() {
 			// given
 			int numberOfTotalProducts = allProducts.size();
 			int numberOfNonDeletedProducts = (int) allProducts.stream()
@@ -165,6 +171,37 @@ class ProductServiceIntegrationTest {
 
 			// then
 			assertThat(slice.getNumberOfElements()).isEqualTo(numberOfNonDeletedProducts);
+		}
+
+	}
+
+	@Nested
+	@DisplayName("Member의 판매 Product 조회 테스트")
+	class FindAllByMemberTest {
+
+		@Test
+		@DisplayName("Member가 판매하는 제품 중 삭제된 제품을 제외하고 조회된다")
+		void findAll_by_member() {
+			// given
+			Long sellerId = seller.getId();
+			List<Product> allProductsBySeller = allProducts.stream()
+				.filter(p -> p.getSeller().matchesId(sellerId))
+				.collect(Collectors.toList());
+			int deletedCount = (int) allProductsBySeller.stream()
+				.filter(p -> p.getDeleted().equals(Boolean.TRUE))
+				.count();
+			if (deletedCount == 0) {
+				fail("테스트를 위해 삭제된 제품을 하나 이상 만들어두고 테스트하자");
+			}
+			int size = 20;
+			PageRequest pageRequest = PageRequest.ofSize(size);
+
+			// when
+			Slice<ProductResponse> slice = productService.findProductsByMember(sellerId, pageRequest);
+
+			// then
+			List<ProductResponse> list = slice.getContent();
+			assertThat(list).hasSize(allProductsBySeller.size() - deletedCount);
 		}
 
 	}
