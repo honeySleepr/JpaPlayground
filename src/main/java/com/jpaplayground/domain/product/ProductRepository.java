@@ -23,8 +23,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	@Query("select p from Product p where p.deleted = false")
 	Slice<Product> findAllProducts(Pageable pageable);
 
-	@Query("select p from Product p " +
-		   "where p.seller.id = :sellerId and p.deleted = false " +
-		   "and (p.status = 'SELLING' or p.status = 'RESERVED')")
-	Slice<Product> findSellingProductsBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
+	@Query("select p from Product p where p.seller.id = :sellerId and p.deleted = false")
+	Slice<Product> findProductsBySellerId(@Param("sellerId") Long sellerId, Pageable pageable);
 }
