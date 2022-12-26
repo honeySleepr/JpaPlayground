@@ -45,7 +45,7 @@ public class ProductService {
 
 		product.verifySeller(memberId);
 		product.delete();
-		bookmarkRepository.deleteAllByProductIdInQuery(product.getId());
+		bookmarkRepository.deleteAllByProductId(product.getId());
 		// flushAutomatically = true를 추가하지 않으면, Product의 update 쿼리가 삭제된다!
 
 		/* 이 방법이 귀찮긴 하지만 더 효율적인가?? innoDB에서는 FK도 인덱스가 만들어진다고 하니 차이 없을 것 같은데

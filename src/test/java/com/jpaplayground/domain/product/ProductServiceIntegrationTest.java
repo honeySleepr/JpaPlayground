@@ -157,9 +157,7 @@ class ProductServiceIntegrationTest {
 			int numberOfNonDeletedProducts = (int) allProducts.stream()
 				.filter(product -> !product.getDeleted())
 				.count();
-			System.out.println("@@@@@@@@@@@@@@@@");
-			System.out.println("numberOfTotalProducts = " + numberOfTotalProducts);
-			System.out.println("numberOfNonDeletedProducts = " + numberOfNonDeletedProducts);
+
 			Pageable pageable = Pageable.ofSize(numberOfTotalProducts);
 
 			// when

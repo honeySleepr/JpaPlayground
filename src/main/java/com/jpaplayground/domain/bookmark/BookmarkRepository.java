@@ -24,7 +24,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 	@Transactional
 	@Modifying(clearAutomatically = true, flushAutomatically = true)
 	@Query("delete from Bookmark b where b.product.id = :productId")
-	int deleteAllByProductIdInQuery(@Param("productId") Long productId);
+	int deleteAllByProductId(@Param("productId") Long productId);
 
 	@EntityGraph(attributePaths = {"product", "product.bookmarks", "member", "member.bookmarks"})
 	Optional<Bookmark> findByProductIdAndMemberId(Long productId, Long memberId);

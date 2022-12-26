@@ -112,10 +112,6 @@ public class Product extends BaseTimeEntity {
 		this.status = ProductStatus.RESERVED;
 	}
 
-	public boolean isReserved() {
-		return this.reservation != null;
-	}
-
 	public void update(String name, Integer price) {
 		if (!name.isBlank()) {
 			this.name = name;
