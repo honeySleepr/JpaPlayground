@@ -121,9 +121,18 @@ public class Product extends BaseTimeEntity {
 		}
 	}
 
-	public void verifyReservationDoesNotExist() {
+	public void verifyAvailableForReservation() {
+		if (status == ProductStatus.SOLD) {
+			throw new ReservationException(ErrorCode.PRODUCT_SOLD);
+		}
 		if (reservation != null) {
 			throw new ReservationException(ErrorCode.RESERVED);
+		}
+	}
+
+	public void verifyAvailableForSale() {
+		if (status == ProductStatus.SOLD) {
+			throw new ProductException(ErrorCode.PRODUCT_SOLD);
 		}
 	}
 
@@ -162,11 +171,5 @@ public class Product extends BaseTimeEntity {
 
 	public void changeStatusToSold() {
 		status = ProductStatus.SOLD;
-	}
-
-	public void verifyNotSold() {
-		if (status == ProductStatus.SOLD) {
-			throw new ProductException(ErrorCode.PRODUCT_SOLD);
-		}
 	}
 }

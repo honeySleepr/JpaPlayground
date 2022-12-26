@@ -25,7 +25,7 @@ public class PurchaseRecordService {
 			.orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 
 		product.verifySeller(memberId);
-		product.verifyNotSold();
+		product.verifyAvailableForSale();
 
 		Member buyer = memberRepository.getReferenceById(buyerId);
 		PurchaseRecord purchaseRecord = new PurchaseRecord(buyer, product);

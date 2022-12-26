@@ -26,8 +26,8 @@ public class ReservationService {
 	@Transactional
 	public ReservationResponse save(ReservationCreateRequest request, Long productId, Long memberId) {
 		Product product = findProduct(productId);
-		product.verifyReservationDoesNotExist();
 		product.verifySeller(memberId);
+		product.verifyAvailableForReservation();
 
 		Member buyer = findMember(
 			request); // 여기서는 `getReferenceById()`를 써도되지 않을까 했으나, 클라이언트에서 보내주는 값이므로 검증이 필요하여 `findById()` 그대로 사용
@@ -39,8 +39,8 @@ public class ReservationService {
 
 	public ReservationResponse findByProductId(Long productId, Long memberId) {
 		Product product = findProduct(productId);
-		product.verifyReservationExists();
 		product.verifySellerOrBuyer(memberId);
+		product.verifyReservationExists();
 
 		Reservation reservation = product.getReservation();
 		return new ReservationResponse(product, reservation);
@@ -49,8 +49,8 @@ public class ReservationService {
 	@Transactional
 	public ReservationResponse update(Long productId, ReservationUpdateRequest request, Long memberId) {
 		Product product = findProduct(productId);
-		product.verifyReservationExists();
 		product.verifySeller(memberId);
+		product.verifyReservationExists();
 
 		Reservation reservation = product.getReservation();
 		reservation.changeTime(request.getTimeToMeet());
@@ -60,8 +60,8 @@ public class ReservationService {
 	@Transactional
 	public ReservationDeleteResponse delete(Long productId, Long memberId) {
 		Product product = findProduct(productId);
-		product.verifyReservationExists();
 		product.verifySeller(memberId);
+		product.verifyReservationExists();
 
 		Reservation reservation = product.getReservation();
 		product.deleteReservation();
