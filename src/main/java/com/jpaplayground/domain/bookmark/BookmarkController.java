@@ -33,7 +33,7 @@ public class BookmarkController {
 		return ResponseEntity.ok(bookmarkService.delete(productId, memberId));
 	}
 
-	@GetMapping("/bookmarks/products")
+	@GetMapping("members/bookmarks/products")
 	public PagingResponse<ProductResponse> findBookmarkedProducts(@LoginMemberId Long memberId, Pageable pageable) {
 		return new PagingResponse<>(bookmarkService.findList(memberId, pageable));
 	}
