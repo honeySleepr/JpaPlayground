@@ -2,7 +2,6 @@ package com.jpaplayground.domain.product;
 
 import com.jpaplayground.domain.bookmark.Bookmark;
 import com.jpaplayground.domain.product.exception.ProductException;
-import com.jpaplayground.domain.reservation.Reservation;
 import com.jpaplayground.domain.reservation.exception.ReservationException;
 import com.jpaplayground.global.auditing.BaseTimeEntity;
 import com.jpaplayground.global.exception.ErrorCode;
@@ -21,7 +20,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -61,10 +59,6 @@ public class Product extends BaseTimeEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(updatable = false, name = "seller_id")
 	private Member seller;
-
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "reservation_id")
-	private Reservation reservation;
 
 	/**
 	 * <h2>product 삭제 시 관련 북마크도 삭제!</h2>
@@ -107,8 +101,7 @@ public class Product extends BaseTimeEntity {
 		}
 	}
 
-	public void reserve(Reservation reservation) {
-		this.reservation = reservation;
+	public void reserve() {
 		this.status = ProductStatus.RESERVED;
 	}
 
@@ -125,7 +118,7 @@ public class Product extends BaseTimeEntity {
 		if (status == ProductStatus.SOLD) {
 			throw new ReservationException(ErrorCode.PRODUCT_SOLD);
 		}
-		if (reservation != null) {
+		if (status == ProductStatus.RESERVED) {
 			throw new ReservationException(ErrorCode.RESERVED);
 		}
 	}
@@ -136,20 +129,7 @@ public class Product extends BaseTimeEntity {
 		}
 	}
 
-	public void verifyReservationExists() {
-		if (reservation == null) {
-			throw new ReservationException(ErrorCode.RESERVATION_NOT_FOUND);
-		}
-	}
-
-	public void verifySellerOrBuyer(Long memberId) {
-		if (!seller.matchesId(memberId) && !reservation.isBuyer(memberId)) {
-			throw new ReservationException(ErrorCode.NOT_SELLER_NOR_BUYER);
-		}
-	}
-
-	public void deleteReservation() {
-		reservation = null;
+	public void changeStatusToSelling() {
 		status = ProductStatus.SELLING;
 	}
 

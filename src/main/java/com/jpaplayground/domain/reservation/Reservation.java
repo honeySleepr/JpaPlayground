@@ -1,5 +1,6 @@
 package com.jpaplayground.domain.reservation;
 
+import com.jpaplayground.domain.product.Product;
 import com.jpaplayground.global.auditing.BaseTimeEntity;
 import com.jpaplayground.global.member.Member;
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,9 +34,16 @@ public class Reservation extends BaseTimeEntity {
 	@JoinColumn(name = "buyer_id")
 	private Member buyer;
 
-	public Reservation(Member buyer, LocalDateTime timeToMeet) {
-		this.buyer = buyer;
+	@NotNull
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "product_id")
+	private Product product;
+
+	public Reservation(Member buyer, Product product, LocalDateTime timeToMeet) {
+		product.reserve();
 		this.timeToMeet = timeToMeet;
+		this.buyer = buyer;
+		this.product = product;
 	}
 
 	public boolean isBuyer(Long memberId) {

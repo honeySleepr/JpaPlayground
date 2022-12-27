@@ -48,8 +48,8 @@ public class TestData {
 	private void clear() {
 		bookmarkRepository.deleteAll();
 		purchaseRecordRepository.deleteAll();
-		productRepository.deleteAll();
 		reservationRepository.deleteAll();
+		productRepository.deleteAll();
 		memberRepository.deleteAll();
 	}
 

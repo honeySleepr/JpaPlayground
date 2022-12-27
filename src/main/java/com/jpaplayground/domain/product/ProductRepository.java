@@ -16,7 +16,7 @@ import org.springframework.data.repository.query.Param;
  */
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-	@EntityGraph(attributePaths = {"reservation", "seller", "bookmarks"})
+	@EntityGraph(attributePaths = {"seller", "bookmarks"})
 	@Query("select p from Product p where p.id = :productId and p.deleted = false")
 	Optional<Product> findProductById(@Param("productId") Long productId);
 
