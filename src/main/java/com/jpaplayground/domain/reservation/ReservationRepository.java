@@ -1,6 +1,8 @@
 package com.jpaplayground.domain.reservation;
 
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,4 +20,6 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
 	@EntityGraph(attributePaths = "product")
 	Optional<Reservation> findByProductId(Long productId);
 
+	@EntityGraph(attributePaths = "product")
+	Slice<Reservation> findAllByBuyerId(Long buyerId, Pageable pageable);
 }

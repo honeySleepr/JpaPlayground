@@ -21,4 +21,8 @@ public class ReservationResponse {
 		this.sellerId = product.getSeller().getId();
 		this.buyerId = reservation.getBuyer().getId();
 	}
+
+	public ReservationResponse(Reservation reservation) {
+		this(reservation.getProduct(), reservation);
+	}
 }

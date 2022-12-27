@@ -12,6 +12,8 @@ import com.jpaplayground.global.member.Member;
 import com.jpaplayground.global.member.MemberRepository;
 import com.jpaplayground.global.member.exception.MemberException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +40,11 @@ public class ReservationService {
 		Reservation reservation = new Reservation(buyer, product, request.getTimeToMeet());
 		reservationRepository.save(reservation);
 		return new ReservationResponse(product, reservation);
+	}
+
+	public Slice<ReservationResponse> findAllByMemberId(Long memberId, Pageable pageable) {
+		return reservationRepository.findAllByBuyerId(memberId, pageable)
+			.map(ReservationResponse::new);
 	}
 
 	@Transactional
