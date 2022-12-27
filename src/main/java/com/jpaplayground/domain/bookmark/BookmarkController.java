@@ -34,7 +34,7 @@ public class BookmarkController {
 	}
 
 	@GetMapping("members/bookmarks/products")
-	public PagingResponse<ProductResponse> findBookmarkedProducts(@LoginMemberId Long memberId, Pageable pageable) {
-		return new PagingResponse<>(bookmarkService.findList(memberId, pageable));
+	public PagingResponse<ProductResponse> findAllByMember(@LoginMemberId Long memberId, Pageable pageable) {
+		return new PagingResponse<>(bookmarkService.findAllByMemberId(memberId, pageable));
 	}
 }

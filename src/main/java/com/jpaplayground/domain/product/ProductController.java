@@ -30,8 +30,8 @@ public class ProductController {
 	}
 
 	@GetMapping("/members/products")
-	public PagingResponse<ProductResponse> findProductsByMember(@LoginMemberId Long memberId, Pageable pageable) {
-		return new PagingResponse<>(productService.findProductsByMember(memberId, pageable));
+	public PagingResponse<ProductResponse> findAllByMember(@LoginMemberId Long memberId, Pageable pageable) {
+		return new PagingResponse<>(productService.findAllByMemberId(memberId, pageable));
 	}
 
 	@PostMapping("/products")

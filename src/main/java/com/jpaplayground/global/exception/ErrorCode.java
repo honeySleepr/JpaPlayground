@@ -28,9 +28,8 @@ public enum ErrorCode {
 
 	// Reservation
 	RESERVED(BAD_REQUEST, "이미 예약된 제품입니다"),
-	RESERVATION_NOT_FOUND(NOT_FOUND, "예약이 없습니다"),
-	NOT_SELLER_NOR_BUYER(FORBIDDEN, "판매자 또는 구매자만 예약을 조회할 수 있습니다"),
-	;
+	RESERVATION_NOT_FOUND(NOT_FOUND, "예약 되지 않은 제품입니다"),
+	NOT_SELLER_NOR_BUYER(FORBIDDEN, "판매자 또는 구매자만 예약을 조회할 수 있습니다");
 
 	private final HttpStatus status;
 	private final String message;

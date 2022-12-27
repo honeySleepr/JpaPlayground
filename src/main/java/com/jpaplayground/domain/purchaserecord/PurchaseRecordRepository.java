@@ -3,13 +3,10 @@ package com.jpaplayground.domain.purchaserecord;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.repository.CrudRepository;
 
-public interface PurchaseRecordRepository extends JpaRepository<PurchaseRecord, Long> {
+public interface PurchaseRecordRepository extends CrudRepository<PurchaseRecord, Long> {
 
 	@EntityGraph(attributePaths = {"product", "product.bookmarks"})
-	@Query("select p from PurchaseRecord p where p.buyer.id = :memberId")
-	Slice<PurchaseRecord> findAllByBuyerId(@Param("memberId") Long memberId, Pageable pageable);
+	Slice<PurchaseRecord> findAllByBuyerId(Long buyerId, Pageable pageable);
 }

@@ -206,7 +206,7 @@ class ProductServiceIntegrationTest {
 			PageRequest pageRequest = PageRequest.ofSize(size);
 
 			// when
-			Slice<ProductResponse> slice = productService.findProductsByMember(sellerId, pageRequest);
+			Slice<ProductResponse> slice = productService.findAllByMemberId(sellerId, pageRequest);
 
 			// then
 			List<ProductResponse> list = slice.getContent();

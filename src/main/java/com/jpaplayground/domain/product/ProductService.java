@@ -28,7 +28,7 @@ public class ProductService {
 		return productRepository.findAllProducts(pageable).map(ProductResponse::new);
 	}
 
-	public Slice<ProductResponse> findProductsByMember(Long memberId, Pageable pageable) {
+	public Slice<ProductResponse> findAllByMemberId(Long memberId, Pageable pageable) {
 		Slice<Product> products = productRepository.findProductsBySellerId(memberId, pageable);
 		return products.map(ProductResponse::new);
 	}

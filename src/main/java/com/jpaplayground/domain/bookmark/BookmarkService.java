@@ -32,10 +32,11 @@ public class BookmarkService {
 		member.getBookmarks().stream()
 			.filter(bookmark -> bookmark.matchesProduct(product))
 			.findFirst()
-			.orElseGet(() -> {
-				Bookmark bookmark = new Bookmark(product, member);
-				return bookmarkRepository.save(bookmark);
-			});
+			.ifPresentOrElse(bookmark -> {},
+				() -> {
+					Bookmark bookmark = new Bookmark(product, member);
+					bookmarkRepository.save(bookmark);
+				});
 
 		return new BookmarkResponse(product);
 	}
@@ -78,7 +79,7 @@ public class BookmarkService {
 		return new BookmarkResponse(product);
 	}
 
-	public Slice<ProductResponse> findList(Long memberId, Pageable pageable) {
+	public Slice<ProductResponse> findAllByMemberId(Long memberId, Pageable pageable) {
 		Slice<Bookmark> bookmarks = bookmarkRepository.findAllByMemberId(memberId, pageable);
 		return bookmarks.map(bookmark -> new ProductResponse(bookmark.getProduct()));
 	}

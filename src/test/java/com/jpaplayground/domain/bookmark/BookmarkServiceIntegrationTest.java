@@ -155,8 +155,8 @@ class BookmarkServiceIntegrationTest {
 			Pageable pageable = Pageable.ofSize(20);
 
 			// when
-			List<ProductResponse> content1 = bookmarkService.findList(buyerId, pageable).getContent();
-			List<ProductResponse> content2 = bookmarkService.findList(thirdPersonId, pageable).getContent();
+			List<ProductResponse> content1 = bookmarkService.findAllByMemberId(buyerId, pageable).getContent();
+			List<ProductResponse> content2 = bookmarkService.findAllByMemberId(thirdPersonId, pageable).getContent();
 
 			// then
 			assertThat(content1).hasSize(buyerBookmarkCount);
@@ -178,7 +178,7 @@ class BookmarkServiceIntegrationTest {
 			productService.delete(seller.getId(), bookmarkedProductId);
 
 			// then
-			List<ProductResponse> content = bookmarkService.findList(buyerId, pageable).getContent();
+			List<ProductResponse> content = bookmarkService.findAllByMemberId(buyerId, pageable).getContent();
 			assertThat(content).hasSize(buyerBookmarkCount - 1);
 			assertThat(content.get(0).getName()).isEqualTo(bookmarkedProduct2.getName());
 		}
