@@ -12,6 +12,7 @@ import com.jpaplayground.domain.reservation.exception.ReservationException;
 import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.member.Member;
 import java.time.LocalDateTime;
+import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -34,10 +35,11 @@ class ReservationServiceIntegrationTest {
 	@Autowired
 	ProductRepository productRepository;
 	@Autowired
+	ReservationRepository reservationRepository;
+	@Autowired
 	TestData testData;
 	Product notReservedProduct;
 	Product reservedProduct;
-	Reservation reservation;
 	Member seller;
 	Member buyer;
 	Member thirdPerson;
@@ -45,12 +47,18 @@ class ReservationServiceIntegrationTest {
 	@BeforeEach
 	void init() {
 		testData.init();
-		notReservedProduct = testData.getAllProducts().get(4);
-		reservedProduct = testData.getReservedProduct();
-		reservation = testData.getReservation();
 		seller = testData.getSeller();
 		buyer = testData.getBuyer();
 		thirdPerson = testData.getThirdPerson();
+
+		List<Product> allProducts = testData.getAllProducts();
+		notReservedProduct = allProducts.get(4);
+
+		reservedProduct = allProducts.get(5);
+		Reservation reservation = new Reservation(buyer, LocalDateTime.now());
+		reservedProduct.reserve(reservation);
+		reservationRepository.save(reservation);
+		productRepository.save(reservedProduct);
 	}
 
 	@Nested

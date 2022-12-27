@@ -39,6 +39,7 @@ class ProductServiceIntegrationTest {
 	Product product;
 	Member seller;
 	Member buyer;
+	int deletedProductCount;
 
 	@BeforeEach
 	void init() {
@@ -47,6 +48,11 @@ class ProductServiceIntegrationTest {
 		product = allProducts.get(4);
 		seller = testData.getSeller();
 		buyer = testData.getBuyer();
+
+		deletedProductCount = 1;
+		Product deletedProduct = allProducts.get(0);
+		deletedProduct.delete();
+		productRepository.save(deletedProduct);
 	}
 
 	@Nested
@@ -141,7 +147,7 @@ class ProductServiceIntegrationTest {
 			//given
 			int page = 1;
 			int size = 3;
-			int offSet = page * size + 1;
+			int offSet = page * size + deletedProductCount;
 			PageRequest pageRequest = PageRequest.of(page, size);
 
 			//when
@@ -159,18 +165,21 @@ class ProductServiceIntegrationTest {
 		@DisplayName("삭제된 제품은 조회되지 않는다")
 		void findAll_exclude_deleted() {
 			// given
-			int numberOfTotalProducts = allProducts.size();
-			int numberOfNonDeletedProducts = (int) allProducts.stream()
+			int totalProductCount = allProducts.size();
+			int deletedProductCount = (int) allProducts.stream()
 				.filter(product -> !product.getDeleted())
 				.count();
+			if (deletedProductCount == 0) {
+				fail("테스트를 위해 삭제된 제품을 하나 이상 만들어두고 테스트하자");
+			}
 
-			Pageable pageable = Pageable.ofSize(numberOfTotalProducts);
+			Pageable pageable = Pageable.ofSize(totalProductCount);
 
 			// when
 			Slice<ProductResponse> slice = productService.findAll(pageable);
 
 			// then
-			assertThat(slice.getNumberOfElements()).isEqualTo(numberOfNonDeletedProducts);
+			assertThat(slice.getNumberOfElements()).isEqualTo(deletedProductCount);
 		}
 
 	}

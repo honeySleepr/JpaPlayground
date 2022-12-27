@@ -26,25 +26,37 @@ class BookmarkServiceIntegrationTest {
 	@Autowired
 	ProductService productService;
 	@Autowired
+	BookmarkRepository bookmarkRepository;
+	@Autowired
 	TestData testData;
 
-	Product notBookmarkedProduct;
-	List<Product> allProducts;
+	Product product;
+	Product bookmarkedProduct1;
+	Product bookmarkedProduct2;
+	Product bookmarkedProduct3;
 	Member seller;
 	Member buyer;
 	Member thirdPerson;
-
-	@Autowired
-	BookmarkRepository bookmarkRepository;
+	int buyerBookmarkCount;
+	int thirdPersonBookmarkCount;
 
 	@BeforeEach
 	void init() {
 		testData.init();
-		this.notBookmarkedProduct = testData.getAllProducts().get(4);
-		this.allProducts = testData.getAllProducts();
 		this.seller = testData.getSeller();
 		this.buyer = testData.getBuyer();
 		this.thirdPerson = testData.getThirdPerson();
+		List<Product> allProducts = testData.getAllProducts();
+		this.product = allProducts.get(3);
+
+		bookmarkedProduct1 = allProducts.get(4);
+		bookmarkedProduct2 = allProducts.get(5);
+		bookmarkedProduct3 = allProducts.get(6);
+		buyerBookmarkCount = 2;
+		thirdPersonBookmarkCount = 1;
+		bookmarkRepository.save(new Bookmark(bookmarkedProduct1, buyer));
+		bookmarkRepository.save(new Bookmark(bookmarkedProduct2, buyer));
+		bookmarkRepository.save(new Bookmark(bookmarkedProduct3, thirdPerson));
 	}
 
 	@Nested
@@ -55,7 +67,7 @@ class BookmarkServiceIntegrationTest {
 		@DisplayName("북마크 생성을 요청 하면 북마크가 생성된다")
 		void save() {
 			// given
-			Long productId = notBookmarkedProduct.getId();
+			Long productId = product.getId();
 			Long buyerId = buyer.getId();
 
 			// when
@@ -70,12 +82,11 @@ class BookmarkServiceIntegrationTest {
 		@DisplayName("한 제품에 여러명의 북마크를 등록할 수 있다")
 		void save_multiple() {
 			// given
-			Long productId = notBookmarkedProduct.getId();
+			Long bookmarkedProductId = bookmarkedProduct1.getId();
 			Long memberId = thirdPerson.getId();
-			bookmarkRepository.save(new Bookmark(notBookmarkedProduct, buyer));
 
 			// when
-			BookmarkResponse response = bookmarkService.save(productId, memberId);
+			BookmarkResponse response = bookmarkService.save(bookmarkedProductId, memberId);
 
 			// then
 			assertThat(response.getBookmarkCount()).isEqualTo(2);
@@ -85,12 +96,11 @@ class BookmarkServiceIntegrationTest {
 		@DisplayName("한 제품에 member 당 하나의 북마크만 등록할 수 있다")
 		void save_one_per_member() {
 			// given
-			Long productId = notBookmarkedProduct.getId();
-			Long memberId = buyer.getId();
-			bookmarkRepository.save(new Bookmark(notBookmarkedProduct, buyer));
+			Long bookmarkedProductId = bookmarkedProduct1.getId();
+			Long buyerId = buyer.getId();
 
 			// when
-			BookmarkResponse response = bookmarkService.save(productId, memberId);
+			BookmarkResponse response = bookmarkService.save(bookmarkedProductId, buyerId);
 
 			// then
 			assertThat(response.getBookmarkCount()).isEqualTo(1); // 이미 같은 member의 북마크가 있으면 개수가 증가하지 않는다.
@@ -105,13 +115,12 @@ class BookmarkServiceIntegrationTest {
 		@DisplayName("bookmark 삭제 요청 시 자신의 bookmark가 삭제된다")
 		void delete() {
 			// given
-			Long productId = notBookmarkedProduct.getId();
+			Long bookmarkedProductId = bookmarkedProduct1.getId();
 			Long buyerId = buyer.getId();
-			bookmarkRepository.save(new Bookmark(notBookmarkedProduct, buyer));
-			int initialCount = notBookmarkedProduct.getBookmarkCount();
+			int initialCount = bookmarkedProduct1.getBookmarkCount();
 
 			// when
-			BookmarkResponse response = bookmarkService.delete(productId, buyerId);
+			BookmarkResponse response = bookmarkService.delete(bookmarkedProductId, buyerId);
 
 			// then
 			assertThat(response.getBookmarkCount()).isEqualTo(initialCount - 1);
@@ -121,13 +130,12 @@ class BookmarkServiceIntegrationTest {
 		@DisplayName("bookmark 삭제 요청 시 다른 member의 bookmark는 삭제되지 않는다")
 		void delete_not_yours() {
 			// given
-			Long productId = notBookmarkedProduct.getId();
-			Long memberId = thirdPerson.getId();
-			bookmarkRepository.save(new Bookmark(notBookmarkedProduct, buyer));
-			int initialCount = notBookmarkedProduct.getBookmarkCount();
+			Long bookmarkedProductId = bookmarkedProduct1.getId();
+			int initialCount = bookmarkedProduct1.getBookmarkCount();
+			Long thirdPersonId = thirdPerson.getId();
 
 			// when
-			BookmarkResponse response = bookmarkService.delete(productId, memberId);
+			BookmarkResponse response = bookmarkService.delete(bookmarkedProductId, thirdPersonId);
 
 			// then
 			assertThat(response.getBookmarkCount()).isEqualTo(initialCount);
@@ -142,49 +150,37 @@ class BookmarkServiceIntegrationTest {
 		@DisplayName("Bookmark 제품 조회 시 지정된 Member의 Bookmark 제품들만 조회된다")
 		void find() {
 			// given
-			Long memberId = buyer.getId();
-			Product product1 = allProducts.get(4);
-			Product product2 = allProducts.get(5);
-			Product product3 = allProducts.get(6);
-			bookmarkRepository.save(new Bookmark(product1, buyer));
-			bookmarkRepository.save(new Bookmark(product2, buyer));
-			bookmarkRepository.save(new Bookmark(product3, buyer));
-			long size = bookmarkRepository.count();
-			bookmarkRepository.save(new Bookmark(product3, thirdPerson));
-			Pageable pageable = Pageable.ofSize(10);
+			Long buyerId = buyer.getId();
+			Long thirdPersonId = thirdPerson.getId();
+			Pageable pageable = Pageable.ofSize(20);
 
 			// when
-			List<ProductResponse> content = bookmarkService.findList(memberId, pageable).getContent();
+			List<ProductResponse> content1 = bookmarkService.findList(buyerId, pageable).getContent();
+			List<ProductResponse> content2 = bookmarkService.findList(thirdPersonId, pageable).getContent();
 
 			// then
-			assertThat(content).hasSize((int) size);
-			assertThat(content.get(0).getName()).isEqualTo(product1.getName());
-			assertThat(content.get(1).getName()).isEqualTo(product2.getName());
-			assertThat(content.get(2).getName()).isEqualTo(product3.getName());
+			assertThat(content1).hasSize(buyerBookmarkCount);
+			assertThat(content1.get(0).getName()).isEqualTo(bookmarkedProduct1.getName());
+			assertThat(content1.get(1).getName()).isEqualTo(bookmarkedProduct2.getName());
+			assertThat(content2).hasSize(thirdPersonBookmarkCount);
+			assertThat(content2.get(0).getName()).isEqualTo(bookmarkedProduct3.getName());
 		}
 
 		@Test
 		@DisplayName("Bookmark 제품 조회 시 삭제된 제품은 조회되지 않는다")
 		void find_not_deleted() {
 			// given
-			Long memberId = buyer.getId();
-			Product product1 = allProducts.get(4);
-			Product product2 = allProducts.get(5);
-			Product product3 = allProducts.get(6);
-			bookmarkRepository.save(new Bookmark(product1, buyer));
-			bookmarkRepository.save(new Bookmark(product2, buyer));
-			bookmarkRepository.save(new Bookmark(product3, buyer));
-			long size = bookmarkRepository.count();
-			productService.delete(seller.getId(), product1.getId());
+			Long bookmarkedProductId = bookmarkedProduct1.getId();
+			Long buyerId = buyer.getId();
 			Pageable pageable = Pageable.ofSize(10);
 
 			// when
-			List<ProductResponse> content = bookmarkService.findList(memberId, pageable).getContent();
+			productService.delete(seller.getId(), bookmarkedProductId);
 
 			// then
-			assertThat(content).hasSize((int) size - 1);
-			assertThat(content.get(0).getName()).isEqualTo(product2.getName());
-			assertThat(content.get(1).getName()).isEqualTo(product3.getName());
+			List<ProductResponse> content = bookmarkService.findList(buyerId, pageable).getContent();
+			assertThat(content).hasSize(buyerBookmarkCount - 1);
+			assertThat(content.get(0).getName()).isEqualTo(bookmarkedProduct2.getName());
 		}
 	}
 }
