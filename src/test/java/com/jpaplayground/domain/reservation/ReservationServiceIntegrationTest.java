@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
@@ -39,10 +40,15 @@ class ReservationServiceIntegrationTest {
 	@Autowired
 	TestData testData;
 	Product product;
-	Product reservedProduct;
+	Product reservedProduct1;
+	Product reservedProduct2;
+	Product reservedProduct3;
 	Member seller;
 	Member buyer;
 	Member thirdPerson;
+	int buyerReservationCount;
+	int thirdPersonReservationCount;
+	int sellerReservationCount;
 
 	@BeforeEach
 	void init() {
@@ -54,10 +60,22 @@ class ReservationServiceIntegrationTest {
 		List<Product> allProducts = testData.getAllProducts();
 		product = allProducts.get(4);
 
-		reservedProduct = allProducts.get(5);
-		Reservation reservation = new Reservation(buyer, reservedProduct, LocalDateTime.now());
-		reservationRepository.save(reservation);
-		productRepository.save(reservedProduct);
+		buyerReservationCount = 2;
+		thirdPersonReservationCount = 1;
+		sellerReservationCount = 0;
+
+		reservedProduct1 = allProducts.get(5);
+		Reservation reservation1 = new Reservation(buyer, reservedProduct1, LocalDateTime.now());
+		reservedProduct2 = allProducts.get(6);
+		Reservation reservation2 = new Reservation(buyer, reservedProduct2, LocalDateTime.now());
+		reservedProduct3 = allProducts.get(7);
+		Reservation reservation3 = new Reservation(thirdPerson, reservedProduct3, LocalDateTime.now()); // thirdPerson
+		reservationRepository.save(reservation1);
+		productRepository.save(reservedProduct1);
+		reservationRepository.save(reservation2);
+		productRepository.save(reservedProduct2);
+		reservationRepository.save(reservation3);
+		productRepository.save(reservedProduct3);
 	}
 
 	@Nested
@@ -97,7 +115,7 @@ class ReservationServiceIntegrationTest {
 
 			// when
 			// then
-			assertThatThrownBy(() -> reservationService.save(request, reservedProduct.getId(), seller.getId()))
+			assertThatThrownBy(() -> reservationService.save(request, reservedProduct1.getId(), seller.getId()))
 				.isInstanceOf(ReservationException.class)
 				.hasMessage(ErrorCode.RESERVED.getMessage());
 		}
@@ -117,47 +135,33 @@ class ReservationServiceIntegrationTest {
 		}
 	}
 
-	//	@Nested
-	//	@DisplayName("Reservation 조회 테스트")
-	//	class FindTest {
-	//
-	//		@Test
-	//		@DisplayName("판매자 또는 구매자가 제품의 예약 정보 조회 요청 시 예약 정보를 반환한다")
-	//		void find() {
-	//			// when
-	//			ReservationResponse response1 = reservationService.findAllByMemberId(reservedProduct.getId(),
-	//				seller.getId());
-	//			ReservationResponse response2 = reservationService.findAllByMemberId(reservedProduct.getId(),
-	//				buyer.getId());
-	//			// then
-	//			assertThat(response1.getBuyerId()).isEqualTo(buyer.getId());
-	//			assertThat(response1.getSellerId()).isEqualTo(seller.getId());
-	//			assertThat(response1.getProductId()).isEqualTo(reservedProduct.getId());
-	//			assertThat(response2.getBuyerId()).isEqualTo(buyer.getId());
-	//			assertThat(response2.getSellerId()).isEqualTo(seller.getId());
-	//			assertThat(response2.getProductId()).isEqualTo(reservedProduct.getId());
-	//		}
-	//
-	//		@Test
-	//		@DisplayName("판매자나 구매자가 아닌 member가 조회 요청 시 예외가 발생한다")
-	//		void find_not_buyer_nor_sell() {
-	//			// when
-	//			// then
-	//			assertThatThrownBy(() -> reservationService.findAllByMemberId(reservedProduct.getId(), thirdPerson.getId()))
-	//				.isInstanceOf(ReservationException.class)
-	//				.hasMessage(ErrorCode.NOT_SELLER_NOR_BUYER.getMessage());
-	//		}
-	//
-	//		@Test
-	//		@DisplayName("존재하지 않는 예약을 조회하면 예외가 발생한다")
-	//		void find_no_reservation() {
-	//			// when
-	//			// then
-	//			assertThatThrownBy(() -> reservationService.findAllByMemberId(product.getId(), seller.getId()))
-	//				.isInstanceOf(ReservationException.class)
-	//				.hasMessage(ErrorCode.RESERVATION_NOT_FOUND.getMessage());
-	//		}
-	//	}
+	@Nested
+	@DisplayName("Reservation 조회 테스트")
+	class FindTest {
+
+		@Test
+		@DisplayName("로그인 된 member의 예약 정보를 조회한다")
+		void find() {
+			//given
+			Long buyerId = buyer.getId();
+			Long thirdPersonId = thirdPerson.getId();
+			Long sellerId = seller.getId();
+			PageRequest pageRequest = PageRequest.ofSize(20);
+
+			// when
+			List<ReservationResponse> content1 = reservationService.findAllByMemberId(buyerId, pageRequest)
+				.getContent();
+			List<ReservationResponse> content2 = reservationService.findAllByMemberId(thirdPersonId, pageRequest)
+				.getContent(); // thirdPerson 예약 조회
+			List<ReservationResponse> content3 = reservationService.findAllByMemberId(sellerId, pageRequest)
+				.getContent();
+
+			// then
+			assertThat(content1).hasSize(buyerReservationCount);
+			assertThat(content2).hasSize(thirdPersonReservationCount);
+			assertThat(content3).hasSize(sellerReservationCount);
+		}
+	}
 
 	@Nested
 	@DisplayName("Reservation 수정 테스트")
@@ -171,7 +175,7 @@ class ReservationServiceIntegrationTest {
 			ReservationUpdateRequest request = new ReservationUpdateRequest(newTime);
 
 			// when
-			ReservationResponse response = reservationService.update(reservedProduct.getId(), request, seller.getId());
+			ReservationResponse response = reservationService.update(reservedProduct1.getId(), request, seller.getId());
 
 			// then
 			assertThat(response.getTimeToMeet()).isEqualTo(newTime);
@@ -186,7 +190,7 @@ class ReservationServiceIntegrationTest {
 
 			// when
 			// then
-			assertThatThrownBy(() -> reservationService.update(reservedProduct.getId(), request, buyer.getId()))
+			assertThatThrownBy(() -> reservationService.update(reservedProduct1.getId(), request, buyer.getId()))
 				.isInstanceOf(ProductException.class)
 				.hasMessage(ErrorCode.NOT_SELLER.getMessage());
 		}
@@ -214,7 +218,7 @@ class ReservationServiceIntegrationTest {
 		@DisplayName("판매자가 예약 삭제 요청 시 예약을 삭제한다")
 		void delete() {
 			//given
-			Long reservedProductId = reservedProduct.getId();
+			Long reservedProductId = reservedProduct1.getId();
 			Long sellerId = seller.getId();
 
 			// when
@@ -230,7 +234,7 @@ class ReservationServiceIntegrationTest {
 		void delete_not_seller() {
 			// when
 			// then
-			assertThatThrownBy(() -> reservationService.delete(reservedProduct.getId(), buyer.getId()))
+			assertThatThrownBy(() -> reservationService.delete(reservedProduct1.getId(), buyer.getId()))
 				.isInstanceOf(ProductException.class)
 				.hasMessage(ErrorCode.NOT_SELLER.getMessage());
 		}
