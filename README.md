@@ -8,7 +8,7 @@ JPA와 Spring의 기능들을 학습하며, 간단한 버전의 **당근마켓**
 
 ## 🔨 사용한 기술 스택
 
-<img src="https://img.shields.io/badge/java-ED8B00?style=for-the-badge&logo=java&logoColor=white"> <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=spring boot&logoColor=white"> <img src="https://img.shields.io/badge/Spring Data JPA-6DB33F?style=for-the-badge&logo=spring&logoColor=white">
+<img src="https://img.shields.io/badge/java_11-ED8B00?style=for-the-badge&logo=java&logoColor=white"> <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=spring boot&logoColor=white"> <img src="https://img.shields.io/badge/Spring Data JPA-6DB33F?style=for-the-badge&logo=spring&logoColor=white">
 
 <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white"> <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=mysql&logoColor=white">
 
@@ -20,15 +20,18 @@ JPA와 Spring의 기능들을 학습하며, 간단한 버전의 **당근마켓**
 ## ✨ 구현한 내용
 
 - Product, Reservation CRUD
-- Bookmark 기능 구현 중
-- 로그인 (OAuth + JWT ) - Spring Security X
+- Bookmark 기능
+- 구매 기능
+- member가 구매한 제품, 판매 중인 제품, 북마크한 제품 조회 기능
+- 로그인 (OAuth + JWT ) - Spring Security 사용X
 - AWS와 GitHub Actions로 CI/CD 파이프라인 구축
+
 
 <br>
 
 ## 배포 URL (API 서버)
 
-http://13.209.232.84/products
+~~http://3.36.222.165/products~~ **(인스턴스 일시 중단)**
 
 <br>
 
@@ -64,5 +67,3 @@ https://documenter.getpostman.com/view/20860983/2s8YmHykWU
 [Login 에러 메시지는 자세한 게 좋을까?](https://github.com/honeySleepr/JpaPlayground/wiki/Login-%EC%97%90%EB%9F%AC-%EB%A9%94%EC%84%B8%EC%A7%80%EB%8A%94-%EC%9E%90%EC%84%B8%ED%95%9C-%EA%B2%8C-%EC%A2%8B%EC%9D%84%EA%B9%8C%3F)
 
 [단일 DTO와 Slice를 모두 수용할 수 있는 CommonResponse를 만드려면?(실패)](https://github.com/honeySleepr/JpaPlayground/wiki/%EB%8B%A8%EC%9D%BC-DTO%EC%99%80-Slice%EB%A5%BC-%EB%AA%A8%EB%91%90-%EC%88%98%EC%9A%A9%ED%95%A0-%EC%88%98-%EC%9E%88%EB%8A%94-CommonResponse%EB%A5%BC-%EB%A7%8C%EB%93%9C%EB%A0%A4%EB%A9%B4%3F(%EC%8B%A4%ED%8C%A8))
-
-[ManyToOne 관계에서 Many의 개수가 잘못 표기되는 문제](https://github.com/honeySleepr/JpaPlayground/wiki/ManyToOne-%EA%B4%80%EA%B3%84%EC%97%90%EC%84%9C-Many-%EA%B0%9C%EC%88%98%EA%B0%80-%EC%9E%98%EB%AA%BB-%ED%91%9C%EA%B8%B0%EB%90%98%EB%8A%94-%EB%AC%B8%EC%A0%9C)
