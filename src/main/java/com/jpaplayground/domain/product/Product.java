@@ -9,8 +9,11 @@ import com.jpaplayground.global.exception.ErrorCode;
 import com.jpaplayground.global.member.Member;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -38,7 +41,8 @@ public class Product extends BaseTimeEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotBlank
+	@NotNull
+	@NotBlank // @NotBlank만 썼을 때는 table에 not null 제약조건이 붙지않는다
 	private String name;
 
 	@NotNull
@@ -62,21 +66,39 @@ public class Product extends BaseTimeEntity {
 	@JoinColumn(name = "reservation_id")
 	private Reservation reservation;
 
+	/**
+	 * <h2>product 삭제 시 관련 북마크도 삭제!</h2>
+	 * 1. Cascade.Type.PERSIST : soft delete 이기 때문에 REMOVE로는 안된다
+	 * <br>2. bookmarks.clear() : Product의 delete 필드를 true로 바꾼다고 bookmark에 영향을 주진 못한다. 연관관계를 끊어야한다
+	 * <br>3. orphanRemoval true : 이것도 붙여줘야 정상 작동한다. Cascade 옵션 없이 이것만으로도 작동할 줄 알았는데, Bookmark가 FK를 가지고 있는 Product와
+	 * Member에 모두 orphan 옵션을 붙여줘도 작동하지 않았다.
+	 *
+	 * <br><br><h2>하지만 이 방법을 사용하면 Bookmark당 쿼리가 하나씩 나가서, 따로 delete query를 날리는 방식을 사용하는 것으로 변경하였다</h2>
+	 */
 	@OneToMany(mappedBy = "product")
 	private final Set<Bookmark> bookmarks = new HashSet<>();
+
+	@NotNull
+	@Column(columnDefinition = "enum('SELLING','RESERVED','SOLD')")
+	@Enumerated(EnumType.STRING)
+	private ProductStatus status;
 
 	private Product(String name, Integer price) {
 		this.name = name;
 		this.price = price;
 		this.deleted = false;
+		this.status = ProductStatus.SELLING;
 	}
 
 	public static Product of(String name, Integer price) {
 		return new Product(name, price);
 	}
 
-	public void changeDeletedState(boolean deleted) {
-		this.deleted = deleted;
+	/**
+	 * 이 메서드를 호출한 경우 반드시 연관된 Bookmark 들도 같이 삭제해주자
+	 */
+	public void delete() {
+		this.deleted = true;
 	}
 
 	public void verifySeller(Long memberId) {
@@ -87,6 +109,7 @@ public class Product extends BaseTimeEntity {
 
 	public void reserve(Reservation reservation) {
 		this.reservation = reservation;
+		this.status = ProductStatus.RESERVED;
 	}
 
 	public boolean isReserved() {

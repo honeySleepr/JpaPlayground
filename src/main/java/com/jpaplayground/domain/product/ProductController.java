@@ -22,28 +22,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ProductController {
 
-	private final ProductService service;
+	private final ProductService productService;
 
 	@GetMapping("/products")
 	public PagingResponse<ProductResponse> findAll(Pageable pageable) {
-		return new PagingResponse<>(service.findAll(pageable));
+		return new PagingResponse<>(productService.findAll(pageable));
+	}
+
+	@GetMapping("/member/products")
+	public PagingResponse<ProductResponse> findSellingProducts(@LoginMemberId Long memberId, Pageable pageable) {
+		return new PagingResponse<>(productService.findSellingProductsByMember(memberId, pageable));
 	}
 
 	@PostMapping("/products")
 	public ResponseEntity<ProductResponse> add(@Valid @RequestBody ProductCreateRequest request) {
-		ProductResponse save = service.save(request);
+		ProductResponse save = productService.save(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(save);
 	}
 
 	@DeleteMapping("/products/{productId}")
 	public ResponseEntity<ProductResponse> delete(@PathVariable Long productId, @LoginMemberId Long memberId) {
-		return ResponseEntity.ok(service.delete(memberId, productId));
+		return ResponseEntity.ok(productService.delete(memberId, productId));
 	}
 
 	@PatchMapping("/products/{productId}")
 	public ResponseEntity<ProductResponse> update(@PathVariable Long productId,
 												  @Valid @RequestBody ProductUpdateRequest request,
 												  @LoginMemberId Long memberId) {
-		return ResponseEntity.ok(service.update(memberId, productId, request));
+		return ResponseEntity.ok(productService.update(memberId, productId, request));
 	}
 }
